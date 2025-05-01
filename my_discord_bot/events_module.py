@@ -2,6 +2,7 @@
 import discord
 from discord.ui import View, Select, Modal, TextInput, Button
 from persistence import save_profiles
+from ai_agent import generate_opportunity_suggestion
 
 # --- UI COMPONENTS INLINE ---
 
@@ -219,26 +220,35 @@ async def on_message_handler(bot, message):
         )
 
     elif step == 4:
-        # Step 4: Save resume → Step 5
-        profile["resume"] = content
+        # Step 4: Save resume link or text → Step 5
+        if message.attachments:
+            profile["resume"] = message.attachments[0].url
+        else:
+            profile["resume"] = content
+
         profile["step"] = 5
         save_profiles(profiles)
-        await message.channel.send(
-            f"Awesome, thanks {profile['name']}! 🙌\n\n"
-            f"I’ve saved your profile — {profile['interests']}, {profile['skills']}… got it! ✅\n"
-            "Give me a moment to scan through what’s available… 🔍"
-        )
-        await message.channel.send(
-            "🎯 **Found an Opportunity That Matches You!**\n\n"
-            "🔹 **Role:** Backend Developer Intern\n"
-            "🏢 **Company:** NovaTech Solutions\n"
-            "📍 **Location:** Remote\n"
-            "🕒 **Duration:** 3 months\n"
-            "💼 **Stack:** Python, Django, PostgreSQL\n"
-            "📝 **Description:** You’ll join a team building REST APIs and work on scalable backend services…\n\n"
-            "What would you like to do?",
-            view=OpportunityView(bot)
-        )
+
+        try:
+            from ai_agent import generate_opportunity_suggestion  # ✅ Add this if not already at top
+            suggestion = generate_opportunity_suggestion(profile)
+            await message.channel.send(suggestion)
+
+            await message.channel.send(
+                "🎯 **Here’s another example opportunity:**\n\n"
+                "🔹 **Role:** Backend Developer Intern\n"
+                "🏢 **Company:** NovaTech Solutions\n"
+                "📍 **Location:** Remote\n"
+                "🕒 **Duration:** 3 months\n"
+                "💼 **Stack:** Python, Django, PostgreSQL\n"
+                "📝 **Description:** You’ll join a team building REST APIs and scalable backend services.\n\n"
+                "What would you like to do?",
+                view=OpportunityView(bot)
+            )
+
+        except Exception as e:
+            await message.channel.send("❌ An error occurred while generating your AI-powered suggestion.")
+            print("GPT error:", e)
 
     elif step == 6:
         # Step 6: Complete
