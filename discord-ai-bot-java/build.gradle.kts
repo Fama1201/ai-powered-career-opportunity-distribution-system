@@ -22,6 +22,9 @@ dependencies {
 
     // Logging
     implementation("org.slf4j:slf4j-simple:2.0.9")
+
+    implementation("net.dv8tion:JDA:5.0.0-beta.23")
+
 }
 
 application {
