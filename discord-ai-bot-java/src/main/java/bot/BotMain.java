@@ -7,6 +7,7 @@ import javax.security.auth.login.LoginException;
 
 public class BotMain {
     public static void main(String[] args) throws LoginException {
+
         // Get the Discord bot token from environment variables
         String token = System.getenv("DISCORD_TOKEN");
 
@@ -29,8 +30,13 @@ public class BotMain {
         // Set the bot's activity (shows under the bot's name in Discord)
         builder.setActivity(Activity.listening("!start"))
 
-                // Add your event listener (command handler logic)
-                .addEventListeners(new CommandHandler())
+                // Register both message and button interaction handlers
+                .addEventListeners(
+                        new CommandHandler(),
+                        new ButtonHandler(),
+                        new SelectMenuHandler()
+                )
+
 
                 // Build and start the bot
                 .build();
