@@ -8,60 +8,65 @@ import storage.ProfileStorage;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handles button clicks for the initial CV question.
+ *
+ * There are two possible flows:
+ *  1. User has a CV → we ask them to upload their PDF (step 7).
+ *  2. User does not have a CV → we start the manual profile flow (step 1).
+ */
 public class ButtonHandler extends ListenerAdapter {
 
-    /**
-     * This method is called whenever a button interaction event occurs.
-     * It handles clicks on the "Yes" and "No" CV buttons and updates the user profile accordingly.
-     */
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        // Reload the latest user profiles from storage
+        // Reload the current profiles map from storage
         Map<String, Map<String, Object>> userProfiles = ProfileStorage.loadProfiles();
         String userId = event.getUser().getId();
-        // Get the profile for this user, or create a new one if it doesn't exist yet
+
+        // Get or create this user's profile
         Map<String, Object> profile = userProfiles.getOrDefault(userId, new HashMap<>());
 
         switch (event.getComponentId()) {
             case "cv_yes" -> {
-                // User has a CV: mark resume status and skip to result step
-                profile.put("resume", "Has CV ✅");
-                profile.put("step", 5);
+                // User said they have a CV:
+                //   → advance to a new step where we wait for a PDF upload.
+                profile.put("step", 7);  // 7: awaiting file upload
 
-                // Send an ephemeral acknowledgement to the user
-                event.reply("✅ Great! We'll use your resume to find opportunities...")
+                // Save immediately so the next DM handler sees the updated step
+                userProfiles.put(userId, profile);
+                ProfileStorage.saveProfiles(userProfiles);
+
+                // Prompt user to upload their resume PDF
+                event.reply("📄 Great – please upload your resume **PDF** here in this DM.")
                         .setEphemeral(true)
                         .queue();
-
-                // Send a follow-up message with a matched opportunity example
-                event.getChannel().sendMessage(
-                        "🎯 **Found an Opportunity That Matches You!**\n\n" +
-                                "🔹 **Role:** Backend Developer Intern\n" +
-                                "🏢 **Company:** NovaTech Solutions\n" +
-                                "📍 **Location:** Remote\n" +
-                                "💼 **Stack:** Java, Spring Boot, PostgreSQL"
-                ).queue();
             }
+
             case "cv_no" -> {
-                // User does not have a CV: mark resume status and set step to start the normal flow
+                // User said they do NOT have a CV:
+                //   → mark resume status and start the manual profile flow.
                 profile.put("resume", "No CV ❌");
-                profile.put("step", 1);
+                profile.put("step", 1);  // 1: next we ask for full name
 
-                // Ask the user for their full name next
-                event.reply("👤 No problem! What’s your full name?")
+                userProfiles.put(userId, profile);
+                ProfileStorage.saveProfiles(userProfiles);
+
+                // Ask for their full name
+                event.reply("👤 No worries! What’s your full name?")
                         .setEphemeral(true)
                         .queue();
             }
+
             default -> {
-                // Unknown button ID: inform the user
-                event.reply("⚠️ Unknown button.")
+                // Any other button ID is unexpected
+                event.reply("⚠️ Sorry, I didn't recognize that button.")
                         .setEphemeral(true)
                         .queue();
-                return;
+                return;  // do not save or modify anything further
             }
         }
 
-        // Save the updated profile back into storage
+        // Ensure the profile is saved after handling
         userProfiles.put(userId, profile);
         ProfileStorage.saveProfiles(userProfiles);
     }
