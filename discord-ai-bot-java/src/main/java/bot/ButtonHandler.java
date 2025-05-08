@@ -9,64 +9,57 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handles button clicks for the initial CV question.
+ * Handles the user's response to the "Do you have a resume?" prompt.
  *
- * There are two possible flows:
- *  1. User has a CV → we ask them to upload their PDF (step 7).
- *  2. User does not have a CV → we start the manual profile flow (step 1).
+ * Two flows:
+ *   1. User has a resume → await PDF upload in step 7.
+ *   2. User does not have a resume → start manual registration by asking for email (step 1).
  */
 public class ButtonHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        // Reload the current profiles map from storage
+        // Load existing profiles from storage
         Map<String, Map<String, Object>> userProfiles = ProfileStorage.loadProfiles();
         String userId = event.getUser().getId();
-
-        // Get or create this user's profile
         Map<String, Object> profile = userProfiles.getOrDefault(userId, new HashMap<>());
 
         switch (event.getComponentId()) {
             case "cv_yes" -> {
-                // User said they have a CV:
-                //   → advance to a new step where we wait for a PDF upload.
-                profile.put("step", 7);  // 7: awaiting file upload
-
-                // Save immediately so the next DM handler sees the updated step
+                // User will upload a PDF resume
+                profile.put("step", 7);
                 userProfiles.put(userId, profile);
                 ProfileStorage.saveProfiles(userProfiles);
 
-                // Prompt user to upload their resume PDF
-                event.reply("📄 Great – please upload your resume **PDF** here in this DM.")
+                // Instruct user to upload PDF resume
+                event.reply("📄 Great! Please upload your resume as a PDF in this DM.")
                         .setEphemeral(true)
                         .queue();
             }
 
             case "cv_no" -> {
-                // User said they do NOT have a CV:
-                //   → mark resume status and start the manual profile flow.
-                profile.put("resume", "No CV ❌");
-                profile.put("step", 1);  // 1: next we ask for full name
-
+                // No resume available; proceed to email collection
+                profile.put("resume", "No CV provided");
+                profile.put("step", 1);  // Next: ask for email
                 userProfiles.put(userId, profile);
                 ProfileStorage.saveProfiles(userProfiles);
 
-                // Ask for their full name
-                event.reply("👤 No worries! What’s your full name?")
+                // Prompt user for email address
+                event.reply("📧 Perfect. What is your email address?")
                         .setEphemeral(true)
                         .queue();
             }
 
             default -> {
-                // Any other button ID is unexpected
-                event.reply("⚠️ Sorry, I didn't recognize that button.")
+                // Unrecognized button ID
+                event.reply("⚠️ Sorry, I didn't recognize that option.")
                         .setEphemeral(true)
                         .queue();
-                return;  // do not save or modify anything further
+                return;
             }
         }
 
-        // Ensure the profile is saved after handling
+        // Ensure profile changes are saved
         userProfiles.put(userId, profile);
         ProfileStorage.saveProfiles(userProfiles);
     }

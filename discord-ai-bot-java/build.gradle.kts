@@ -22,6 +22,11 @@ dependencies {
 
     // Logging
     implementation("org.slf4j:slf4j-simple:2.0.9")
+
+    implementation("org.postgresql:postgresql:42.5.4")
+
+    implementation("com.zaxxer:HikariCP:5.0.1")
+
 }
 
 
