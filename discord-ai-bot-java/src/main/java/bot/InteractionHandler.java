@@ -180,9 +180,21 @@ public class InteractionHandler extends ListenerAdapter {
                     profile.put("step", 6);
                     userProfiles.put(userId, profile);
                     ProfileStorage.saveProfiles(userProfiles);
-                    event.reply("✅ Position saved. Please describe your resume or paste a link.")
+
+                    event.reply("✅ Position saved.")
                             .setEphemeral(true)
                             .queue();
+
+                    // Return to main menu
+                    event.getUser().openPrivateChannel().queue(dm -> {
+                        dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
+                                .setActionRow(
+                                        Button.primary("gpt_ask", "🤖 Ask GPT"),
+                                        Button.primary("view_profile", "👤 View Profile"),
+                                        Button.success("create_profile", "📝 Create Profile")
+                                )
+                                .queue();
+                    });
                 }
             }
 
