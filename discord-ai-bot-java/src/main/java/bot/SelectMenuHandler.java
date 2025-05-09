@@ -81,8 +81,8 @@ public class SelectMenuHandler extends ListenerAdapter {
                     .queue();
 
             StringSelectMenu positionMenu = StringSelectMenu.create("select_position")
-                    .setPlaceholder("📌 Choose your preferred position")
-                    .setMaxValues(1)
+                    .setPlaceholder("📌 Select up to 5 positions")
+                    .setMaxValues(5)
                     .addOption("Backend", "backend")
                     .addOption("Frontend", "frontend")
                     .addOption("Full Stack", "fullstack")

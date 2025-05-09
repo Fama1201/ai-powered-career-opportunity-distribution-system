@@ -48,10 +48,16 @@ public class CommandHandler extends ListenerAdapter {
         System.out.println("✅ Bot is online as " + event.getJDA().getSelfUser().getAsTag());
         for (var guild : event.getJDA().getGuilds()) {
             if (guild.getDefaultChannel() instanceof TextChannel channel && channel.canTalk()) {
-                channel.sendMessage("👋 **EXPERTS.AI Bot is now online and ready to help!**").queue();
+                // only one call to sendMessage, with the button attached
+                channel.sendMessage("👋 **EXPERTS.AI Bot is now online and ready to help!**")
+                        .setActionRow(
+                                Button.primary("start", "🚀 Get Started")
+                        )
+                        .queue();
             }
         }
     }
+
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -178,8 +184,8 @@ public class CommandHandler extends ListenerAdapter {
 
     private void promptPositionSelection(MessageReceivedEvent event) {
         StringSelectMenu positionMenu = StringSelectMenu.create("select_position")
-                .setPlaceholder("📌 Choose your desired position")
-                .setMaxValues(1)
+                .setPlaceholder("📌 Select up to 5 positions")
+                .setMaxValues(5)
                 .addOption("Backend", "backend")
                 .addOption("Frontend", "frontend")
                 .addOption("Full Stack", "fullstack")
