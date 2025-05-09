@@ -43,8 +43,8 @@ public class BotMain {
 
             builder.addEventListeners(
                     new CommandHandler(gptClient),
-                    new ButtonHandler(),
-                    new SelectMenuHandler()
+                    new InteractionHandler()
+
             );
 
 

@@ -1,6 +1,20 @@
 {
   "988228291183902750": {
-    "step": -1,
+    "step": 6,
+    "resume": "No CV provided",
+    "email": "franco@gmail.com",
+    "name": "fds",
+    "skills": "spring, javascript, python",
+    "career_interest": "fullstack",
     "resumePath": "C:\\Users\\Franc\\OneDrive\\Desktop\\ai-powered-career-opportunity-distribution-system\\discord-ai-bot-java\\resumes\\988228291183902750.pdf"
+  },
+  "242669444982112257": {
+    "step": -1.0,
+    "resume": "No CV provided",
+    "email": "bl@gmail.com",
+    "name": "erer",
+    "skills": "java, python, javascript, react",
+    "career_interest": "backend",
+    "resumePath": "C:\\Users\\Franc\\OneDrive\\Desktop\\ai-powered-career-opportunity-distribution-system\\discord-ai-bot-java\\resumes\\242669444982112257.pdf"
   }
 }

@@ -48,10 +48,16 @@ public class CommandHandler extends ListenerAdapter {
         System.out.println("✅ Bot is online as " + event.getJDA().getSelfUser().getAsTag());
         for (var guild : event.getJDA().getGuilds()) {
             if (guild.getDefaultChannel() instanceof TextChannel channel && channel.canTalk()) {
-                channel.sendMessage("👋 **EXPERTS.AI Bot is now online and ready to help!**").queue();
+                // only one call to sendMessage, with the button attached
+                channel.sendMessage("👋 **EXPERTS.AI Bot is now online and ready to help!**")
+                        .setActionRow(
+                                Button.primary("start", "🚀 Get Started")
+                        )
+                        .queue();
             }
         }
     }
+
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -72,7 +78,18 @@ public class CommandHandler extends ListenerAdapter {
             event.getChannel()
                     .sendMessage("👋 **Welcome to the EXPERTS.AI Career Hub!** Check your DMs to begin registration.")
                     .queue();
+
             event.getAuthor().openPrivateChannel().queue(dm -> {
+                dm.sendMessage("👋 Welcome! Choose an option:")
+                        .setActionRow(
+                                Button.primary("gpt_ask", "🤖 Ask GPT"),
+                                Button.primary("view_profile", "👤 View Profile"),
+                                Button.success("create_profile", "📝 Create Profile")
+                        )
+                        .queue();
+            });
+
+            /*event.getAuthor().openPrivateChannel().queue(dm -> {
                 Map<String, Object> profile = new HashMap<>();
                 profile.put("step", 0);
                 userProfiles.put(userId, profile);
@@ -83,7 +100,8 @@ public class CommandHandler extends ListenerAdapter {
                                 Button.success("cv_yes", "✅ Yes"),
                                 Button.danger("cv_no",  "❌ No")
                         ).queue();
-            });
+            }*/
+
             return;
         }
 
@@ -178,8 +196,8 @@ public class CommandHandler extends ListenerAdapter {
 
     private void promptPositionSelection(MessageReceivedEvent event) {
         StringSelectMenu positionMenu = StringSelectMenu.create("select_position")
-                .setPlaceholder("📌 Choose your desired position")
-                .setMaxValues(1)
+                .setPlaceholder("📌 Select up to 5 positions")
+                .setMaxValues(5)
                 .addOption("Backend", "backend")
                 .addOption("Frontend", "frontend")
                 .addOption("Full Stack", "fullstack")
