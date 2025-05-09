@@ -78,7 +78,18 @@ public class CommandHandler extends ListenerAdapter {
             event.getChannel()
                     .sendMessage("👋 **Welcome to the EXPERTS.AI Career Hub!** Check your DMs to begin registration.")
                     .queue();
+
             event.getAuthor().openPrivateChannel().queue(dm -> {
+                dm.sendMessage("👋 Welcome! Choose an option:")
+                        .setActionRow(
+                                Button.primary("gpt_ask", "🤖 Ask GPT"),
+                                Button.primary("view_profile", "👤 View Profile"),
+                                Button.success("create_profile", "📝 Create Profile")
+                        )
+                        .queue();
+            });
+
+            /*event.getAuthor().openPrivateChannel().queue(dm -> {
                 Map<String, Object> profile = new HashMap<>();
                 profile.put("step", 0);
                 userProfiles.put(userId, profile);
@@ -89,7 +100,8 @@ public class CommandHandler extends ListenerAdapter {
                                 Button.success("cv_yes", "✅ Yes"),
                                 Button.danger("cv_no",  "❌ No")
                         ).queue();
-            });
+            }*/
+
             return;
         }
 
