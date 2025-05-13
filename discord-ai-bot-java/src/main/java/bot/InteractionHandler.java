@@ -79,7 +79,8 @@ public class InteractionHandler extends ListenerAdapter {
 
             case "cv_no" -> {
                 try {
-                    StudentDAO.upsertStudent(null, null, null, null, userId, "No CV provided", null);
+                    StudentDAO.upsertStudent(null, null, null, null, userId, null);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -107,7 +108,8 @@ public class InteractionHandler extends ListenerAdapter {
                 List<String> values = event.getValues();
                 String skills = String.join(", ", values);
                 try {
-                    StudentDAO.upsertStudent(null, null, skills, null, userId, null, null);
+                    StudentDAO.upsertStudent(null, null, skills, null, userId, null);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -136,7 +138,8 @@ public class InteractionHandler extends ListenerAdapter {
             case "select_position" -> {
                 String selected = event.getValues().get(0);
                 try {
-                    StudentDAO.upsertStudent(null, null, null, selected, userId, null, null);
+                    StudentDAO.upsertStudent(null, null, null, selected, userId, null);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

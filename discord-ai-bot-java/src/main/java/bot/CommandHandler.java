@@ -120,7 +120,7 @@ public class CommandHandler extends ListenerAdapter {
             return;
         }
         try {
-            StudentDAO.upsertStudent(null, email, null, null, userId, null, null);
+            StudentDAO.upsertStudent(null, email, null, null, userId, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,7 +129,7 @@ public class CommandHandler extends ListenerAdapter {
 
     public static void handleNameStep(MessageReceivedEvent event, String userId, String name) {
         try {
-            StudentDAO.upsertStudent(name, null, null, null, userId, null, null);
+            StudentDAO.upsertStudent(name, null, null, null, userId, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,7 +188,7 @@ public class CommandHandler extends ListenerAdapter {
 
     public static void handleResumeDescriptionStep(MessageReceivedEvent event, String userId, String description) {
         try {
-            StudentDAO.upsertStudent(null, null, null, null, userId, description, null);
+            StudentDAO.upsertStudent(null, null, null, null, userId, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -220,6 +220,7 @@ public class CommandHandler extends ListenerAdapter {
                     }
                     event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
                     showMainMenu(event.getAuthor());
+
                 })
                 .exceptionally(ex -> {
                     event.getChannel().sendMessage("❌ Error uploading PDF. Please try again.").queue();
