@@ -6,26 +6,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
-import storage.ProfileStorage;
 import storage.StudentDAO;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * Handles all user interactions:
- * - Button clicks: start, gpt_ask, view_profile, create_profile, cv_yes, cv_no
- * - Select menus: select_skills, select_position
- */
 public class InteractionHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String id = event.getComponentId();
-        Map<String, Map<String, Object>> userProfiles = ProfileStorage.loadProfiles();
         String userId = event.getUser().getId();
-        Map<String, Object> profile = userProfiles.getOrDefault(userId, new HashMap<>());
 
         switch (id) {
             case "start" -> {
@@ -72,10 +62,6 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "create_profile" -> {
-                profile.put("step", 0);
-                userProfiles.put(userId, profile);
-                ProfileStorage.saveProfiles(userProfiles);
-
                 event.reply("📄 Do you have a resume (CV)?")
                         .setEphemeral(true)
                         .setActionRow(
@@ -86,116 +72,88 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "cv_yes" -> {
-                profile.put("step", 7);
-                userProfiles.put(userId, profile);
-                ProfileStorage.saveProfiles(userProfiles);
-
                 event.reply("📄 Please upload your resume as a PDF.")
                         .setEphemeral(true)
                         .queue();
             }
 
             case "cv_no" -> {
-                profile.put("resume", "No CV provided");
-                profile.put("step", 1);
-                userProfiles.put(userId, profile);
-                ProfileStorage.saveProfiles(userProfiles);
+                try {
+                    StudentDAO.upsertStudent(null, null, null, null, userId, "No CV provided", null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Iniciar flujo paso a paso
+                CommandHandler.startRegistrationFor(userId);
 
                 event.reply("📧 Please enter your email address.")
                         .setEphemeral(true)
                         .queue();
             }
 
-            default -> event.reply("⚠️ Unrecognized button.").setEphemeral(true).queue();
+            default -> event.reply("⚠️ Unrecognized button.")
+                    .setEphemeral(true)
+                    .queue();
         }
     }
 
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
-        Map<String, Map<String, Object>> userProfiles = ProfileStorage.loadProfiles();
         String userId = event.getUser().getId();
-        Map<String, Object> profile = userProfiles.getOrDefault(userId, new HashMap<>());
 
         switch (event.getComponentId()) {
             case "select_skills" -> {
                 List<String> values = event.getValues();
-                if (values.contains("other")) {
-                    profile.put("step", 3);
-                    userProfiles.put(userId, profile);
-                    ProfileStorage.saveProfiles(userProfiles);
-                    event.reply("✍️ Please type your skills manually.")
-                            .setEphemeral(true)
-                            .queue();
-                } else {
-                    String skills = String.join(", ", values);
-                    profile.put("skills", skills);
-                    try {
-                        StudentDAO.upsertStudent(null, null, skills, null, userId, null, null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    profile.put("step", 4);
-                    userProfiles.put(userId, profile);
-                    ProfileStorage.saveProfiles(userProfiles);
-
-                    event.reply("✅ Skills saved.")
-                            .setEphemeral(true)
-                            .queue();
-
-                    StringSelectMenu posMenu = StringSelectMenu.create("select_position")
-                            .setPlaceholder("📌 Choose your preferred position")
-                            .setMaxValues(5)
-                            .addOption("Backend", "backend")
-                            .addOption("Frontend", "frontend")
-                            .addOption("Full Stack", "fullstack")
-                            .addOption("Mobile", "mobile")
-                            .addOption("QA", "qa")
-                            .addOption("DevOps", "devops")
-                            .addOption("Data Science", "data")
-                            .addOption("Other", "other")
-                            .build();
-
-                    event.getChannel().sendMessage("🧾 What type of position are you looking for?")
-                            .setActionRow(posMenu)
-                            .queue();
+                String skills = String.join(", ", values);
+                try {
+                    StudentDAO.upsertStudent(null, null, skills, null, userId, null, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+                event.reply("✅ Skills saved.")
+                        .setEphemeral(true)
+                        .queue();
+
+                StringSelectMenu posMenu = StringSelectMenu.create("select_position")
+                        .setPlaceholder("📌 Choose your preferred position")
+                        .setMaxValues(5)
+                        .addOption("Backend", "backend")
+                        .addOption("Frontend", "frontend")
+                        .addOption("Full Stack", "fullstack")
+                        .addOption("Mobile", "mobile")
+                        .addOption("QA", "qa")
+                        .addOption("DevOps", "devops")
+                        .addOption("Data Science", "data")
+                        .build();
+
+                event.getChannel().sendMessage("🧾 What type of position are you looking for?")
+                        .setActionRow(posMenu)
+                        .queue();
             }
 
             case "select_position" -> {
                 String selected = event.getValues().get(0);
-                if (selected.equals("other")) {
-                    profile.put("step", 5);
-                    userProfiles.put(userId, profile);
-                    ProfileStorage.saveProfiles(userProfiles);
-                    event.reply("✍️ Please type your preferred position.")
-                            .setEphemeral(true)
-                            .queue();
-                } else {
-                    profile.put("career_interest", selected);
-                    try {
-                        StudentDAO.upsertStudent(null, null, null, selected, userId, null, null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    profile.put("step", 6);
-                    userProfiles.put(userId, profile);
-                    ProfileStorage.saveProfiles(userProfiles);
-
-                    event.reply("✅ Position saved.")
-                            .setEphemeral(true)
-                            .queue();
-
-                    // Return to main menu
-                    event.getUser().openPrivateChannel().queue(dm -> {
-                        dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
-                                .setActionRow(
-                                        Button.primary("gpt_ask", "🤖 Ask GPT"),
-                                        Button.primary("view_profile", "👤 View Profile"),
-                                        Button.success("create_profile", "📝 Create Profile")
-                                )
-                                .queue();
-                    });
+                try {
+                    StudentDAO.upsertStudent(null, null, null, selected, userId, null, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+                event.reply("✅ Position saved.")
+                        .setEphemeral(true)
+                        .queue();
+
+                event.getUser().openPrivateChannel().queue(dm -> {
+                    dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
+                            .setActionRow(
+                                    Button.primary("gpt_ask", "🤖 Ask GPT"),
+                                    Button.primary("view_profile", "👤 View Profile"),
+                                    Button.success("create_profile", "📝 Create Profile")
+                            )
+                            .queue();
+                });
             }
 
             default -> event.reply("⚠️ Unknown select menu.")
