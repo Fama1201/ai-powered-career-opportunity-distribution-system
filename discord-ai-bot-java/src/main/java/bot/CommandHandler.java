@@ -219,6 +219,7 @@ public class CommandHandler extends ListenerAdapter {
                         e.printStackTrace();
                     }
                     event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
+                    showMainMenu(event.getAuthor());
                 })
                 .exceptionally(ex -> {
                     event.getChannel().sendMessage("❌ Error uploading PDF. Please try again.").queue();
