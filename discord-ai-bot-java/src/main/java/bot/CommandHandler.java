@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
 import storage.StudentDAO;
 import util.PdfUtils;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,6 +83,55 @@ public class CommandHandler extends ListenerAdapter {
                 handlePdfUploadStep(event, userId);
                 return;
             }
+
+            if (content.equalsIgnoreCase("!fetch")) {
+                try {
+                    // Recuperar el perfil del estudiante
+                    Map<String, String> profile = StudentDAO.getStudentProfile(userId);
+
+                    if (profile == null || profile.get("Skills") == null || profile.get("Career Interest") == null) {
+                        event.getChannel().sendMessage("❗ You need to complete your profile first.").queue();
+                        return;
+                    }
+
+                    String skills = profile.get("Skills");
+                    String interest = profile.get("Career Interest");
+
+                    // Buscar oportunidades usando OpportunityClient
+
+                    Set<bot.api.OpportunityClient.Opportunity> results =
+                            bot.api.OpportunityClient.searchMultipleKeywords(skills + " " + interest);
+
+
+                    if (results.isEmpty()) {
+                        event.getChannel().sendMessage("😢 No opportunities found for your profile.").queue();
+                    } else {
+                        event.getChannel().sendMessage("🎯 Found " + results.size() + " opportunities for you:").queue();
+                        for (var opp : results) {
+                            event.getChannel().sendMessage(opp.toString()).queue();
+
+                            try {
+                                if (!storage.OpportunityDAO.existsForUser(opp, userId)) {
+                                    storage.OpportunityDAO.insertForUser(opp, userId);
+                                    System.out.println("✅ Opportunity saved to DB for " + userId);
+                                } else {
+                                    System.out.println("🔁 This opportunity already exists for " + userId);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    event.getChannel().sendMessage("❌ Error fetching opportunities: " + e.getMessage()).queue();
+                }
+                return;
+            }
+
 
             // ✅ GPT pregunta
             if (content.startsWith("!ask ") && gpt != null) {
