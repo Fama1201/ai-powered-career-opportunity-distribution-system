@@ -23,19 +23,17 @@ public class StudentDAO {
             String skills,
             String careerInterest,
             String discordId,
-            String cvUrl,
             String jobType
     ) throws Exception {
         String sql = """
             INSERT INTO student
-                (name, email, skills, career_interest, discord_id, cv_url, job_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                (name, email, skills, career_interest, discord_id, job_type)
+            VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT (discord_id) DO UPDATE
               SET name            = COALESCE(EXCLUDED.name,            student.name),
                   email           = COALESCE(EXCLUDED.email,           student.email),
                   skills          = COALESCE(EXCLUDED.skills,          student.skills),
                   career_interest = COALESCE(EXCLUDED.career_interest, student.career_interest),
-                  cv_url          = COALESCE(EXCLUDED.cv_url,          student.cv_url),
                   job_type        = COALESCE(EXCLUDED.job_type,        student.job_type)
             """;
 
@@ -47,8 +45,7 @@ public class StudentDAO {
             stmt.setObject(3, skills, Types.VARCHAR);
             stmt.setObject(4, careerInterest, Types.VARCHAR);
             stmt.setString(5, discordId);
-            stmt.setObject(6, cvUrl, Types.VARCHAR);
-            stmt.setObject(7, jobType, Types.VARCHAR);
+            stmt.setObject(6, jobType, Types.VARCHAR);
 
             stmt.executeUpdate();
         }
@@ -61,7 +58,7 @@ public class StudentDAO {
      * @return a map of field names to values, or null if not found
      */
     public static Map<String, String> getStudentProfile(String discordId) throws Exception {
-        String sql = "SELECT name, email, skills, career_interest, cv_url, job_type FROM student WHERE discord_id = ?";
+        String sql = "SELECT name, email, skills, career_interest, job_type FROM student WHERE discord_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -74,7 +71,6 @@ public class StudentDAO {
                     profile.put("Email", rs.getString("email"));
                     profile.put("Skills", rs.getString("skills"));
                     profile.put("Career Interest", rs.getString("career_interest"));
-                    profile.put("CV", rs.getString("cv_url"));
                     profile.put("Job Type", rs.getString("job_type"));
                     return profile;
                 } else {
