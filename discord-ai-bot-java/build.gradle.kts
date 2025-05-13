@@ -27,6 +27,9 @@ dependencies {
 
     implementation("com.zaxxer:HikariCP:5.0.1")
 
+    implementation ("org.apache.pdfbox:pdfbox:2.0.30") // Safe cv in text format
+
+
 }
 
 

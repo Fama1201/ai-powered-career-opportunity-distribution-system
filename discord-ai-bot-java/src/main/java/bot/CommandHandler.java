@@ -1,6 +1,7 @@
 package bot;
 
 import bot.ai.GPTClient;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,36 +10,25 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
-import storage.ProfileStorage;
 import storage.StudentDAO;
+import util.PdfUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * CommandHandler listens for guild and private messages.
- *
- * Supports:
- *   - !status health check
- *   - !start to initiate DM profile flow
- *   - !ask to query GPT advisor
- *   - Profile registration steps (1–7):
- *       1. Email
- *       2. Full Name
- *       3. Skills selection or manual entry
- *       4. Position preference
- *       5. Resume description or link
- *       7. PDF upload
- */
 public class CommandHandler extends ListenerAdapter {
 
     private final GPTClient gpt;
 
-    /**
-     * @param gpt GPTClient instance for AI interactions
-     */
+    private static final Map<String, Integer> userSteps = new HashMap<>();
+
+    public static void startRegistrationFor(String userId) {
+        userSteps.put(userId, 1);
+    }
+
     public CommandHandler(GPTClient gpt) {
         this.gpt = gpt;
     }
@@ -48,16 +38,12 @@ public class CommandHandler extends ListenerAdapter {
         System.out.println("✅ Bot is online as " + event.getJDA().getSelfUser().getAsTag());
         for (var guild : event.getJDA().getGuilds()) {
             if (guild.getDefaultChannel() instanceof TextChannel channel && channel.canTalk()) {
-                // only one call to sendMessage, with the button attached
-                channel.sendMessage("👋 **EXPERTS.AI Bot is now online and ready to help!**")
-                        .setActionRow(
-                                Button.primary("start", "🚀 Get Started")
-                        )
+                channel.sendMessage("👋 **JOBIFY CVUT Bot is now online and ready to help!**")
+                        .setActionRow(Button.primary("start", "🚀 Get Started"))
                         .queue();
             }
         }
     }
-
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -65,15 +51,12 @@ public class CommandHandler extends ListenerAdapter {
 
         String userId = event.getAuthor().getId();
         String content = event.getMessage().getContentRaw().trim();
-        Map<String, Map<String, Object>> userProfiles = ProfileStorage.loadProfiles();
 
-        // === Status Command ===
         if (content.equalsIgnoreCase("!status")) {
             event.getChannel().sendMessage("✅ Bot is operational.").queue();
             return;
         }
 
-        // === Start Command in Guild ===
         if (event.isFromGuild() && content.equalsIgnoreCase("!start")) {
             event.getChannel()
                     .sendMessage("👋 **Welcome to the EXPERTS.AI Career Hub!** Check your DMs to begin registration.")
@@ -88,32 +71,24 @@ public class CommandHandler extends ListenerAdapter {
                         )
                         .queue();
             });
-
-            /*event.getAuthor().openPrivateChannel().queue(dm -> {
-                Map<String, Object> profile = new HashMap<>();
-                profile.put("step", 0);
-                userProfiles.put(userId, profile);
-                ProfileStorage.saveProfiles(userProfiles);
-
-                dm.sendMessage("📄 Do you have a resume (CV)?")
-                        .setActionRow(
-                                Button.success("cv_yes", "✅ Yes"),
-                                Button.danger("cv_no",  "❌ No")
-                        ).queue();
-            }*/
-
             return;
         }
 
-        // === Private Channel Flow ===
         if (event.isFromType(ChannelType.PRIVATE)) {
-            // GPT Ask Command
+
+            // ✅ Si el usuario sube un archivo (PDF esperado)
+            if (!event.getMessage().getAttachments().isEmpty()) {
+                handlePdfUploadStep(event, userId);
+                return;
+            }
+
+            // ✅ GPT pregunta
             if (content.startsWith("!ask ") && gpt != null) {
                 String question = content.substring(5).trim();
                 event.getChannel().sendTyping().queue();
-                List<Map<String,String>> messages = List.of(
-                        Map.of("role","system", "content","You are a helpful career advisor."),
-                        Map.of("role","user",   "content", question)
+                List<Map<String, String>> messages = List.of(
+                        Map.of("role", "system", "content", "You are a helpful career advisor."),
+                        Map.of("role", "user", "content", question)
                 );
                 try {
                     String aiReply = gpt.ask(messages, "gpt-3.5-turbo");
@@ -124,56 +99,44 @@ public class CommandHandler extends ListenerAdapter {
                 return;
             }
 
-            Map<String, Object> profile = userProfiles.getOrDefault(userId, new HashMap<>());
-            int step = ((Number) profile.getOrDefault("step", 0)).intValue();
-
+            // ✅ Flujo paso a paso
+            int step = userSteps.getOrDefault(userId, -1);
             switch (step) {
-                case 1 -> handleEmailStep(event, userId, content, profile, userProfiles);
-                case 2 -> handleNameStep(event, userId, content, profile, userProfiles);
-                case 3 -> promptSkillsSelection(event);
-                case 4 -> promptPositionSelection(event);
-                case 5 -> handleResumeDescriptionStep(event, userId, content, profile, userProfiles);
-                case 7 -> handlePdfUploadStep(event, userId, profile, userProfiles);
-                default -> {
-                    // No active step; ignore or log
+                case 1 -> {
+                    handleEmailStep(event, userId, content);
+                    userSteps.put(userId, 2);
+                }
+                case 2 -> {
+                    handleNameStep(event, userId, content);
+                    userSteps.remove(userId);
                 }
             }
         }
     }
 
-    private void handleEmailStep(MessageReceivedEvent event, String userId, String email,
-                                 Map<String,Object> profile, Map<String,Map<String,Object>> userProfiles) {
+    public static void handleEmailStep(MessageReceivedEvent event, String userId, String email) {
         if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             event.getChannel().sendMessage("❗ Invalid email format, please retry.").queue();
             return;
         }
-        profile.put("email", email);
         try {
             StudentDAO.upsertStudent(null, email, null, null, userId, null, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        profile.put("step", 2);
-        userProfiles.put(userId, profile);
-        ProfileStorage.saveProfiles(userProfiles);
         event.getChannel().sendMessage("👤 Please enter your full name.").queue();
     }
 
-    private void handleNameStep(MessageReceivedEvent event, String userId, String name,
-                                Map<String,Object> profile, Map<String,Map<String,Object>> userProfiles) {
-        profile.put("name", name);
+    public static void handleNameStep(MessageReceivedEvent event, String userId, String name) {
         try {
             StudentDAO.upsertStudent(name, null, null, null, userId, null, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        profile.put("step", 3);
-        userProfiles.put(userId, profile);
-        ProfileStorage.saveProfiles(userProfiles);
         promptSkillsSelection(event);
     }
 
-    private void promptSkillsSelection(MessageReceivedEvent event) {
+    public static void promptSkillsSelection(MessageReceivedEvent event) {
         StringSelectMenu skillsMenu = StringSelectMenu.create("select_skills")
                 .setPlaceholder("💻 Select up to 5 skills")
                 .setMaxValues(5)
@@ -194,7 +157,7 @@ public class CommandHandler extends ListenerAdapter {
                 .queue();
     }
 
-    private void promptPositionSelection(MessageReceivedEvent event) {
+    public static void promptPositionSelection(MessageReceivedEvent event) {
         StringSelectMenu positionMenu = StringSelectMenu.create("select_position")
                 .setPlaceholder("📌 Select up to 5 positions")
                 .setMaxValues(5)
@@ -212,22 +175,27 @@ public class CommandHandler extends ListenerAdapter {
                 .queue();
     }
 
-    private void handleResumeDescriptionStep(MessageReceivedEvent event, String userId, String description,
-                                             Map<String,Object> profile, Map<String,Map<String,Object>> userProfiles) {
-        profile.put("resume", description);
+    public static void showMainMenu(User user) {
+        user.openPrivateChannel().queue(dm -> {
+            dm.sendMessage("💼 What would you like to do next?")
+                    .setActionRow(
+                            Button.primary("gpt_ask", "🤖 Ask GPT"),
+                            Button.primary("view_profile", "👤 View Profile"),
+                            Button.success("create_profile", "📝 Create Profile")
+                    ).queue();
+        });
+    }
+
+    public static void handleResumeDescriptionStep(MessageReceivedEvent event, String userId, String description) {
         try {
             StudentDAO.upsertStudent(null, null, null, null, userId, description, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        profile.put("step", 7);
-        userProfiles.put(userId, profile);
-        ProfileStorage.saveProfiles(userProfiles);
         event.getChannel().sendMessage("📄 Please upload your resume as a PDF file.").queue();
     }
 
-    private void handlePdfUploadStep(MessageReceivedEvent event, String userId,
-                                     Map<String,Object> profile, Map<String,Map<String,Object>> userProfiles) {
+    public static void handlePdfUploadStep(MessageReceivedEvent event, String userId) {
         if (event.getMessage().getAttachments().isEmpty()) {
             event.getChannel().sendMessage("❗ Attach a PDF file please.").queue();
             return;
@@ -237,21 +205,20 @@ public class CommandHandler extends ListenerAdapter {
             event.getChannel().sendMessage("❌ Only PDF files are accepted.").queue();
             return;
         }
-        java.io.File dir = new java.io.File("resumes");
+        File dir = new File("resumes");
         if (!dir.exists()) dir.mkdirs();
-        java.io.File out = new java.io.File(dir, userId + ".pdf");
+        File out = new File(dir, userId + ".pdf");
+
         attachment.downloadToFile(out)
                 .thenRun(() -> {
-                    profile.put("resumePath", out.getAbsolutePath());
                     try {
-                        StudentDAO.upsertStudent(null, null, null, null, userId, out.getAbsolutePath(), null);
+                        String extractedText = PdfUtils.extractText(out);
+                        StudentDAO.updateCvTextByDiscordId(userId, extractedText);
+                        System.out.println("✅ Text saved in DB for " + userId);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    profile.put("step", -1);
-                    userProfiles.put(userId, profile);
-                    ProfileStorage.saveProfiles(userProfiles);
-                    event.getChannel().sendMessage("✅ PDF resume received. Thank you!").queue();
+                    event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
                 })
                 .exceptionally(ex -> {
                     event.getChannel().sendMessage("❌ Error uploading PDF. Please try again.").queue();

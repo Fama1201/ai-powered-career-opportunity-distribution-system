@@ -83,4 +83,15 @@ public class StudentDAO {
             }
         }
     }
+
+    public static void updateCvTextByDiscordId(String discordId, String cvText) throws Exception {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "UPDATE student SET cv_text = ? WHERE discord_id = ?")) {
+            pstmt.setString(1, cvText);
+            pstmt.setString(2, discordId);
+            pstmt.executeUpdate();
+        }
+    }
+
 }
