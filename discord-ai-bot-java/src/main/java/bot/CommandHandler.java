@@ -320,30 +320,32 @@ public class CommandHandler extends ListenerAdapter {
         attachment.downloadToFile(out)
                 .thenRun(() -> {
                     try {
+                        // 📄 Extract text from the uploaded PDF
                         String extractedText = PdfUtils.extractText(out);
                         StudentDAO.updateCvTextByDiscordId(userId, extractedText);
                         System.out.println("✅ Text saved in DB for " + userId);
 
-                        // 🔍 ANALYZE WITH GPT
+                        // 🤖 Analyze the CV using GPT
                         if (gpt != null) {
+                            // 🎯 Prompt GPT to extract key fields
                             String prompt = """
-                            Analyze the following CV and return a JSON object with the following keys:
-                            - name (full name)
-                            - email (valid email address)
-                            - skills (array of skills)
-                            - positions (array of desired job roles like backend, frontend, devops, etc.)
+                        Analyze the following CV and return a JSON object with the following keys:
+                        - name (full name)
+                        - email (valid email address)
+                        - skills (array of skills, that are used in the projects or jobs, for example: JAVA, C)
+                        - positions (array of desired job roles like backend, frontend, devops, etc.)
 
-                            CV:
-                            --------------------
-                            """ + extractedText;
+                        CV:
+                        --------------------
+                        """ + extractedText;
 
                             List<Map<String, String>> messages = List.of(
                                     Map.of("role", "user", "content", prompt)
                             );
 
                             String response = gpt.ask(messages, "gpt-3.5-turbo");
-
                             JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+
                             String name = json.get("name").getAsString();
                             String email = json.get("email").getAsString();
                             String skills = String.join(", ", toList(json.get("skills").getAsJsonArray()));
@@ -351,20 +353,55 @@ public class CommandHandler extends ListenerAdapter {
 
                             StudentDAO.upsertStudent(name, email, skills, positions, userId);
                             System.out.println("✅ Profile updated using AI.");
+
+                            // 📊 Ask GPT for rating and suggestions
+                            String ratingPrompt = """
+                        You are a career advisor. Read the following CV and evaluate its overall quality.
+                        Return a JSON object with two fields:
+                        - rating: a number between 1 and 10 (10 = excellent)
+                        - feedback: a list of 2–5 suggestions to improve the CV.
+
+                        CV:
+                        --------------------
+                        """ + extractedText;
+
+                            List<Map<String, String>> ratingMessages = List.of(
+                                    Map.of("role", "user", "content", ratingPrompt)
+                            );
+
+                            String ratingResponse = gpt.ask(ratingMessages, "gpt-3.5-turbo");
+                            JsonObject ratingJson = JsonParser.parseString(ratingResponse).getAsJsonObject();
+
+                            int rating = ratingJson.get("rating").getAsInt();
+                            List<String> feedbackList = toList(ratingJson.get("feedback").getAsJsonArray());
+
+                            // 📝 Format and send feedback to the user
+                            StringBuilder feedbackMsg = new StringBuilder("📝 **CV Rating: " + rating + "/10**\n");
+                            feedbackMsg.append("💡 **Suggestions to improve your CV:**\n");
+                            for (String tip : feedbackList) {
+                                feedbackMsg.append("- ").append(tip).append("\n");
+                            }
+
+                            // ✅ Send the feedback message before the final confirmation
+                            event.getChannel().sendMessage(feedbackMsg.toString()).queue();
                         }
+
+                        // 📬 Final confirmation and main menu
+                        event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
+
 
                     } catch (Exception e) {
                         e.printStackTrace();
+                        event.getChannel().sendMessage("⚠️ Error processing your CV.").queue();
                     }
-
-                    event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
-                    showMainMenu(event.getAuthor());
                 })
                 .exceptionally(ex -> {
                     event.getChannel().sendMessage("❌ Error uploading PDF. Please try again.").queue();
                     return null;
                 });
     }
+
+
 
     private static List<String> toList(JsonArray array) {
         List<String> list = new ArrayList<>();
@@ -373,5 +410,6 @@ public class CommandHandler extends ListenerAdapter {
         }
         return list;
     }
+
 
 }
