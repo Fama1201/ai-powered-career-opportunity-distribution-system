@@ -223,15 +223,31 @@ public class CommandHandler extends ListenerAdapter {
                 .addOption("Spring Boot", "spring")
                 .addOption("Node.js", "node")
                 .addOption("C++", "cpp")
+                .addOption("C#", "csharp")
+                .addOption("ASP.NET", "aspnet")
                 .addOption("SQL", "sql")
                 .addOption("Git", "git")
                 .addOption("Docker", "docker")
+                .addOption("Linux", "linux")
+                .addOption("Operating Systems", "os")
+                .addOption("Data Science", "data_science")
+                .addOption("Machine Learning", "ml")
+                .addOption("Deep Learning", "dl")
+                .addOption("Recommender Systems", "recommender")
+                .addOption("Customer Service", "customer_service")
+                .addOption("Security", "security")
+                .addOption("Explainability", "explainability")
+                .addOption("Software Tool", "software_tool")
+                .addOption("Memory", "memory")
+                .addOption("Cache Storage", "cache_storage")
                 .build();
+
         event.getChannel()
                 .sendMessage("💻 What are your primary skills or technologies?")
                 .setActionRow(skillsMenu)
                 .queue();
     }
+
 
     // Sends position preference dropdown
     public static void promptPositionSelection(MessageReceivedEvent event) {
