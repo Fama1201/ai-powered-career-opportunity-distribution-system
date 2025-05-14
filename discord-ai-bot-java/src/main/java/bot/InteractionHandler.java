@@ -1,5 +1,6 @@
 package bot;
 
+import bot.api.OpportunityClient;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -9,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import storage.StudentDAO;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class InteractionHandler extends ListenerAdapter {
 
@@ -26,7 +29,8 @@ public class InteractionHandler extends ListenerAdapter {
                                     .setActionRow(
                                             Button.primary("gpt_ask", "\uD83E\uDD16 Ask GPT"),
                                             Button.primary("view_profile", "\uD83D\uDC64 View Profile"),
-                                            Button.success("create_profile", "\uD83D\uDCDD Create Profile")
+                                            Button.success("create_profile", "\uD83D\uDCDD Create Profile"),
+                                            Button.secondary("match_jobs", "\uD83C\uDFAF Match Me")
                                     )
                                     .queue();
                         }));
@@ -75,6 +79,46 @@ public class InteractionHandler extends ListenerAdapter {
                 } catch (Exception e) {
                     e.printStackTrace();
                     event.getHook().sendMessage("❌ Failed to initialize profile setup.").queue();
+                }
+            }
+
+            case "match_jobs" -> {
+                event.deferReply(true).queue();
+                try {
+                    var profile = StudentDAO.getStudentProfile(userId);
+
+                    if (profile == null || profile.get("Skills") == null || profile.get("Career Interest") == null) {
+                        event.getHook().sendMessage("❗ You need to complete your profile first.").queue();
+                        return;
+                    }
+
+                    String skills = profile.get("Skills");
+                    String interest = profile.get("Career Interest");
+
+                    Set<OpportunityClient.Opportunity> results =
+                            OpportunityClient.searchMultipleKeywords(skills + " " + interest);
+
+                    if (results.isEmpty()) {
+                        event.getHook().sendMessage("😢 No opportunities found for your profile.").queue();
+                    } else {
+                        event.getHook().sendMessage("🎯 Found " + results.size() + " opportunities for you:").queue();
+                        for (var opp : results) {
+                            if (!storage.OpportunityDAO.existsForUser(opp, userId)) {
+                                storage.OpportunityDAO.insertForUser(opp, userId);
+                            }
+                            if (!opp.url.isBlank()) {
+                                event.getChannel().sendMessageEmbeds(opp.toEmbed())
+                                        .addActionRow(Button.link(opp.url, "📩 Apply"))
+                                        .queue();
+                            } else {
+                                event.getChannel().sendMessageEmbeds(opp.toEmbed()).queue();
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    event.getHook().sendMessage("❌ Error matching opportunities: " + e.getMessage()).queue();
                 }
             }
 
@@ -131,7 +175,8 @@ public class InteractionHandler extends ListenerAdapter {
                             .setActionRow(
                                     Button.primary("gpt_ask", "🤖 Ask GPT"),
                                     Button.primary("view_profile", "👤 View Profile"),
-                                    Button.success("create_profile", "📝 Create Profile")
+                                    Button.success("create_profile", "📝 Create Profile"),
+                                    Button.secondary("match_jobs", "🎯 Match Me")
                             ).queue();
                 });
             }
