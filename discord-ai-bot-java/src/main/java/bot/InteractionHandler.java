@@ -12,6 +12,12 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+
 
 /**
  * Handles all interactions from Discord UI components such as buttons and select menus.
@@ -220,29 +226,43 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "select_position" -> {
-                // Store selected positions to user profile in career_interest column
-                List<String> selectedPositions = event.getValues(); // Now supports multiple positions
+                event.deferReply(true).queue();
+
+                List<String> selectedPositions = event.getValues();
+                String joined = String.join(", ", selectedPositions);
+
                 try {
-                    String joined = String.join(", ", selectedPositions);
-                    StudentDAO.upsertStudent(null, null, null, joined, userId); // <-- save to career_interest
+                    StudentDAO.upsertStudent(null, null, null, joined, userId); // Save positions
+
+                    event.getHook().sendMessage("✅ Positions saved: " + joined).queue(msg -> {
+
+                        // Crear un pequeño delay antes de abrir el DM
+                        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+                        scheduler.schedule(() -> {
+                            event.getUser().openPrivateChannel().queue(dm -> {
+                                dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
+                                        .addActionRow(
+                                                Button.primary("gpt_ask", "🤖 Ask GPT"),
+                                                Button.primary("view_profile", "👤 View Profile"),
+                                                Button.success("create_profile", "📝 Create Profile")
+                                        )
+                                        .addActionRow(
+                                                Button.secondary("match_jobs", "🎯 Match Me"),
+                                                Button.danger("delete_profile", "🗑️ Delete Profile")
+                                        )
+                                        .queue();
+                            });
+                            scheduler.shutdown(); // Cerramos el scheduler después de usarlo
+                        }, 1500, TimeUnit.MILLISECONDS);
+
+                    });
+
                 } catch (Exception e) {
                     e.printStackTrace();
+                    event.getHook().sendMessage("❌ Error saving positions. Please try again.").queue();
                 }
-
-                String joined = String.join(", ", selectedPositions);
-                event.reply("✅ Positions saved: " + joined).setEphemeral(true).queue();
-
-                // Show next step menu
-                event.getUser().openPrivateChannel().queue(dm -> {
-                    dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
-                            .setActionRow(
-                                    Button.primary("gpt_ask", "🤖 Ask GPT"),
-                                    Button.primary("view_profile", "👤 View Profile"),
-                                    Button.success("create_profile", "📝 Create Profile"),
-                                    Button.secondary("match_jobs", "🎯 Match Me")
-                            ).queue();
-                });
             }
+
 
 
             // Default case for unknown select menus
