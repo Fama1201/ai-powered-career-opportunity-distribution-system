@@ -19,33 +19,28 @@ public class InteractionHandler extends ListenerAdapter {
 
         switch (id) {
             case "start" -> {
-                event.reply("📩 Check your DMs to continue.")
+                event.reply("\uD83D\uDCEC Check your DMs to continue.")
                         .setEphemeral(true)
-                        .queue();
-
-                event.getUser().openPrivateChannel().queue(dm -> {
-                    dm.sendMessage("👋 Welcome! Choose an option:")
-                            .setActionRow(
-                                    Button.primary("gpt_ask", "🤖 Ask GPT"),
-                                    Button.primary("view_profile", "👤 View Profile"),
-                                    Button.success("create_profile", "📝 Create Profile")
-                            )
-                            .queue();
-                });
+                        .queue(success -> event.getUser().openPrivateChannel().queue(dm -> {
+                            dm.sendMessage("\uD83D\uDC4B Welcome! Choose an option:")
+                                    .setActionRow(
+                                            Button.primary("gpt_ask", "\uD83E\uDD16 Ask GPT"),
+                                            Button.primary("view_profile", "\uD83D\uDC64 View Profile"),
+                                            Button.success("create_profile", "\uD83D\uDCDD Create Profile")
+                                    )
+                                    .queue();
+                        }));
             }
 
-            case "gpt_ask" -> {
-                event.reply("✍️ You can ask the AI by typing `!ask <your question>` here.")
-                        .setEphemeral(true)
-                        .queue();
-            }
+            case "gpt_ask" -> event.reply("\u270D\uFE0F You can ask the AI by typing `!ask <your question>` here.")
+                    .setEphemeral(true).queue();
 
             case "view_profile" -> {
                 event.deferReply(true).queue();
                 try {
                     var data = StudentDAO.getStudentProfile(userId);
                     if (data == null || data.isEmpty()) {
-                        event.getHook().sendMessage("⚠️ You don't have a profile yet. Select 'Create Profile' to start.").queue();
+                        event.getHook().sendMessage("\u26A0\uFE0F You don't have a profile yet. Select 'Create Profile' to start.").queue();
                     } else {
                         StringBuilder sb = new StringBuilder("**Your Profile**\n");
                         data.forEach((k, v) -> {
@@ -61,41 +56,30 @@ public class InteractionHandler extends ListenerAdapter {
                 }
             }
 
-            case "create_profile" -> {
-                event.reply("📄 Do you have a resume (CV)?")
-                        .setEphemeral(true)
-                        .setActionRow(
-                                Button.success("cv_yes", "✅ Yes"),
-                                Button.danger("cv_no", "❌ No")
-                        )
-                        .queue();
-            }
+            case "create_profile" -> event.reply("\uD83D\uDCC4 Do you have a resume (CV)?")
+                    .setEphemeral(true)
+                    .setActionRow(
+                            Button.success("cv_yes", "✅ Yes"),
+                            Button.danger("cv_no", "❌ No")
+                    ).queue();
 
-            case "cv_yes" -> {
-                event.reply("📄 Please upload your resume as a PDF.")
-                        .setEphemeral(true)
-                        .queue();
-            }
+            case "cv_yes" -> event.reply("\uD83D\uDCC4 Please upload your resume as a PDF.")
+                    .setEphemeral(true).queue();
 
             case "cv_no" -> {
+                event.deferReply(true).queue();
                 try {
                     StudentDAO.upsertStudent(null, null, null, null, userId, null);
-
+                    CommandHandler.startRegistrationFor(userId);
+                    event.getHook().sendMessage("\uD83D\uDCE7 Please enter your email address.").queue();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    event.getHook().sendMessage("❌ Failed to initialize profile setup.").queue();
                 }
-
-                // Iniciar flujo paso a paso
-                CommandHandler.startRegistrationFor(userId);
-
-                event.reply("📧 Please enter your email address.")
-                        .setEphemeral(true)
-                        .queue();
             }
 
-            default -> event.reply("⚠️ Unrecognized button.")
-                    .setEphemeral(true)
-                    .queue();
+            default -> event.reply("\u26A0\uFE0F Unrecognized button.")
+                    .setEphemeral(true).queue();
         }
     }
 
@@ -109,17 +93,14 @@ public class InteractionHandler extends ListenerAdapter {
                 String skills = String.join(", ", values);
                 try {
                     StudentDAO.upsertStudent(null, null, skills, null, userId, null);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                event.reply("✅ Skills saved.")
-                        .setEphemeral(true)
-                        .queue();
+                event.reply("✅ Skills saved.").setEphemeral(true).queue();
 
                 StringSelectMenu posMenu = StringSelectMenu.create("select_position")
-                        .setPlaceholder("📌 Choose your preferred position")
+                        .setPlaceholder("\uD83D\uDCCC Choose your preferred position")
                         .setMaxValues(5)
                         .addOption("Backend", "backend")
                         .addOption("Frontend", "frontend")
@@ -130,7 +111,7 @@ public class InteractionHandler extends ListenerAdapter {
                         .addOption("Data Science", "data")
                         .build();
 
-                event.getChannel().sendMessage("🧾 What type of position are you looking for?")
+                event.getChannel().sendMessage("\uD83D\uDCDD What type of position are you looking for?")
                         .setActionRow(posMenu)
                         .queue();
             }
@@ -139,14 +120,11 @@ public class InteractionHandler extends ListenerAdapter {
                 String selected = event.getValues().get(0);
                 try {
                     StudentDAO.upsertStudent(null, null, null, selected, userId, null);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                event.reply("✅ Position saved.")
-                        .setEphemeral(true)
-                        .queue();
+                event.reply("✅ Position saved.").setEphemeral(true).queue();
 
                 event.getUser().openPrivateChannel().queue(dm -> {
                     dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
@@ -154,8 +132,7 @@ public class InteractionHandler extends ListenerAdapter {
                                     Button.primary("gpt_ask", "🤖 Ask GPT"),
                                     Button.primary("view_profile", "👤 View Profile"),
                                     Button.success("create_profile", "📝 Create Profile")
-                            )
-                            .queue();
+                            ).queue();
                 });
             }
 
