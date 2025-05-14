@@ -15,14 +15,11 @@ import util.PdfUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommandHandler extends ListenerAdapter {
 
     private final GPTClient gpt;
-
     private static final Map<String, Integer> userSteps = new HashMap<>();
 
     public static void startRegistrationFor(String userId) {
@@ -76,13 +73,63 @@ public class CommandHandler extends ListenerAdapter {
 
         if (event.isFromType(ChannelType.PRIVATE)) {
 
-            // ✅ Si el usuario sube un archivo (PDF esperado)
             if (!event.getMessage().getAttachments().isEmpty()) {
                 handlePdfUploadStep(event, userId);
                 return;
             }
 
-            // ✅ GPT pregunta
+            if (content.equalsIgnoreCase("!fetch")) {
+                try {
+                    Map<String, String> profile = StudentDAO.getStudentProfile(userId);
+
+                    if (profile == null || profile.get("Skills") == null || profile.get("Career Interest") == null) {
+                        event.getChannel().sendMessage("❗ You need to complete your profile first.").queue();
+                        return;
+                    }
+
+                    String skills = profile.get("Skills");
+                    String interest = profile.get("Career Interest");
+
+                    Set<bot.api.OpportunityClient.Opportunity> results =
+                            bot.api.OpportunityClient.searchMultipleKeywords(skills + " " + interest);
+                    for (var opp : results) {
+                        System.out.println("🔍 Opportunity from API: " + opp.id + " | " + opp.title);
+                    }
+
+                    if (results.isEmpty()) {
+                        event.getChannel().sendMessage("😢 No opportunities found for your profile.").queue();
+                    } else {
+                        event.getChannel().sendMessage("🎯 Found " + results.size() + " opportunities for you:").queue();
+                        for (var opp : results) {
+                            if (!opp.url.isBlank()) {
+                                event.getChannel()
+                                        .sendMessageEmbeds(opp.toEmbed())
+                                        .setActionRow(Button.link(opp.url, "📩 Apply"))
+                                        .queue();
+                            } else {
+                                event.getChannel().sendMessageEmbeds(opp.toEmbed()).queue();
+                            }
+
+                            try {
+                                if (!storage.OpportunityDAO.existsForUser(opp, userId)) {
+                                    storage.OpportunityDAO.insertForUser(opp, userId);
+                                    System.out.println("✅ Opportunity saved to DB for " + userId);
+                                } else {
+                                    System.out.println("🔁 This opportunity already exists for " + userId);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    event.getChannel().sendMessage("❌ Error fetching opportunities: " + e.getMessage()).queue();
+                }
+                return;
+            }
+
             if (content.startsWith("!ask ") && gpt != null) {
                 String question = content.substring(5).trim();
                 event.getChannel().sendTyping().queue();
@@ -99,7 +146,6 @@ public class CommandHandler extends ListenerAdapter {
                 return;
             }
 
-            // ✅ Flujo paso a paso
             int step = userSteps.getOrDefault(userId, -1);
             switch (step) {
                 case 1 -> {
