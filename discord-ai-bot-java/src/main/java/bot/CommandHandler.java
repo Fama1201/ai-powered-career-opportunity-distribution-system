@@ -194,7 +194,7 @@ public class CommandHandler extends ListenerAdapter {
             return;
         }
         try {
-            StudentDAO.upsertStudent(null, email, null, null, userId, null);
+            StudentDAO.upsertStudent(null, email, null, null, userId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -204,7 +204,7 @@ public class CommandHandler extends ListenerAdapter {
     // Stores name and proceeds to skills selection
     public static void handleNameStep(MessageReceivedEvent event, String userId, String name) {
         try {
-            StudentDAO.upsertStudent(name, null, null, null, userId, null);
+            StudentDAO.upsertStudent(name, null, null, null, userId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -288,7 +288,7 @@ public class CommandHandler extends ListenerAdapter {
     // Placeholder for handling a resume description (future enhancement)
     public static void handleResumeDescriptionStep(MessageReceivedEvent event, String userId, String description) {
         try {
-            StudentDAO.upsertStudent(null, null, null, null, userId, null);
+            StudentDAO.upsertStudent(null, null, null, null, userId);
         } catch (Exception e) {
             e.printStackTrace();
         }
