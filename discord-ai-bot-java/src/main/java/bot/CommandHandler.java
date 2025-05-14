@@ -12,6 +12,11 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
 import storage.StudentDAO;
 import util.PdfUtils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -296,16 +301,18 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     // Handles resume file upload and extraction
-    public static void handlePdfUploadStep(MessageReceivedEvent event, String userId) {
+    public void handlePdfUploadStep(MessageReceivedEvent event, String userId) {
         if (event.getMessage().getAttachments().isEmpty()) {
             event.getChannel().sendMessage("❗ Attach a PDF file please.").queue();
             return;
         }
+
         var attachment = event.getMessage().getAttachments().get(0);
         if (!attachment.getFileName().toLowerCase().endsWith(".pdf")) {
             event.getChannel().sendMessage("❌ Only PDF files are accepted.").queue();
             return;
         }
+
         File dir = new File("resumes");
         if (!dir.exists()) dir.mkdirs();
         File out = new File(dir, userId + ".pdf");
@@ -316,9 +323,40 @@ public class CommandHandler extends ListenerAdapter {
                         String extractedText = PdfUtils.extractText(out);
                         StudentDAO.updateCvTextByDiscordId(userId, extractedText);
                         System.out.println("✅ Text saved in DB for " + userId);
+
+                        // 🔍 ANALYZE WITH GPT
+                        if (gpt != null) {
+                            String prompt = """
+                            Analyze the following CV and return a JSON object with the following keys:
+                            - name (full name)
+                            - email (valid email address)
+                            - skills (array of skills)
+                            - positions (array of desired job roles like backend, frontend, devops, etc.)
+
+                            CV:
+                            --------------------
+                            """ + extractedText;
+
+                            List<Map<String, String>> messages = List.of(
+                                    Map.of("role", "user", "content", prompt)
+                            );
+
+                            String response = gpt.ask(messages, "gpt-3.5-turbo");
+
+                            JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+                            String name = json.get("name").getAsString();
+                            String email = json.get("email").getAsString();
+                            String skills = String.join(", ", toList(json.get("skills").getAsJsonArray()));
+                            String positions = String.join(", ", toList(json.get("positions").getAsJsonArray()));
+
+                            StudentDAO.upsertStudent(name, email, skills, positions, userId);
+                            System.out.println("✅ Profile updated using AI.");
+                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+
                     event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
                     showMainMenu(event.getAuthor());
                 })
@@ -327,4 +365,13 @@ public class CommandHandler extends ListenerAdapter {
                     return null;
                 });
     }
+
+    private static List<String> toList(JsonArray array) {
+        List<String> list = new ArrayList<>();
+        for (JsonElement el : array) {
+            list.add(el.getAsString());
+        }
+        return list;
+    }
+
 }
