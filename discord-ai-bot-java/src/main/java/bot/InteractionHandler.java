@@ -13,38 +13,63 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Handles all interactions from Discord UI components such as buttons and select menus.
+ * This includes profile actions, matching jobs, and chatbot prompts.
+ */
 public class InteractionHandler extends ListenerAdapter {
 
+    /**
+     * Responds to button clicks based on their component ID.
+     * Each button triggers a different workflow depending on its ID.
+     */
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        String id = event.getComponentId();
-        String userId = event.getUser().getId();
+        String id = event.getComponentId();              // Unique identifier of the button clicked
+        String userId = event.getUser().getId();         // Discord user ID
 
         switch (id) {
             case "start" -> {
-                event.reply("\uD83D\uDCEC Check your DMs to continue.")
+                // Show main menu after the user clicks the start button
+                event.reply("📬 Check your DMs to continue.")
                         .setEphemeral(true)
-                        .queue(success -> event.getUser().openPrivateChannel().queue(dm -> {
-                            dm.sendMessage("\uD83D\uDC4B Welcome! Choose an option:")
-                                    .setActionRow(
-                                            Button.primary("gpt_ask", "\uD83E\uDD16 Ask GPT"),
-                                            Button.primary("view_profile", "\uD83D\uDC64 View Profile"),
-                                            Button.success("create_profile", "\uD83D\uDCDD Create Profile"),
-                                            Button.secondary("match_jobs", "\uD83C\uDFAF Match Me")
-                                    )
-                                    .queue();
-                        }));
+                        .queue(success -> CommandHandler.showMainMenu(event.getUser()));
             }
 
-            case "gpt_ask" -> event.reply("\u270D\uFE0F You can ask the AI by typing `!ask <your question>` here.")
-                    .setEphemeral(true).queue();
+            case "delete_profile" -> {
+                // Delete user profile from the database
+                event.deferReply(true).queue();
+                try {
+                    boolean deleted = StudentDAO.deleteProfileByDiscordId(userId);
+                    if (deleted) {
+                        event.getHook().sendMessage("✅ Your profile has been successfully deleted.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
+                    } else {
+                        event.getHook().sendMessage("⚠️ No profile was found to delete.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    event.getHook().sendMessage("❌ An error occurred while trying to delete your profile.")
+                            .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
+                }
+            }
+
+            case "gpt_ask" -> {
+                // Prompt user to type a GPT question
+                event.reply("✍️ You can ask the AI by typing `!ask <your question>` here.")
+                        .setEphemeral(true)
+                        .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
+            }
 
             case "view_profile" -> {
+                // Show user profile if it exists
                 event.deferReply(true).queue();
                 try {
                     var data = StudentDAO.getStudentProfile(userId);
                     if (data == null || data.isEmpty()) {
-                        event.getHook().sendMessage("\u26A0\uFE0F You don't have a profile yet. Select 'Create Profile' to start.").queue();
+                        event.getHook().sendMessage("⚠️ You don't have a profile yet. Select 'Create Profile' to start.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                     } else {
                         StringBuilder sb = new StringBuilder("**Your Profile**\n");
                         data.forEach((k, v) -> {
@@ -52,25 +77,34 @@ public class InteractionHandler extends ListenerAdapter {
                                 sb.append("**").append(k).append(":** ").append(v).append("\n");
                             }
                         });
-                        event.getHook().sendMessage(sb.toString()).queue();
+                        event.getHook().sendMessage(sb.toString())
+                                .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    event.getHook().sendMessage("❌ Error retrieving profile.").queue();
+                    event.getHook().sendMessage("❌ Error retrieving profile.")
+                            .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                 }
             }
 
-            case "create_profile" -> event.reply("\uD83D\uDCC4 Do you have a resume (CV)?")
-                    .setEphemeral(true)
-                    .setActionRow(
-                            Button.success("cv_yes", "✅ Yes"),
-                            Button.danger("cv_no", "❌ No")
-                    ).queue();
+            case "create_profile" -> {
+                // Ask if the user has a resume (CV)
+                event.reply("\uD83D\uDCC4 Do you have a resume (CV)?")
+                        .setEphemeral(true)
+                        .setActionRow(
+                                Button.success("cv_yes", "✅ Yes"),
+                                Button.danger("cv_no", "❌ No")
+                        ).queue();
+            }
 
-            case "cv_yes" -> event.reply("\uD83D\uDCC4 Please upload your resume as a PDF.")
-                    .setEphemeral(true).queue();
+            case "cv_yes" -> {
+                // Ask the user to upload a PDF
+                event.reply("\uD83D\uDCC4 Please upload your resume as a PDF.")
+                        .setEphemeral(true).queue();
+            }
 
             case "cv_no" -> {
+                // Initialize profile and start registration (email step)
                 event.deferReply(true).queue();
                 try {
                     StudentDAO.upsertStudent(null, null, null, null, userId, null);
@@ -83,12 +117,14 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "match_jobs" -> {
+                // Match job opportunities based on profile data
                 event.deferReply(true).queue();
                 try {
                     var profile = StudentDAO.getStudentProfile(userId);
 
                     if (profile == null || profile.get("Skills") == null || profile.get("Career Interest") == null) {
-                        event.getHook().sendMessage("❗ You need to complete your profile first.").queue();
+                        event.getHook().sendMessage("❗ You need to complete your profile first.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                         return;
                     }
 
@@ -99,40 +135,56 @@ public class InteractionHandler extends ListenerAdapter {
                             OpportunityClient.searchMultipleKeywords(skills + " " + interest);
 
                     if (results.isEmpty()) {
-                        event.getHook().sendMessage("😢 No opportunities found for your profile.").queue();
+                        event.getHook().sendMessage("😢 No opportunities found for your profile.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                     } else {
-                        event.getHook().sendMessage("🎯 Found " + results.size() + " opportunities for you:").queue();
-                        for (var opp : results) {
-                            if (!storage.OpportunityDAO.existsForUser(opp, userId)) {
-                                storage.OpportunityDAO.insertForUser(opp, userId);
-                            }
-                            if (!opp.url.isBlank()) {
-                                event.getChannel().sendMessageEmbeds(opp.toEmbed())
-                                        .addActionRow(Button.link(opp.url, "📩 Apply"))
-                                        .queue();
-                            } else {
-                                event.getChannel().sendMessageEmbeds(opp.toEmbed()).queue();
-                            }
-                        }
+                        event.getHook().sendMessage("🎯 Found " + results.size() + " opportunities for you:")
+                                .queue(msg -> {
+                                    for (var opp : results) {
+                                        try {
+                                            if (!storage.OpportunityDAO.existsForUser(opp, userId)) {
+                                                storage.OpportunityDAO.insertForUser(opp, userId);
+                                            }
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                        }
+
+                                        if (!opp.url.isBlank()) {
+                                            event.getChannel().sendMessageEmbeds(opp.toEmbed())
+                                                    .addActionRow(Button.link(opp.url, "📩 Apply"))
+                                                    .queue();
+                                        } else {
+                                            event.getChannel().sendMessageEmbeds(opp.toEmbed()).queue();
+                                        }
+                                    }
+                                    // Show menu after listing jobs
+                                    CommandHandler.showMainMenu(event.getUser());
+                                });
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    event.getHook().sendMessage("❌ Error matching opportunities: " + e.getMessage()).queue();
+                    event.getHook().sendMessage("❌ Error matching opportunities: " + e.getMessage())
+                            .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                 }
             }
 
+            // Default case for unknown buttons
             default -> event.reply("\u26A0\uFE0F Unrecognized button.")
                     .setEphemeral(true).queue();
         }
     }
 
+    /**
+     * Handles dropdown (select menu) interaction events from the user.
+     */
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         String userId = event.getUser().getId();
 
         switch (event.getComponentId()) {
             case "select_skills" -> {
+                // Store selected skills to user profile
                 List<String> values = event.getValues();
                 String skills = String.join(", ", values);
                 try {
@@ -143,6 +195,7 @@ public class InteractionHandler extends ListenerAdapter {
 
                 event.reply("✅ Skills saved.").setEphemeral(true).queue();
 
+                // Prompt for position selection
                 StringSelectMenu posMenu = StringSelectMenu.create("select_position")
                         .setPlaceholder("\uD83D\uDCCC Choose your preferred position")
                         .setMaxValues(5)
@@ -161,6 +214,7 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "select_position" -> {
+                // Store selected position to user profile
                 String selected = event.getValues().get(0);
                 try {
                     StudentDAO.upsertStudent(null, null, null, selected, userId, null);
@@ -170,6 +224,7 @@ public class InteractionHandler extends ListenerAdapter {
 
                 event.reply("✅ Position saved.").setEphemeral(true).queue();
 
+                // Show next step menu
                 event.getUser().openPrivateChannel().queue(dm -> {
                     dm.sendMessage("✅ Your profile has been saved! What would you like to do next?")
                             .setActionRow(
@@ -181,6 +236,7 @@ public class InteractionHandler extends ListenerAdapter {
                 });
             }
 
+            // Default case for unknown select menus
             default -> event.reply("⚠️ Unknown select menu.")
                     .setEphemeral(true)
                     .queue();

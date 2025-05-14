@@ -17,11 +17,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This class handles message events and command processing in both public and private Discord channels.
+ * It also manages the registration flow for student profiles and file upload logic.
+ */
 public class CommandHandler extends ListenerAdapter {
 
     private final GPTClient gpt;
-    private static final Map<String, Integer> userSteps = new HashMap<>();
+    private static final Map<String, Integer> userSteps = new HashMap<>(); // Tracks the registration step per user
 
+    // Begin the registration process for a user
     public static void startRegistrationFor(String userId) {
         userSteps.put(userId, 1);
     }
@@ -30,6 +35,7 @@ public class CommandHandler extends ListenerAdapter {
         this.gpt = gpt;
     }
 
+    // Runs when the bot is ready and connected to Discord
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         System.out.println("✅ Bot is online as " + event.getJDA().getSelfUser().getAsTag());
@@ -42,18 +48,30 @@ public class CommandHandler extends ListenerAdapter {
         }
     }
 
+    // Handles all messages received in public or private channels
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
+        if (event.getAuthor().isBot()) return; // Ignore bot messages
 
         String userId = event.getAuthor().getId();
         String content = event.getMessage().getContentRaw().trim();
 
+        // Command to check if bot is online
         if (content.equalsIgnoreCase("!status")) {
             event.getChannel().sendMessage("✅ Bot is operational.").queue();
             return;
         }
 
+        // Hidden test command to show delete button directly
+        if (content.equalsIgnoreCase("!testbutton")) {
+            event.getAuthor().openPrivateChannel().queue(dm -> {
+                dm.sendMessage("🧪 Testing delete_profile button:")
+                        .addActionRow(Button.danger("delete_profile", "🗑️ Delete Profile"))
+                        .queue();
+            });
+        }
+
+        // When a user types !start in a public server, send them a welcome message via DM
         if (event.isFromGuild() && content.equalsIgnoreCase("!start")) {
             event.getChannel()
                     .sendMessage("👋 **Welcome to the EXPERTS.AI Career Hub!** Check your DMs to begin registration.")
@@ -61,23 +79,30 @@ public class CommandHandler extends ListenerAdapter {
 
             event.getAuthor().openPrivateChannel().queue(dm -> {
                 dm.sendMessage("👋 Welcome! Choose an option:")
-                        .setActionRow(
+                        .addActionRow(
                                 Button.primary("gpt_ask", "🤖 Ask GPT"),
                                 Button.primary("view_profile", "👤 View Profile"),
                                 Button.success("create_profile", "📝 Create Profile")
+                        )
+                        .addActionRow(
+                                Button.secondary("match_jobs", "🎯 Match Me"),
+                                Button.danger("delete_profile", "🗑️ Delete Profile")
                         )
                         .queue();
             });
             return;
         }
 
+        // Handle private messages (e.g. profile registration and uploading files)
         if (event.isFromType(ChannelType.PRIVATE)) {
 
+            // If user sends a file (resume), handle upload
             if (!event.getMessage().getAttachments().isEmpty()) {
                 handlePdfUploadStep(event, userId);
                 return;
             }
 
+            // Fetch jobs based on user profile
             if (content.equalsIgnoreCase("!fetch")) {
                 try {
                     Map<String, String> profile = StudentDAO.getStudentProfile(userId);
@@ -130,6 +155,7 @@ public class CommandHandler extends ListenerAdapter {
                 return;
             }
 
+            // Handle !ask command for GPT integration
             if (content.startsWith("!ask ") && gpt != null) {
                 String question = content.substring(5).trim();
                 event.getChannel().sendTyping().queue();
@@ -146,6 +172,7 @@ public class CommandHandler extends ListenerAdapter {
                 return;
             }
 
+            // Handle step-based registration (step 1: email, step 2: name)
             int step = userSteps.getOrDefault(userId, -1);
             switch (step) {
                 case 1 -> {
@@ -160,6 +187,7 @@ public class CommandHandler extends ListenerAdapter {
         }
     }
 
+    // Validates and stores email, prompts for name
     public static void handleEmailStep(MessageReceivedEvent event, String userId, String email) {
         if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             event.getChannel().sendMessage("❗ Invalid email format, please retry.").queue();
@@ -173,6 +201,7 @@ public class CommandHandler extends ListenerAdapter {
         event.getChannel().sendMessage("👤 Please enter your full name.").queue();
     }
 
+    // Stores name and proceeds to skills selection
     public static void handleNameStep(MessageReceivedEvent event, String userId, String name) {
         try {
             StudentDAO.upsertStudent(name, null, null, null, userId, null);
@@ -182,6 +211,7 @@ public class CommandHandler extends ListenerAdapter {
         promptSkillsSelection(event);
     }
 
+    // Sends skill selection dropdown
     public static void promptSkillsSelection(MessageReceivedEvent event) {
         StringSelectMenu skillsMenu = StringSelectMenu.create("select_skills")
                 .setPlaceholder("💻 Select up to 5 skills")
@@ -203,6 +233,7 @@ public class CommandHandler extends ListenerAdapter {
                 .queue();
     }
 
+    // Sends position preference dropdown
     public static void promptPositionSelection(MessageReceivedEvent event) {
         StringSelectMenu positionMenu = StringSelectMenu.create("select_position")
                 .setPlaceholder("📌 Select up to 5 positions")
@@ -221,17 +252,24 @@ public class CommandHandler extends ListenerAdapter {
                 .queue();
     }
 
+    // Displays the main action menu (GPT, view, create, match, delete)
     public static void showMainMenu(User user) {
         user.openPrivateChannel().queue(dm -> {
             dm.sendMessage("💼 What would you like to do next?")
-                    .setActionRow(
+                    .addActionRow(
                             Button.primary("gpt_ask", "🤖 Ask GPT"),
                             Button.primary("view_profile", "👤 View Profile"),
                             Button.success("create_profile", "📝 Create Profile")
-                    ).queue();
+                    )
+                    .addActionRow(
+                            Button.secondary("match_jobs", "🎯 Match Me"),
+                            Button.danger("delete_profile", "🗑️ Delete Profile")
+                    )
+                    .queue();
         });
     }
 
+    // Placeholder for handling a resume description (future enhancement)
     public static void handleResumeDescriptionStep(MessageReceivedEvent event, String userId, String description) {
         try {
             StudentDAO.upsertStudent(null, null, null, null, userId, null);
@@ -241,6 +279,7 @@ public class CommandHandler extends ListenerAdapter {
         event.getChannel().sendMessage("📄 Please upload your resume as a PDF file.").queue();
     }
 
+    // Handles resume file upload and extraction
     public static void handlePdfUploadStep(MessageReceivedEvent event, String userId) {
         if (event.getMessage().getAttachments().isEmpty()) {
             event.getChannel().sendMessage("❗ Attach a PDF file please.").queue();
@@ -266,7 +305,6 @@ public class CommandHandler extends ListenerAdapter {
                     }
                     event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
                     showMainMenu(event.getAuthor());
-
                 })
                 .exceptionally(ex -> {
                     event.getChannel().sendMessage("❌ Error uploading PDF. Please try again.").queue();
