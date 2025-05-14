@@ -22,22 +22,25 @@ public class OpportunityClient {
 
         for (String term : terms) {
             if (term.isBlank()) continue;
-            try {
-                List<Opportunity> partial = search(term);
-                allResults.addAll(partial);
-            } catch (IOException e) {
-                System.out.println("❌ Error searching for keyword '" + term + "': " + e.getMessage());
+            for (int page = 1; page <= 3; page++) {
+                try {
+                    List<Opportunity> partial = search(term, page);
+                    allResults.addAll(partial);
+                    if (partial.size() < 5) break; // Stop early if fewer than limit returned
+                } catch (IOException e) {
+                    System.out.println("❌ Error searching for keyword '" + term + "' on page " + page + ": " + e.getMessage());
+                }
             }
         }
         return allResults;
     }
 
-    private static List<Opportunity> search(String query) throws IOException {
-        System.out.println("🔍 Searching for: " + query);
+    private static List<Opportunity> search(String query, int page) throws IOException {
+        System.out.println("🔍 Searching for: " + query + " (page " + page + ")");
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(API_URL).newBuilder();
         urlBuilder.addQueryParameter("query", query);
-        urlBuilder.addQueryParameter("page", "1");
+        urlBuilder.addQueryParameter("page", String.valueOf(page));
         urlBuilder.addQueryParameter("limit", "5");
         urlBuilder.addQueryParameter("includeApplications", "false");
 
