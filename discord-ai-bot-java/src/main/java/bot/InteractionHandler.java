@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
 import storage.StudentDAO;
-
+import net.dv8tion.jda.api.EmbedBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,7 +63,6 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "view_profile" -> {
-                // Show user profile if it exists
                 event.deferReply(true).queue();
                 try {
                     var data = StudentDAO.getStudentProfile(userId);
@@ -71,13 +70,20 @@ public class InteractionHandler extends ListenerAdapter {
                         event.getHook().sendMessage("⚠️ You don't have a profile yet. Select 'Create Profile' to start.")
                                 .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                     } else {
-                        StringBuilder sb = new StringBuilder("**Your Profile**\n");
-                        data.forEach((k, v) -> {
-                            if (v != null && !v.isBlank()) {
-                                sb.append("**").append(k).append(":** ").append(v).append("\n");
-                            }
-                        });
-                        event.getHook().sendMessage(sb.toString())
+                        EmbedBuilder embed = new EmbedBuilder();
+                        embed.setTitle("👤 Your Profile");
+                        embed.setColor(0x5865F2); // Discord blurple
+
+                        if (data.get("Name") != null)
+                            embed.addField("🧑 Name", data.get("Name"), false);
+                        if (data.get("Email") != null)
+                            embed.addField("📧 Email", data.get("Email"), false);
+                        if (data.get("Skills") != null)
+                            embed.addField("🛠️ Skills", data.get("Skills"), false);
+                        if (data.get("Career Interest") != null)
+                            embed.addField("🎯 Career Interests", data.get("Career Interest"), false);
+
+                        event.getHook().sendMessageEmbeds(embed.build())
                                 .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                     }
                 } catch (Exception e) {
@@ -107,7 +113,7 @@ public class InteractionHandler extends ListenerAdapter {
                 // Initialize profile and start registration (email step)
                 event.deferReply(true).queue();
                 try {
-                    StudentDAO.upsertStudent(null, null, null, null, userId, null);
+                    StudentDAO.upsertStudent(null, null, null, null, userId);
                     CommandHandler.startRegistrationFor(userId);
                     event.getHook().sendMessage("\uD83D\uDCE7 Please enter your email address.").queue();
                 } catch (Exception e) {
@@ -188,7 +194,7 @@ public class InteractionHandler extends ListenerAdapter {
                 List<String> values = event.getValues();
                 String skills = String.join(", ", values);
                 try {
-                    StudentDAO.upsertStudent(null, null, skills, null, userId, null);
+                    StudentDAO.upsertStudent(null, null, skills, null, userId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -214,15 +220,17 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "select_position" -> {
-                // Store selected position to user profile
-                String selected = event.getValues().get(0);
+                // Store selected positions to user profile in career_interest column
+                List<String> selectedPositions = event.getValues(); // Now supports multiple positions
                 try {
-                    StudentDAO.upsertStudent(null, null, null, selected, userId, null);
+                    String joined = String.join(", ", selectedPositions);
+                    StudentDAO.upsertStudent(null, null, null, joined, userId); // <-- save to career_interest
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                event.reply("✅ Position saved.").setEphemeral(true).queue();
+                String joined = String.join(", ", selectedPositions);
+                event.reply("✅ Positions saved: " + joined).setEphemeral(true).queue();
 
                 // Show next step menu
                 event.getUser().openPrivateChannel().queue(dm -> {
@@ -235,6 +243,7 @@ public class InteractionHandler extends ListenerAdapter {
                             ).queue();
                 });
             }
+
 
             // Default case for unknown select menus
             default -> event.reply("⚠️ Unknown select menu.")
