@@ -94,7 +94,7 @@ public class CommandHandler extends ListenerAdapter {
             return;
         }
         // === !clean ===
-        if (event.isFromGuild() && content.startsWith("!clean ")) {
+        if (content.startsWith("!clean ")) {
 
             String[] parts = content.split("\\s+");
             if (parts.length != 2) {
