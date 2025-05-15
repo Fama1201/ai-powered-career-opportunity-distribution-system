@@ -2,8 +2,9 @@ package storage;
 
 import bot.api.OpportunityClient.Opportunity;
 import config.DBConnection;
-
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Data Access Object (DAO) for interacting with the 'opportunities' table.
@@ -104,6 +105,13 @@ public class OpportunityDAO {
     private static String emptyToNull(String value) {
         return (value == null || value.isBlank()) ? null : value;
     }
+
+    /**
+     * Deletes all opportunities assigned to a specific user.
+     *
+     * @param discordId the Discord user ID
+     * @throws Exception if deletion fails
+     */
     public static void deleteAllForUser(String discordId) throws Exception {
         String sql = "DELETE FROM opportunities WHERE discord_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -115,4 +123,54 @@ public class OpportunityDAO {
         }
     }
 
+    /**
+     * Retrieves all opportunities assigned to a specific Discord user.
+     *
+     * @param discordId the Discord user ID
+     * @return a list of Opportunity objects associated with the user
+     * @throws Exception if a database error occurs
+     */
+    public static List<Opportunity> getAllForUser(String discordId) throws Exception {
+        List<Opportunity> list = new ArrayList<>();
+
+        String sql = """
+        SELECT opportunity_id, title, description, job_type, application_deadline,
+               url, wage, home_office, benefits, formal_requirements,
+               technical_requirements, contact_person, company
+        FROM opportunities
+        WHERE discord_id = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, discordId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Opportunity opp = new Opportunity();
+                opp.id = rs.getString("opportunity_id");
+                opp.title = rs.getString("title");
+                opp.description = rs.getString("description");
+                opp.type = rs.getString("job_type");
+
+                Date deadline = rs.getDate("application_deadline");
+                opp.deadline = (deadline != null) ? deadline.toString() : null;
+
+                opp.url = rs.getString("url");
+                opp.wage = rs.getString("wage");
+                opp.homeOffice = rs.getString("home_office");
+                opp.benefits = rs.getString("benefits");
+                opp.formReq = rs.getString("formal_requirements");
+                opp.techReq = rs.getString("technical_requirements");
+                opp.contactPerson = rs.getString("contact_person");
+                opp.company = rs.getString("title"); // solo si `title` representa el nombre de la empresa, aunque no es lo ideal
+
+
+                list.add(opp);
+            }
+        }
+
+        return list;
+    }
 }

@@ -67,11 +67,32 @@ public class InteractionHandler extends ListenerAdapter {
 
 
             case "gpt_ask" -> {
-                // Prompt user to type a GPT question
-                event.reply("✍️ You can ask the AI by typing `!ask <your question>` here.")
-                        .setEphemeral(true)
+                // Prompt user to type a GPT question with contextual explanation and usage conditions
+                event.reply("""
+        🤖 **Welcome to Jobify CVUT – your personal AI career assistant!**
+        
+        You can ask me questions using `!ask <your question>`.
+        I’ll use your saved **profile** and **matched opportunities** to guide you.
+
+        ✅ Make sure you’ve already:
+        • Completed your profile (Name, Email, Skills, Career Interest)
+        • Clicked the **🎯 Match Me** button to find suitable job offers
+
+        Once you’ve done that, I can:
+        • 🔍 Recommend the best-fit job from your saved opportunities  
+        • 🧠 Suggest skills to improve based on your goals  
+        • 📄 Help you improve your CV and job applications  
+        • ❓ Answer anything about internships, tech roles, or FIT ČVUT career tips
+
+        _📌 Best prompt for accurate job matching:_  
+        `!ask Based on my profile and the opportunities below, please recommend the one that fits me best`
+
+        _💡 Example:_  
+        `!ask Which opportunity suits my backend experience more?`
+        """).setEphemeral(true)
                         .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
             }
+
 
             case "view_profile" -> {
                 event.deferReply(true).queue();

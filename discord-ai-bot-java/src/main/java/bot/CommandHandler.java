@@ -16,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import storage.OpportunityDAO;
 
 
 import java.io.File;
@@ -164,18 +165,75 @@ public class CommandHandler extends ListenerAdapter {
             if (content.startsWith("!ask ") && gpt != null) {
                 String question = content.substring(5).trim();
                 event.getChannel().sendTyping().queue();
-                List<Map<String, String>> messages = List.of(
-                        Map.of("role", "system", "content", "You are a helpful career advisor."),
-                        Map.of("role", "user", "content", question)
-                );
+
+                userId = event.getAuthor().getId();
+                StringBuilder profileInfo = new StringBuilder();
+                StringBuilder opportunitiesInfo = new StringBuilder();
+
+                try {
+                    // 1. Student profile
+                    var profileData = StudentDAO.getStudentProfile(userId);
+                    if (profileData != null && !profileData.isEmpty()) {
+                        profileInfo.append("📄 Student Profile:\n");
+                        profileData.forEach((key, value) -> {
+                            if (value != null && !value.isBlank()) {
+                                profileInfo.append("- ").append(key).append(": ").append(value).append("\n");
+                            }
+                        });
+                    }
+
+                    // 2. Assigned opportunities
+                    var opportunities = OpportunityDAO.getAllForUser(userId);
+                    if (opportunities != null && !opportunities.isEmpty()) {
+                        opportunitiesInfo.append("📌 Assigned Opportunities:\n");
+                        for (var opp : opportunities) {
+                            opportunitiesInfo.append(formatOpportunity(opp));
+                        }
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace(); // Log error, but still proceed
+                }
+
+                List<Map<String, String>> messages = new ArrayList<>();
+                messages.add(Map.of("role", "system", "content",
+                        "You are an AI assistant integrated into a Discord bot called Jobify CVUT. Your job is to help students of FIT ČVUT find and understand job opportunities. Always keep your answers relevant to career guidance, internships, CVs, and matching opportunities based on their profile."));
+
+                if (!profileInfo.isEmpty()) {
+                    messages.add(Map.of("role", "user", "content", profileInfo.toString()));
+                }
+
+                if (!opportunitiesInfo.isEmpty()) {
+                    messages.add(Map.of("role", "user", "content", opportunitiesInfo.toString()));
+                }
+
+                // Combine question + hint for GPT to analyze opportunities if they exist
+                String fullPrompt = question;
+                if (!opportunitiesInfo.isEmpty()) {
+                    fullPrompt += "\n\nPlease analyze the listed opportunities and tell me which one best fits my profile.";
+                }
+
+                messages.add(Map.of("role", "user", "content", fullPrompt));
+
+                // Optional: debug log
+                System.out.println("🧠 Final prompt to GPT:");
+                messages.forEach(m -> System.out.println(m.get("role") + " ➜ " + m.get("content")));
+
                 try {
                     String aiReply = gpt.ask(messages, "gpt-3.5-turbo");
                     event.getChannel().sendMessage(aiReply).queue();
                 } catch (IOException e) {
                     event.getChannel().sendMessage("⚠️ OpenAI error: " + e.getMessage()).queue();
                 }
+
                 return;
             }
+
+
+
+
+
 
             // Handle step-based registration (step 1: email, step 2: name)
             int step = userSteps.getOrDefault(userId, -1);
@@ -423,6 +481,28 @@ public class CommandHandler extends ListenerAdapter {
             list.add(el.getAsString());
         }
         return list;
+    }
+
+
+    // Formats a single opportunity into a readable format for GPT
+    private String formatOpportunity(bot.api.OpportunityClient.Opportunity opp) {
+        return String.format("""
+        🔹 **Title**: %s
+        🏢 **Company**: %s
+        💼 **Type**: %s
+        📅 **Deadline**: %s
+        🏠 **Home Office**: %s
+        💰 **Salary**: %s
+        🛠 **Tech Req**: %s
+        📚 **Formal Req**: %s
+        📄 **Description**: %s
+        📞 **Contact**: %s
+
+        """,
+                opp.title, opp.company, opp.type, opp.deadline,
+                opp.homeOffice, opp.wage, opp.techReq, opp.formReq,
+                opp.description, opp.contactPerson
+        );
     }
 
 
