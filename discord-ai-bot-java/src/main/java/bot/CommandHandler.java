@@ -346,10 +346,22 @@ public class CommandHandler extends ListenerAdapter {
                             String response = gpt.ask(messages, "gpt-3.5-turbo");
                             JsonObject json = JsonParser.parseString(response).getAsJsonObject();
 
-                            String name = json.get("name").getAsString();
-                            String email = json.get("email").getAsString();
-                            String skills = String.join(", ", toList(json.get("skills").getAsJsonArray()));
-                            String positions = String.join(", ", toList(json.get("positions").getAsJsonArray()));
+                            String name = json.has("name") && !json.get("name").isJsonNull()
+                                    ? json.get("name").getAsString()
+                                    : null;
+
+                            String email = json.has("email") && !json.get("email").isJsonNull()
+                                    ? json.get("email").getAsString()
+                                    : null;
+
+                            String skills = json.has("skills") && json.get("skills").isJsonArray()
+                                    ? String.join(", ", toList(json.get("skills").getAsJsonArray()))
+                                    : null;
+
+                            String positions = json.has("positions") && json.get("positions").isJsonArray()
+                                    ? String.join(", ", toList(json.get("positions").getAsJsonArray()))
+                                    : null;
+
 
                             StudentDAO.upsertStudent(name, email, skills, positions, userId);
                             System.out.println("✅ Profile updated using AI.");
@@ -387,12 +399,14 @@ public class CommandHandler extends ListenerAdapter {
                         }
 
                         // 📬 Final confirmation and main menu
-                        event.getChannel().sendMessage("✅ PDF resume received and processed.").queue();
+                        event.getChannel().sendMessage("✅ PDF resume received and processed.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getAuthor()));
 
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        event.getChannel().sendMessage("⚠️ Error processing your CV.").queue();
+                        event.getChannel().sendMessage("⚠️ Error processing your CV.")
+                                .queue(msg -> CommandHandler.showMainMenu(event.getAuthor()));
                     }
                 })
                 .exceptionally(ex -> {
