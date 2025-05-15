@@ -43,9 +43,13 @@ public class InteractionHandler extends ListenerAdapter {
             }
 
             case "delete_profile" -> {
-                // Delete user profile from the database
+                // Delete user profile and all related opportunities
                 event.deferReply(true).queue();
                 try {
+                    // 🗑️ First, delete all opportunities linked to this user
+                    storage.OpportunityDAO.deleteAllForUser(userId);
+
+                    // 👤 Then, delete the user profile
                     boolean deleted = StudentDAO.deleteProfileByDiscordId(userId);
                     if (deleted) {
                         event.getHook().sendMessage("✅ Your profile has been successfully deleted.")
@@ -60,6 +64,7 @@ public class InteractionHandler extends ListenerAdapter {
                             .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                 }
             }
+
 
             case "gpt_ask" -> {
                 // Prompt user to type a GPT question
