@@ -104,4 +104,15 @@ public class OpportunityDAO {
     private static String emptyToNull(String value) {
         return (value == null || value.isBlank()) ? null : value;
     }
+    public static void deleteAllForUser(String discordId) throws Exception {
+        String sql = "DELETE FROM opportunities WHERE discord_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, discordId);
+            int deleted = stmt.executeUpdate();
+            System.out.println("🗑️ Deleted " + deleted + " opportunities for " + discordId);
+        }
+    }
+
 }
