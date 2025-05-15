@@ -116,13 +116,24 @@ public class StudentDAO {
      * @throws Exception if the update fails
      */
     public static void updateCvTextByDiscordId(String discordId, String cvText) throws Exception {
+        if (cvText == null || cvText.isBlank()) {
+            System.out.println("⚠️ Skipping CV text update: input is null or blank.");
+            return;
+        }
+
+        String sql = "UPDATE student SET cv_text = ? WHERE discord_id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "UPDATE student SET cv_text = ? WHERE discord_id = ?")) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, cvText);
             pstmt.setString(2, discordId);
-            pstmt.executeUpdate();
+
+            int updated = pstmt.executeUpdate();
+            if (updated > 0) {
+                System.out.println("✅ CV text updated in DB for user " + discordId);
+            } else {
+                System.out.println("⚠️ No student found for discord_id: " + discordId);
+            }
         }
     }
 }
