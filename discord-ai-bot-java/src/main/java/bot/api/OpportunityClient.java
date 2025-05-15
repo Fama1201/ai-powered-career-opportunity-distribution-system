@@ -24,6 +24,7 @@ public class OpportunityClient {
     /**
      * Searches for opportunities based on multiple keywords.
      * Each keyword is sent to the API individually (up to 3 pages per keyword).
+     *
      * @param keywords A space- or comma-separated string of keywords.
      * @return A set of opportunities collected from all keyword searches.
      */
@@ -39,29 +40,26 @@ public class OpportunityClient {
                 try {
                     List<Opportunity> partial = search(term, page);
                     allResults.addAll(partial);
-                    // If the API returns fewer than 5 results, assume no more pages
-                    if (partial.size() < 5) break;
+                    if (partial.size() < 5) break; // Stop if less than 5 results
                 } catch (IOException e) {
                     System.out.println("❌ Error searching for keyword '" + term + "' on page " + page + ": " + e.getMessage());
                 }
             }
         }
         System.out.println("✅ Total opportunities found: " + allResults.size());
-
         return allResults;
     }
 
     /**
      * Performs a search query to the opportunity API for a specific keyword and page.
      * Parses the result JSON into a list of Opportunity objects.
+     *
      * @param query The keyword to search for.
-     * @param page The page number (pagination).
+     * @param page  The page number (pagination).
      * @return A list of parsed Opportunity objects.
      * @throws IOException if the API call fails.
      */
     private static List<Opportunity> search(String query, int page) throws IOException {
-        System.out.println("🔍 Searching for: " + query + " (page " + page + ")");
-
         HttpUrl.Builder urlBuilder = HttpUrl.parse(API_URL).newBuilder();
         urlBuilder.addQueryParameter("query", query);
         urlBuilder.addQueryParameter("page", String.valueOf(page));
@@ -78,10 +76,7 @@ public class OpportunityClient {
             if (!response.isSuccessful()) throw new IOException("API error: " + response.code());
 
             JsonObject root = JsonParser.parseString(response.body().string()).getAsJsonObject();
-
-            if (!root.has("opportunityPreviewDtos") || root.get("opportunityPreviewDtos").isJsonNull()) {
-                return List.of();
-            }
+            if (!root.has("opportunityPreviewDtos") || root.get("opportunityPreviewDtos").isJsonNull()) return List.of();
 
             JsonArray items = root.getAsJsonArray("opportunityPreviewDtos");
             List<Opportunity> results = new ArrayList<>();
@@ -89,12 +84,10 @@ public class OpportunityClient {
             for (JsonElement el : items) {
                 JsonObject obj = el.getAsJsonObject();
 
-                // Required fields
                 String id = obj.get("opportunityId").getAsString();
                 String name = obj.get("opportunityName").getAsString();
                 String description = obj.get("opportunityDescription").getAsString();
 
-                // Optional: Company name
                 String company = "Unknown";
                 if (obj.has("organizationBaseDtos")) {
                     JsonArray orgs = obj.getAsJsonArray("organizationBaseDtos");
@@ -104,21 +97,18 @@ public class OpportunityClient {
                     }
                 }
 
-                // Optional: Job type
                 String jobType = "N/A";
                 if (obj.has("jobTypes") && obj.get("jobTypes").isJsonArray()) {
                     JsonArray jobArray = obj.getAsJsonArray("jobTypes");
                     if (jobArray.size() > 0) jobType = "Type " + jobArray.get(0).getAsInt();
                 }
 
-                // Optional: Deadline
                 String deadline = "N/A";
                 if (obj.has("opportunitySignupDate") && !obj.get("opportunitySignupDate").isJsonNull()) {
                     long ts = obj.get("opportunitySignupDate").getAsLong();
                     deadline = dateFormat.format(new Date(ts));
                 }
 
-                // Other optional fields with fallbacks
                 String extLink = obj.has("opportunityExtLink") && !obj.get("opportunityExtLink").isJsonNull()
                         ? obj.get("opportunityExtLink").getAsString()
                         : "";
@@ -143,7 +133,6 @@ public class OpportunityClient {
                         ? obj.get("opportunityTechReq").getAsString()
                         : "";
 
-                // Contact person (optional)
                 String contact = "";
                 if (obj.has("expertPreviews")) {
                     JsonArray contacts = obj.getAsJsonArray("expertPreviews");
@@ -155,7 +144,6 @@ public class OpportunityClient {
                     }
                 }
 
-                // Add the parsed opportunity to the list
                 results.add(new Opportunity(id, name, company, jobType, deadline, description, extLink,
                         wage, homeOffice, benefits, formReq, techReq, contact));
             }
@@ -168,9 +156,18 @@ public class OpportunityClient {
      * Data class representing a single opportunity.
      */
     public static class Opportunity {
-        public final String id, title, company, type, deadline, description, url;
-        public final String wage, homeOffice, benefits, formReq, techReq, contactPerson;
+        public String id, title, company, type, deadline, description, url;
+        public String wage, homeOffice, benefits, formReq, techReq, contactPerson;
 
+        /**
+         * Empty constructor (used when populating manually from database).
+         */
+        public Opportunity() {
+        }
+
+        /**
+         * Full constructor (used when parsing API response directly).
+         */
         public Opportunity(String id, String title, String company, String type, String deadline,
                            String description, String url,
                            String wage, String homeOffice, String benefits,
@@ -191,7 +188,9 @@ public class OpportunityClient {
         }
 
         /**
-         * Converts the opportunity into a Discord MessageEmbed for rich formatting.
+         * Converts this opportunity into a rich Discord embed message.
+         *
+         * @return MessageEmbed for displaying in Discord
          */
         public MessageEmbed toEmbed() {
             EmbedBuilder embed = new EmbedBuilder();
