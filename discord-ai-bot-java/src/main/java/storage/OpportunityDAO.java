@@ -44,13 +44,14 @@ public class OpportunityDAO {
      */
     public static void insertForUser(Opportunity opp, String discordId) throws Exception {
         String sql = """
-            INSERT INTO opportunities (
-                opportunity_id, title, description, job_type, application_deadline,
-                discord_id, url,
-                wage, home_office, benefits, formal_requirements,
-                technical_requirements, contact_person
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO opportunities (
+        opportunity_id, title, description, job_type, application_deadline,
+        discord_id, url,
+        wage, home_office, benefits, formal_requirements,
+        technical_requirements, contact_person, company
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
+
 
         // Debug log showing opportunity info before inserting
         System.out.println("\n📥 Preparing to insert opportunity:");
@@ -63,6 +64,8 @@ public class OpportunityDAO {
         System.out.println("→ Tech Req: " + opp.techReq);
         System.out.println("→ Contact: " + opp.contactPerson);
 
+
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -71,6 +74,7 @@ public class OpportunityDAO {
             stmt.setString(2, opp.title);
             stmt.setString(3, opp.description);
             stmt.setString(4, opp.type);
+
 
             // Convert deadline to SQL date or set null
             if (opp.deadline != null && !opp.deadline.isBlank()) {
@@ -88,6 +92,7 @@ public class OpportunityDAO {
             stmt.setString(11, emptyToNull(opp.formReq));
             stmt.setString(12, emptyToNull(opp.techReq));
             stmt.setString(13, emptyToNull(opp.contactPerson));
+            stmt.setString(14, emptyToNull(opp.company));
 
             // Insert into database
             stmt.executeUpdate();
@@ -164,7 +169,8 @@ public class OpportunityDAO {
                 opp.formReq = rs.getString("formal_requirements");
                 opp.techReq = rs.getString("technical_requirements");
                 opp.contactPerson = rs.getString("contact_person");
-                opp.company = rs.getString("title"); // solo si `title` representa el nombre de la empresa, aunque no es lo ideal
+                opp.company = rs.getString("company"); // ✅ Correcto
+
 
 
                 list.add(opp);
