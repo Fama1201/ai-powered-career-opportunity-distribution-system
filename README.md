@@ -143,6 +143,9 @@ java -cp your-jar-name.jar bot.BotMain
 For help or questions, please contact:
 
 - Email: francisco.molina.antonio@gmail.com
+
+- Email: ErdemYusufEmre@gmail.com
+
 - GitLab Issues: [Open a ticket](https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system/-/issues)
 
 ---
