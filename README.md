@@ -151,7 +151,7 @@ For help or questions, please contact:
 
 This project was developed by a collaborative team of students from FIT ČVUT. Below are the contributors and their specific roles:
 
-- **Francisco Antonio Molina Alava** – 🧠 Team Leader  
+- **Francisco Antonio Molina Alava** – 🧠 Team Leader & Main Developer    
   Led the team, directed the architecture and main code development, improved the database schema, and coordinated the documentation process.
 
 - **Yunus Emre Yuce** – 🗂️ Documentation & Initial Database  
@@ -160,7 +160,7 @@ This project was developed by a collaborative team of students from FIT ČVUT. B
 - **Yusuf Emre Erdem** – 📄 Documentation & Frontend Support  
   Participated in writing documentation, assisted with frontend interactions, and contributed backend logic.
 
-- **Emir Orhan** – 📄 Documentation & Database  
+- **Emir Orhan** – 🗂️ Documentation & Initial Database  
   Helped with the documentation and collaborated on the initial database setup and validation.
 
 - **Abdul Rahman Asaad Mourad** – 📄 Documentation & Code Quality  
