@@ -121,19 +121,22 @@ public class StudentDAO {
             return;
         }
 
-        String sql = "UPDATE student SET cv_text = ? WHERE discord_id = ?";
+        String sql = """
+        INSERT INTO student (discord_id, cv_text)
+        VALUES (?, ?)
+        ON CONFLICT (discord_id) DO UPDATE
+        SET cv_text = EXCLUDED.cv_text
+    """;
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, cvText);
-            pstmt.setString(2, discordId);
+            pstmt.setString(1, discordId);
+            pstmt.setString(2, cvText);
 
-            int updated = pstmt.executeUpdate();
-            if (updated > 0) {
-                System.out.println("✅ CV text updated in DB for user " + discordId);
-            } else {
-                System.out.println("⚠️ No student found for discord_id: " + discordId);
-            }
+            int rows = pstmt.executeUpdate();
+            System.out.println("✅ CV upserted for " + discordId + " (rows affected: " + rows + ")");
         }
     }
+
 }
