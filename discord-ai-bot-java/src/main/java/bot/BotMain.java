@@ -9,46 +9,41 @@ import javax.security.auth.login.LoginException;
 
 public class BotMain {
     public static void main(String[] args) throws LoginException {
-        // 1. Load your Discord bot token from the environment
+        // 1. Load Discord bot token from environment variable
         String discordToken = System.getenv("DISCORD_TOKEN");
         if (discordToken == null || discordToken.isEmpty()) {
             System.err.println("❌ DISCORD_TOKEN is not set.");
             return;
         }
 
-        // 2. Load your OpenAI API key from the environment
-        //    If you don’t need GPT features, you can skip this or leave it blank.
+        // 2. Load OpenAI API key (optional)
         String openAiKey = System.getenv("OPENAI_API_KEY");
         if (openAiKey == null || openAiKey.isEmpty()) {
             System.err.println("⚠️ OPENAI_API_KEY is not set. GPT features will be disabled.");
         }
 
-        // 3. Create GPTClient only if we have a valid key
+        // 3. Initialize GPTClient if API key is provided
         GPTClient gptClient = null;
         if (openAiKey != null && !openAiKey.isEmpty()) {
             gptClient = new GPTClient(openAiKey);
         }
 
-        // 4. Build the JDA Discord client
+        // 4. Initialize JDA bot
         JDABuilder builder = JDABuilder.createDefault(discordToken)
-                // Enable intents to read both guild and DM messages
                 .enableIntents(
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.DIRECT_MESSAGES,
                         GatewayIntent.MESSAGE_CONTENT
                 )
-                // Show "!start" as the bot’s activity status
                 .setActivity(Activity.listening("!start"));
 
+        // 5. Register event listeners
+        builder.addEventListeners(
+                new CommandHandler(gptClient),
+                new InteractionHandler()
+        );
 
-            builder.addEventListeners(
-                    new CommandHandler(gptClient),
-                    new InteractionHandler()
-
-            );
-
-
-        // 6. Login and start the bot
+        // 6. Start the bot
         builder.build();
     }
 }

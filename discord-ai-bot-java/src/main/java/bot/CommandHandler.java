@@ -35,6 +35,7 @@ import java.util.Map;
 public class CommandHandler extends ListenerAdapter {
 
     private final GPTClient gpt;
+    private String message;
 
     /**
      * @param gpt GPTClient instance for AI interactions
@@ -71,6 +72,39 @@ public class CommandHandler extends ListenerAdapter {
         if (content.equalsIgnoreCase("!status")) {
             event.getChannel().sendMessage("✅ Bot is operational.").queue();
             return;
+        }
+
+        if (message.startsWith("!clean")) {
+            if (!event.getMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
+                event.getChannel().sendMessage("❌ You don't have permission to use this command.").queue();
+                return;
+            }
+
+            String[] parts = message.split("\\s+");
+            if (parts.length != 2) {
+                event.getChannel().sendMessage("⚠️ Usage: !clean <number_of_messages>").queue();
+                return;
+            }
+
+            int amount;
+            try {
+                amount = Integer.parseInt(parts[1]);
+                if (amount <= 0 || amount > 100) {
+                    event.getChannel().sendMessage("⚠️ Please specify a number between 1 and 100.").queue();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                event.getChannel().sendMessage("⚠️ Invalid number format.").queue();
+                return;
+            }
+
+            event.getChannel().getHistory().retrievePast(amount).queue(messages -> {
+                event.getChannel().purgeMessages(messages);
+                event.getChannel().sendMessage("✅ Deleted " + messages.size() + " messages.").queue(msg -> {
+                    msg.delete().queueAfter(3, java.util.concurrent.TimeUnit.SECONDS);
+                });
+            });
+            return; // diğer komutlara geçmeden burada durduruyoruz
         }
 
         // === Start Command in Guild ===
