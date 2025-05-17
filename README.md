@@ -1,93 +1,187 @@
-# AI-Powered Career Opportunity Distribution System
+# 🤖 AI-Powered Career Opportunity Distribution System
 
+**Jobify CVUT** is an intelligent Discord bot that connects students of FIT ČVUT with relevant internship and job opportunities. It uses the EXPERTS.AI platform for opportunity sourcing, OpenAI's GPT for CV analysis and recommendations, and PostgreSQL for persistent profile and opportunity tracking.
 
+---
 
-## Getting started
+## 📌 Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- 🎯 **Personalized Job Matching** – Based on skills and career interests stored in student profiles.
+- 📄 **CV Upload & Parsing** – Automatically extracts name, email, skills, and positions from uploaded PDF resumes.
+- 🧠 **GPT-Powered Career Advisor** – Analyzes saved opportunities and CVs to suggest improvements or ideal positions.
+- 👤 **Interactive Profile Setup** – Discord-driven onboarding via buttons and dropdowns.
+- 🔄 **Opportunity Synchronization** – Periodic and real-time fetching from the EXPERTS.AI API.
+- 💾 **Persistent Data Layer** – PostgreSQL-backed storage of students and their assigned opportunities.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+---
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## 📁 Project Structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system.git
-git branch -M main
-git push -uf origin main
+src/
+├── main/
+│   └── java/
+│       └── bot/
+│           ├── BotMain.java               # Entry point
+│           ├── CommandHandler.java        # Handles messages and commands
+│           ├── InteractionHandler.java    # Handles buttons and dropdowns
+│           ├── ai/
+│           │   └── GPTClient.java         # GPT API handler
+│           ├── api/
+│           │   └── OpportunityClient.java # EXPERTS.AI integration
+│           ├── storage/
+│           │   ├── StudentDAO.java        # DB access for students
+│           │   └── OpportunityDAO.java    # DB access for opportunities
+│           └── util/
+│               └── PdfUtils.java          # Resume text extraction
 ```
 
-## Integrate with your tools
+---
 
-- [ ] [Set up project integrations](https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system/-/settings/integrations)
+## ⚙️ Installation & Setup
 
-## Collaborate with your team
+### 1. Requirements
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+- Java 17+
+- PostgreSQL
+- Discord Bot Token
+- OpenAI API Key (optional)
 
-## Test and Deploy
+### 2. Environment Variables
 
-Use the built-in continuous integration in GitLab.
+Set the following variables:
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```env
+DISCORD_TOKEN=your_discord_bot_token
+OPENAI_API_KEY=your_openai_key
+```
 
-***
+### 3. Database Schema
 
-# Editing this README
+```sql
+CREATE TABLE student (
+  discord_id TEXT PRIMARY KEY,
+  name TEXT,
+  email TEXT,
+  skills TEXT,
+  career_interest TEXT,
+  cv_text TEXT
+);
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+CREATE TABLE opportunities (
+  opportunity_id TEXT,
+  discord_id TEXT,
+  title TEXT,
+  description TEXT,
+  job_type TEXT,
+  application_deadline DATE,
+  url TEXT,
+  wage TEXT,
+  home_office TEXT,
+  benefits TEXT,
+  formal_requirements TEXT,
+  technical_requirements TEXT,
+  contact_person TEXT,
+  PRIMARY KEY (opportunity_id, discord_id)
+);
+```
 
-## Suggestions for a good README
+### 4. Run the Bot
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+./gradlew run
+# or with plain Java
+java -cp your-jar-name.jar bot.BotMain
+```
 
-## Name
-Choose a self-explaining name for your project.
+---
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## 🚀 Usage
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Commands
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+| Command       | Description                              |
+|---------------|------------------------------------------|
+| `!start`      | Begins onboarding with buttons           |
+| `!ask <text>` | Asks GPT for personalized guidance       |
+| `!fetch`      | Manually fetches job matches             |
+| `!status`     | Bot status check                         |
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Interaction Flow
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+1. User types `!start`
+2. Bot responds in DM with options to:
+   - Upload CV
+   - Create profile manually
+   - Ask GPT questions
+   - Match jobs
+3. User receives GPT-based analysis or matched jobs
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+---
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## 💡 Example GPT Prompts
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```text
+!ask Based on my profile and the jobs below, which one should I apply to?
+!ask How can I improve my CV for DevOps positions?
+!ask Which technical skills should I focus on for backend roles?
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+---
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## 📌 Roadmap
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+- 🔔 Notification system for new job opportunities
+- 🌍 Location-based filtering
+- 🗃️ Admin panel for company management
+- 🌐 Multilingual support (EN/CZ)
 
-## License
-For open source projects, say how it is licensed.
+---
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## 🙋‍♂️ Support
+
+For help or questions, please contact:
+
+- Email: francisco.molina.antonio@gmail.com
+- GitLab Issues: [Open a ticket](https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system/-/issues)
+
+---
+
+## 👨‍💻 Authors and Acknowledgment
+
+This project was developed by a collaborative team of students from FIT ČVUT. Below are the contributors and their specific roles:
+
+- **Francisco Antonio Molina Alava** – 🧠 Team Leader  
+  Led the team, directed the architecture and main code development, improved the database schema, and coordinated the documentation process.
+
+- **Yunus Emre Yuce** – 🗂️ Documentation & Initial Database  
+  Contributed significantly to the documentation and built the first version of the database.
+
+- **Yusuf Emre Erdem** – 📄 Documentation & Frontend Support  
+  Participated in writing documentation, assisted with frontend interactions, and contributed backend logic.
+
+- **Emir Orhan** – 📄 Documentation & Database  
+  Helped with the documentation and collaborated on the initial database setup and validation.
+
+- **Abdul Rahman Asaad Mourad** – 📄 Documentation & Code Quality  
+  Contributed to the documentation and performed static code analysis to ensure code quality and maintainability.
+
+- **Karim Gamal Aziz Georgy Habib** – 📄 Documentation  
+  Assisted with creating and formatting the official project documentation.
+
+- **Maya Hussein Abdulhalem Elkadi** – 📄 Documentation  
+  Supported the documentation effort across various project components.
+
+We thank all contributors for their collaboration and effort in building this AI-powered opportunity matching system.
+
+
+## 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+## 📊 Project Status
+
+🚧 Actively maintained. New features are being developed regularly.  
+Looking for collaborators and testers!
