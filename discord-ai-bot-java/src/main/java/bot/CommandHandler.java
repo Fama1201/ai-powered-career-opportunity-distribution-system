@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+//import net.dv8tion.jda.api.Permission.MESSAGE_MANAGE;
 import org.jetbrains.annotations.NotNull;
 import storage.StudentDAO;
 import util.PdfUtils;
@@ -95,6 +96,35 @@ public class CommandHandler extends ListenerAdapter {
                                 Button.danger("delete_profile", "🗑️ Delete Profile")
                         )
                         .queue();
+            });
+            return;
+        }
+        // === !clean command ===
+        if (content.startsWith("!clean ")) {
+
+            String[] parts = content.split("\\s+");
+            if (parts.length != 2) {
+                event.getChannel().sendMessage("❗ Usage: `!clean <number>`").queue();
+                return;
+            }
+
+            int count;
+            try {
+                count = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException e) {
+                event.getChannel().sendMessage("❗ Invalid number.").queue();
+                return;
+            }
+
+            if (count < 1 || count > 100) {
+                event.getChannel().sendMessage("⚠️ Please choose a number between 1 and 100.").queue();
+                return;
+            }
+
+            event.getChannel().getHistory().retrievePast(count + 1).queue(messages -> {
+                event.getChannel().purgeMessages(messages);
+                event.getChannel().sendMessage("✅ Deleted " + count + " messages.")
+                        .queue(msg -> msg.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
             });
             return;
         }
