@@ -7,36 +7,43 @@ import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.SQLException;
 
 /**
  * Data Access Object for the 'student' table.
- * Provides an upsert method and profile retrieval by Discord ID.
+ * Provides methods to insert/update (upsert) a student,
+ * retrieve profile data by Discord ID, delete a profile,
+ * and update the student's resume (CV) text.
  */
 public class StudentDAO {
 
     /**
-     * Inserts a new student record or updates an existing one by discord_id.
+     * Inserts a new student record or updates an existing one based on the Discord ID.
+     * Only non-null fields in the upsert call will be updated; others are preserved.
+     *
+     * @param fullName        student's full name
+     * @param email           student's email
+     * @param skills          list of skills as a string
+     * @param careerInterest  preferred career field
+     * @param discordId       unique Discord user ID (primary key)
+     * @throws Exception if the database operation fails
      */
     public static void upsertStudent(
             String fullName,
             String email,
             String skills,
             String careerInterest,
-            String discordId,
-            String cvUrl,
-            String jobType
+            String discordId
     ) throws Exception {
         String sql = """
             INSERT INTO student
-                (name, email, skills, career_interest, discord_id, cv_url, job_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                (name, email, skills, career_interest, discord_id)
+            VALUES (?, ?, ?, ?, ?)
             ON CONFLICT (discord_id) DO UPDATE
               SET name            = COALESCE(EXCLUDED.name,            student.name),
                   email           = COALESCE(EXCLUDED.email,           student.email),
                   skills          = COALESCE(EXCLUDED.skills,          student.skills),
-                  career_interest = COALESCE(EXCLUDED.career_interest, student.career_interest),
-                  cv_url          = COALESCE(EXCLUDED.cv_url,          student.cv_url),
-                  job_type        = COALESCE(EXCLUDED.job_type,        student.job_type)
+                  career_interest = COALESCE(EXCLUDED.career_interest, student.career_interest)
             """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -47,21 +54,20 @@ public class StudentDAO {
             stmt.setObject(3, skills, Types.VARCHAR);
             stmt.setObject(4, careerInterest, Types.VARCHAR);
             stmt.setString(5, discordId);
-            stmt.setObject(6, cvUrl, Types.VARCHAR);
-            stmt.setObject(7, jobType, Types.VARCHAR);
 
             stmt.executeUpdate();
         }
     }
 
     /**
-     * Retrieves the profile of a student by their Discord ID.
+     * Retrieves a student's profile information from the database using their Discord ID.
      *
      * @param discordId the unique Discord user ID
-     * @return a map of field names to values, or null if not found
+     * @return a map with keys like "Name", "Email", "Skills", etc., or null if not found
+     * @throws Exception if the database query fails
      */
     public static Map<String, String> getStudentProfile(String discordId) throws Exception {
-        String sql = "SELECT name, email, skills, career_interest, cv_url, job_type FROM student WHERE discord_id = ?";
+        String sql = "SELECT name, email, skills, career_interest FROM student WHERE discord_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -74,12 +80,59 @@ public class StudentDAO {
                     profile.put("Email", rs.getString("email"));
                     profile.put("Skills", rs.getString("skills"));
                     profile.put("Career Interest", rs.getString("career_interest"));
-                    profile.put("CV", rs.getString("cv_url"));
-                    profile.put("Job Type", rs.getString("job_type"));
                     return profile;
                 } else {
                     return null;
                 }
+            }
+        }
+    }
+
+    /**
+     * Deletes a student's profile from the database using their Discord ID.
+     *
+     * @param discordId the user's Discord ID
+     * @return true if a row was deleted, false if no match was found
+     */
+    public static boolean deleteProfileByDiscordId(String discordId) {
+        String sql = "DELETE FROM student WHERE discord_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, discordId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Updates the `cv_text` column for a student given their Discord ID.
+     *
+     * @param discordId the user's Discord ID
+     * @param cvText    the extracted plain text content of the resume
+     * @throws Exception if the update fails
+     */
+    public static void updateCvTextByDiscordId(String discordId, String cvText) throws Exception {
+        if (cvText == null || cvText.isBlank()) {
+            System.out.println("⚠️ Skipping CV text update: input is null or blank.");
+            return;
+        }
+
+        String sql = "UPDATE student SET cv_text = ? WHERE discord_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, cvText);
+            pstmt.setString(2, discordId);
+
+            int updated = pstmt.executeUpdate();
+            if (updated > 0) {
+                System.out.println("✅ CV text updated in DB for user " + discordId);
+            } else {
+                System.out.println("⚠️ No student found for discord_id: " + discordId);
             }
         }
     }
