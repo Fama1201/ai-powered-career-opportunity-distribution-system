@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
+import storage.FeedbackDAO;
 import storage.OpportunityDAO;
 import storage.StudentDAO;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,10 +42,20 @@ public class InteractionHandler extends ListenerAdapter {
     public void onModalInteraction(ModalInteractionEvent event) {
         if (event.getModalId().equals("feedback_modal")) {
             String feedbackText = event.getValue("feedback_input").getAsString();
+            long userId = event.getUser().getIdLong();
 
-            // Send stars via DM
+            String discordId = event.getUser().getId();
+
+            FeedbackDAO dao = new FeedbackDAO();
+            try {
+                dao.insertFeedback(feedbackText, userId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            // Yıldızları gönder
             event.getUser().openPrivateChannel().queue(channel -> {
-                channel.sendMessage("Thank you for your feedback! 🙏 Now rate us:")
+                channel.sendMessage("Thanks for your feedback! Please rate us:")
                         .addActionRow(
                                 Button.secondary("star_1", "⭐"),
                                 Button.secondary("star_2", "⭐⭐"),
@@ -54,19 +65,29 @@ public class InteractionHandler extends ListenerAdapter {
                         ).queue();
             });
 
-            // Confirmation message
             event.reply("✅ Your feedback has been received!").setEphemeral(true).queue();
-
-            // You can store `feedbackText` temporarily or log it here
-            System.out.println("Feedback from " + event.getUser().getName() + ": " + feedbackText);
         }
     }
+
 
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String id = event.getComponentId();              // Unique identifier of the button clicked
         String userId = event.getUser().getId();         // Discord user ID
+        String componentId = event.getComponentId();
+
+        if(componentId.startsWith("star_")) {
+            int stars = Integer.parseInt(componentId.split("_")[1]);
+            String userID = event.getUser().getId();
+
+            FeedbackDAO dao = new FeedbackDAO();
+            dao.updateStarsByDiscordId(userID, stars);
+
+
+            event.reply("⭐ Thanks! Your rating has been saved.").setEphemeral(true).queue(msg -> CommandHandler.showMainMenu(event.getUser()));
+
+        }
 
         switch (id) {
             case "start" -> {
