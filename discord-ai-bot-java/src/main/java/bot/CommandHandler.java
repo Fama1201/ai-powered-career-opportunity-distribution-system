@@ -99,7 +99,7 @@ public class CommandHandler extends ListenerAdapter {
             });
             return;
         }
-        // === !clean ===
+        // === !clean command ===
         if (content.startsWith("!clean ")) {
 
             String[] parts = content.split("\\s+");
