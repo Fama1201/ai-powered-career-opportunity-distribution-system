@@ -157,8 +157,8 @@ This project was developed by a collaborative team of students from FIT ČVUT. B
 - **Yunus Emre Yuce** – 🗂️ Documentation & Initial Database  
   Contributed significantly to the documentation and built the first version of the database.
 
-- **Yusuf Emre Erdem** – 📄 Documentation & Frontend Support  
-  Participated in writing documentation, assisted with frontend interactions, and contributed backend logic.
+- **Yusuf Emre Erdem** – 💻 Developer & Documentation  
+  Participated in writing documentation, contributed to backend logic, and assisted in development tasks.
 
 - **Emir Orhan** – 🗂️ Documentation & Initial Database  
   Helped with the documentation and collaborated on the initial database setup and validation.
