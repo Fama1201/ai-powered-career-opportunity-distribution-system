@@ -41,7 +41,10 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### Local config files ###
+db.properties
 resources/db.properties
 resumes/
 src/main/resources/db.properties
 src/main/resources/
+

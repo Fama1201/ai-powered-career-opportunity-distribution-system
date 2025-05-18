@@ -1,12 +1,18 @@
 package bot;
 
 import bot.api.OpportunityClient;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
+import storage.FeedbackDAO;
+import storage.OpportunityDAO;
 import storage.StudentDAO;
 import net.dv8tion.jda.api.EmbedBuilder;
 import java.util.List;
@@ -17,6 +23,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+
+import static net.dv8tion.jda.api.interactions.components.text.TextInputStyle.PARAGRAPH;
+
 
 
 /**
@@ -29,10 +38,61 @@ public class InteractionHandler extends ListenerAdapter {
      * Responds to button clicks based on their component ID.
      * Each button triggers a different workflow depending on its ID.
      */
+
+
+    @Override
+    public void onModalInteraction(ModalInteractionEvent event) {
+        if (event.getModalId().equals("feedback_modal")) {
+            String feedbackText = event.getValue("feedback_input").getAsString();
+            long userId = event.getUser().getIdLong();
+
+            String discordId = event.getUser().getId();
+
+            FeedbackDAO dao = new FeedbackDAO();
+            try {
+                dao.insertFeedback(feedbackText, userId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            // Yıldızları gönder
+            event.getUser().openPrivateChannel().queue(channel -> {
+                channel.sendMessage("Thanks for your feedback! Please rate us:")
+                        .addActionRow(
+                                Button.secondary("star_1", "⭐"),
+                                Button.secondary("star_2", "⭐⭐"),
+                                Button.secondary("star_3", "⭐⭐⭐"),
+                                Button.secondary("star_4", "⭐⭐⭐⭐"),
+                                Button.secondary("star_5", "⭐⭐⭐⭐⭐")
+                        ).queue();
+            });
+
+            event.reply("✅ Your feedback has been received!").setEphemeral(true).queue();
+        }
+    }
+
+
+
+
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String id = event.getComponentId();              // Unique identifier of the button clicked
         String userId = event.getUser().getId();         // Discord user ID
+
+        String componentId = event.getComponentId();
+
+        if(componentId.startsWith("star_")) {
+            int stars = Integer.parseInt(componentId.split("_")[1]);
+            String userID = event.getUser().getId();
+
+            FeedbackDAO dao = new FeedbackDAO();
+            dao.updateStarsByDiscordId(userID, stars);
+
+
+            event.reply("⭐ Thanks! Your rating has been saved.").setEphemeral(true).queue(msg -> CommandHandler.showMainMenu(event.getUser()));
+
+        }
+
 
         switch (id) {
             case "start" -> {
@@ -47,8 +107,7 @@ public class InteractionHandler extends ListenerAdapter {
                 event.deferReply(true).queue();
                 try {
                     // 🗑️ First, delete all opportunities linked to this user
-                    storage.OpportunityDAO.deleteAllForUser(userId);
-
+                    OpportunityDAO.deleteAllForUser(userId);
                     // 👤 Then, delete the user profile
                     boolean deleted = StudentDAO.deleteProfileByDiscordId(userId);
                     if (deleted) {
@@ -64,6 +123,20 @@ public class InteractionHandler extends ListenerAdapter {
                             .queue(msg -> CommandHandler.showMainMenu(event.getUser()));
                 }
             }
+            case "feedback" -> {
+                Modal feedbackModal = Modal.create("feedback_modal", "📝 Bot Feedback")
+                        .addActionRow(
+                                TextInput.create("feedback_input", "Your thoughts", PARAGRAPH)
+                                        .setPlaceholder("Tell us what you think about the bot...")
+                                        .setRequired(true)
+                                        .build()
+                        )
+                        .build();
+                event.replyModal(feedbackModal).queue();
+            }
+
+
+
 
 
             case "gpt_ask" -> {
@@ -180,8 +253,9 @@ public class InteractionHandler extends ListenerAdapter {
                                 .queue(msg -> {
                                     for (var opp : results) {
                                         try {
-                                            if (!storage.OpportunityDAO.existsForUser(opp, userId)) {
-                                                storage.OpportunityDAO.insertForUser(opp, userId);
+                                            if (!OpportunityDAO.existsForUser(opp, userId)) {
+                                                OpportunityDAO.insertForUser(opp, userId);
+
                                             }
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
@@ -274,7 +348,9 @@ public class InteractionHandler extends ListenerAdapter {
                                         )
                                         .addActionRow(
                                                 Button.secondary("match_jobs", "🎯 Match Me"),
-                                                Button.danger("delete_profile", "🗑️ Delete Profile")
+                                                Button.danger("delete_profile", "🗑️ Delete Profile"),
+                                                Button.primary("feedback","⭐ Feedback")
+
                                         )
                                         .queue();
                             });

@@ -68,36 +68,7 @@ public class CommandHandler extends ListenerAdapter {
             return;
         }
 
-        // Hidden test command to show delete button directly
-        if (content.equalsIgnoreCase("!testbutton")) {
-            event.getAuthor().openPrivateChannel().queue(dm -> {
-                dm.sendMessage("🧪 Testing delete_profile button:")
-                        .addActionRow(Button.danger("delete_profile", "🗑️ Delete Profile"))
-                        .queue();
-            });
-        }
 
-        // When a user types !start in a public server, send them a welcome message via DM
-        if (event.isFromGuild() && content.equalsIgnoreCase("!start")) {
-            event.getChannel()
-                    .sendMessage("👋 **Welcome to the EXPERTS.AI Career Hub!** Check your DMs to begin registration.")
-                    .queue();
-
-            event.getAuthor().openPrivateChannel().queue(dm -> {
-                dm.sendMessage("👋 Welcome! Choose an option:")
-                        .addActionRow(
-                                Button.primary("gpt_ask", "🤖 Ask GPT"),
-                                Button.primary("view_profile", "👤 View Profile"),
-                                Button.success("create_profile", "📝 Create Profile")
-                        )
-                        .addActionRow(
-                                Button.secondary("match_jobs", "🎯 Match Me"),
-                                Button.danger("delete_profile", "🗑️ Delete Profile")
-                        )
-                        .queue();
-            });
-            return;
-        }
 
         // Handle private messages (e.g. profile registration and uploading files)
         if (event.isFromType(ChannelType.PRIVATE)) {
@@ -342,7 +313,10 @@ public class CommandHandler extends ListenerAdapter {
                     )
                     .addActionRow(
                             Button.secondary("match_jobs", "🎯 Match Me"),
-                            Button.danger("delete_profile", "🗑️ Delete Profile")
+
+                            Button.danger("delete_profile", "🗑️ Delete Profile"),
+                            Button.primary("feedback","⭐ Feedback")
+
                     )
                     .queue();
         });
