@@ -9,7 +9,9 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+
 //import net.dv8tion.jda.api.Permission.MESSAGE_MANAGE;
+
 import org.jetbrains.annotations.NotNull;
 import storage.StudentDAO;
 import util.PdfUtils;
@@ -69,14 +71,7 @@ public class CommandHandler extends ListenerAdapter {
             return;
         }
 
-        // Hidden test command to show delete button directly
-        if (content.equalsIgnoreCase("!testbutton")) {
-            event.getAuthor().openPrivateChannel().queue(dm -> {
-                dm.sendMessage("🧪 Testing delete_profile button:")
-                        .addActionRow(Button.danger("delete_profile", "🗑️ Delete Profile"))
-                        .queue();
-            });
-        }
+
 
         // === !clean command ===
         if (content.startsWith("!clean ")) {
@@ -107,6 +102,7 @@ public class CommandHandler extends ListenerAdapter {
             });
             return;
         }
+
 
         // Handle private messages (e.g. profile registration and uploading files)
         if (event.isFromType(ChannelType.PRIVATE)) {
@@ -342,26 +338,24 @@ public class CommandHandler extends ListenerAdapter {
 
     // Displays the main action menu (GPT, view, create, match, delete)
     public static void showMainMenu(User user) {
-        user.openPrivateChannel().queue(
-                dm -> {
-                    dm.sendMessage("💼 What would you like to do next?")
-                            .addActionRow(
-                                    Button.primary("gpt_ask", "🤖 Ask GPT"),
-                                    Button.primary("view_profile", "👤 View Profile"),
-                                    Button.success("create_profile", "📝 Create Profile")
-                            )
-                            .addActionRow(
-                                    Button.secondary("match_jobs", "🎯 Match Me"),
-                                    Button.danger("delete_profile", "🗑️ Delete Profile")
-                            )
-                            .queue();
-                },
-                error -> {
-                    // ⛔ User has DMs blocked
-                    System.out.println("❌ Could not send DM to " + user.getName());
-                    // Optional: Notify in a public channel if you have access to it (or just log)
-                }
-        );
+
+        user.openPrivateChannel().queue(dm -> {
+            dm.sendMessage("💼 What would you like to do next?")
+                    .addActionRow(
+                            Button.primary("gpt_ask", "🤖 Ask GPT"),
+                            Button.primary("view_profile", "👤 View Profile"),
+                            Button.success("create_profile", "📝 Create Profile")
+                    )
+                    .addActionRow(
+                            Button.secondary("match_jobs", "🎯 Match Me"),
+
+                            Button.danger("delete_profile", "🗑️ Delete Profile"),
+                            Button.primary("feedback","⭐ Feedback")
+
+                    )
+                    .queue();
+        });
+
     }
 
 
