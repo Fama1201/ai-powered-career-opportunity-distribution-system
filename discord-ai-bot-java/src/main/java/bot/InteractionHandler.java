@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import static net.dv8tion.jda.api.interactions.components.text.TextInputStyle.PARAGRAPH;
 
 
+
 /**
  * Handles all interactions from Discord UI components such as buttons and select menus.
  * This includes profile actions, matching jobs, and chatbot prompts.
@@ -37,6 +38,7 @@ public class InteractionHandler extends ListenerAdapter {
      * Responds to button clicks based on their component ID.
      * Each button triggers a different workflow depending on its ID.
      */
+
 
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
@@ -71,10 +73,12 @@ public class InteractionHandler extends ListenerAdapter {
 
 
 
+
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String id = event.getComponentId();              // Unique identifier of the button clicked
         String userId = event.getUser().getId();         // Discord user ID
+
         String componentId = event.getComponentId();
 
         if(componentId.startsWith("star_")) {
@@ -88,6 +92,7 @@ public class InteractionHandler extends ListenerAdapter {
             event.reply("⭐ Thanks! Your rating has been saved.").setEphemeral(true).queue(msg -> CommandHandler.showMainMenu(event.getUser()));
 
         }
+
 
         switch (id) {
             case "start" -> {
@@ -103,7 +108,6 @@ public class InteractionHandler extends ListenerAdapter {
                 try {
                     // 🗑️ First, delete all opportunities linked to this user
                     OpportunityDAO.deleteAllForUser(userId);
-
                     // 👤 Then, delete the user profile
                     boolean deleted = StudentDAO.deleteProfileByDiscordId(userId);
                     if (deleted) {
@@ -130,6 +134,7 @@ public class InteractionHandler extends ListenerAdapter {
                         .build();
                 event.replyModal(feedbackModal).queue();
             }
+
 
 
 
@@ -250,6 +255,7 @@ public class InteractionHandler extends ListenerAdapter {
                                         try {
                                             if (!OpportunityDAO.existsForUser(opp, userId)) {
                                                 OpportunityDAO.insertForUser(opp, userId);
+
                                             }
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
@@ -344,6 +350,7 @@ public class InteractionHandler extends ListenerAdapter {
                                                 Button.secondary("match_jobs", "🎯 Match Me"),
                                                 Button.danger("delete_profile", "🗑️ Delete Profile"),
                                                 Button.primary("feedback","⭐ Feedback")
+
                                         )
                                         .queue();
                             });

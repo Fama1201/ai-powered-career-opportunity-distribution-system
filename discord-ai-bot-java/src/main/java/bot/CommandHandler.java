@@ -68,14 +68,7 @@ public class CommandHandler extends ListenerAdapter {
             return;
         }
 
-        // Hidden test command to show delete button directly
-        if (content.equalsIgnoreCase("!testbutton")) {
-            event.getAuthor().openPrivateChannel().queue(dm -> {
-                dm.sendMessage("🧪 Testing delete_profile button:")
-                        .addActionRow(Button.danger("delete_profile", "🗑️ Delete Profile"))
-                        .queue();
-            });
-        }
+
 
         // Handle private messages (e.g. profile registration and uploading files)
         if (event.isFromType(ChannelType.PRIVATE)) {
@@ -320,8 +313,10 @@ public class CommandHandler extends ListenerAdapter {
                     )
                     .addActionRow(
                             Button.secondary("match_jobs", "🎯 Match Me"),
+
                             Button.danger("delete_profile", "🗑️ Delete Profile"),
                             Button.primary("feedback","⭐ Feedback")
+
                     )
                     .queue();
         });
