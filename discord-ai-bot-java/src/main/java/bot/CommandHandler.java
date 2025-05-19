@@ -194,46 +194,54 @@ public class CommandHandler extends ListenerAdapter {
                         for (var opp : opportunities) {
                             opportunitiesInfo.append(formatOpportunity(opp));
                         }
-
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace(); // Log error, but still proceed
+                    e.printStackTrace(); // Log error, but continue
                 }
 
+                // Build the unified prompt
                 List<Map<String, String>> messages = new ArrayList<>();
                 messages.add(Map.of("role", "system", "content",
-                        "You are an AI assistant integrated into a Discord bot called Jobify CVUT. Your job is to help students of FIT ČVUT find and understand job opportunities. Always keep your answers relevant to career guidance, internships, CVs, and matching opportunities based on their profile."));
+                        "You are an AI career assistant in a Discord bot called Jobify CVUT. "
+                                + "You help students at FIT ČVUT find the best job opportunities from the opportunities provided. "
+                                + "Always be helpful, friendly, and use natural, engaging language. "
+                                + "Focus on career guidance, internships, CVs, and job matching based on their profile."
+                ));
 
+                StringBuilder fullPrompt = new StringBuilder();
                 if (!profileInfo.isEmpty()) {
-                    messages.add(Map.of("role", "user", "content", profileInfo.toString()));
+                    fullPrompt.append("📄 Here is my student profile:\n").append(profileInfo).append("\n");
                 }
-
                 if (!opportunitiesInfo.isEmpty()) {
-                    messages.add(Map.of("role", "user", "content", opportunitiesInfo.toString()));
+                    fullPrompt.append("📌 These are the job opportunities assigned to me:\n").append(opportunitiesInfo).append("\n");
                 }
+                fullPrompt.append("💬 My question is: ").append(question);
 
-                // Combine question + hint for GPT to analyze opportunities if they exist
-                String fullPrompt = question;
-                if (!opportunitiesInfo.isEmpty()) {
-                    fullPrompt += "\n\nPlease analyze the listed opportunities and tell me which one best fits my profile.";
-                }
+                messages.add(Map.of("role", "user", "content", fullPrompt.toString()));
 
-                messages.add(Map.of("role", "user", "content", fullPrompt));
-
-                // Optional: debug log
+                // Debug log
                 System.out.println("🧠 Final prompt to GPT:");
                 messages.forEach(m -> System.out.println(m.get("role") + " ➜ " + m.get("content")));
 
                 try {
                     String aiReply = gpt.ask(messages, "gpt-3.5-turbo");
-                    event.getChannel().sendMessage(aiReply).queue();
+
+                    // 💬 Split response if needed
+                    int maxLength = 2000;
+                    for (int i = 0; i < aiReply.length(); i += maxLength) {
+                        int end = Math.min(aiReply.length(), i + maxLength);
+                        event.getChannel().sendMessage(aiReply.substring(i, end)).queue();
+                    }
+
                 } catch (IOException e) {
                     event.getChannel().sendMessage("⚠️ OpenAI error: " + e.getMessage()).queue();
                 }
 
                 return;
             }
+
+
 
 
 

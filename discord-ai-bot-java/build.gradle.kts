@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.compile.JavaCompile
+
 plugins {
     id("application")
     id("java")
@@ -23,18 +25,18 @@ dependencies {
     // Logging
     implementation("org.slf4j:slf4j-simple:2.0.9")
 
+    // PostgreSQL
     implementation("org.postgresql:postgresql:42.5.4")
 
+    // Connection Pool
     implementation("com.zaxxer:HikariCP:5.0.1")
 
-    implementation ("org.apache.pdfbox:pdfbox:2.0.30") // Safe cv in text format
-
-
+    // PDF parsing
+    implementation("org.apache.pdfbox:pdfbox:2.0.30")
 }
 
-
 application {
-    // Esta clase se ejecuta al iniciar
+    // Clase principal del bot
     mainClass.set("bot.BotMain")
 }
 
@@ -42,4 +44,9 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
+}
+
+// ✅ Soporte para emojis y caracteres especiales (UTF-8)
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }
