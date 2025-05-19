@@ -12,6 +12,7 @@
 - 👤 **Interactive Profile Setup** – Discord-driven onboarding via buttons and dropdowns.
 - 🔄 **Opportunity Synchronization** – Periodic and real-time fetching from the EXPERTS.AI API.
 - 💾 **Persistent Data Layer** – PostgreSQL-backed storage of students and their assigned opportunities.
+- 📝 **Feedback Logging** – Stores GPT-based resume suggestions and ratings using `FeedbackDAO`.
 
 ---
 
@@ -25,15 +26,16 @@ src/
 │           ├── BotMain.java               # Entry point
 │           ├── CommandHandler.java        # Handles messages and commands
 │           ├── InteractionHandler.java    # Handles buttons and dropdowns
-│           ├── ai/
-│           │   └── GPTClient.java         # GPT API handler
+│           ├── GPTClient.java             # GPT API handler
 │           ├── api/
 │           │   └── OpportunityClient.java # EXPERTS.AI integration
 │           ├── storage/
 │           │   ├── StudentDAO.java        # DB access for students
-│           │   └── OpportunityDAO.java    # DB access for opportunities
+│           │   ├── OpportunityDAO.java    # DB access for opportunities
+│           │   └── FeedbackDAO.java       # Stores GPT feedback and ratings
 │           └── util/
 │               └── PdfUtils.java          # Resume text extraction
+
 ```
 
 ---
@@ -83,6 +85,13 @@ CREATE TABLE opportunities (
   technical_requirements TEXT,
   contact_person TEXT,
   PRIMARY KEY (opportunity_id, discord_id)
+);
+
+CREATE TABLE feedback (
+  id SERIAL PRIMARY KEY,
+  feedback_text TEXT,
+  stars INTEGER,
+  discord_id TEXT
 );
 ```
 
@@ -145,6 +154,8 @@ For help or questions, please contact:
 - Email: francisco.molina.antonio@gmail.com
 
 - Email: ErdemYusufEmre@gmail.com
+
+-Email: emreyuce228@gmail.com
 
 - GitLab Issues: [Open a ticket](https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system/-/issues)
 
