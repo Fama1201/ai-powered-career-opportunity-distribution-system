@@ -62,11 +62,12 @@ OPENAI_API_KEY=your_openai_key
 
 ```sql
 CREATE TABLE student (
-  discord_id TEXT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name TEXT,
   email TEXT,
   skills TEXT,
   career_interest TEXT,
+  discord_id TEXT UNIQUE,
   cv_text TEXT
 );
 
@@ -84,6 +85,7 @@ CREATE TABLE opportunities (
   formal_requirements TEXT,
   technical_requirements TEXT,
   contact_person TEXT,
+  company TEXT,
   PRIMARY KEY (opportunity_id, discord_id)
 );
 
