@@ -1,5 +1,6 @@
 package util;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -21,7 +22,7 @@ public class PdfUtils {
      */
     public static String extractText(File file) throws IOException {
         // Load the PDF document from the given file
-        try (PDDocument document = PDDocument.load(file)) {
+        try (PDDocument document = Loader.loadPDF(file)) {
             // Create a text stripper to extract text from the document
             PDFTextStripper stripper = new PDFTextStripper();
             // Return the full extracted text

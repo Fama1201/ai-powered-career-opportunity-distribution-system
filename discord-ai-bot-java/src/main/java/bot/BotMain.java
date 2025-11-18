@@ -1,58 +1,83 @@
 package bot;
 
 import bot.ai.GPTClient;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories; // Make sure this import is here
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.security.auth.login.LoginException;
-
-/**
- * This is the main entry point for the Discord bot.
- * It initializes the bot with necessary API keys, registers event listeners,
- * and starts the bot session using the JDA library.
- */
+// These annotations should be on the ONE class definition
+@EnableJpaRepositories("bot.storage")
+@SpringBootApplication
+@RestController
 public class BotMain {
-    public static void main(String[] args) throws LoginException {
-        // 1. Load your Discord bot token from the environment variables
-        // This token is necessary for authenticating the bot with the Discord API
-        String discordToken = System.getenv("DISCORD_TOKEN");
-        if (discordToken == null || discordToken.isEmpty()) {
-            System.err.println("❌ DISCORD_TOKEN is not set.");
-            return; // Abort if no token is provided
+
+    // This is the main method that starts Spring
+    public static void main(String[] args) {
+        SpringApplication.run(BotMain.class, args);
+    }
+
+    /**
+     * Creates a GPTClient bean.
+     * This method reads the API key and returns a client,
+     * or null if the key is missing.
+     */
+    @Bean
+    public GPTClient gptClient() {
+        String openAIApiKey = System.getenv("OPENAI_API_KEY");
+        if (openAIApiKey == null || openAIApiKey.isEmpty()) {
+            System.out.println("OPENAI_API_KEY is not set. GPT functionality will be disabled.");
+            return null; // Return null if no key
         }
+        System.out.println("GPT Client Initialized.");
+        return new GPTClient(openAIApiKey);
+    }
 
-        // 2. Load your OpenAI API key from the environment
-        // If you don’t use GPT functionality, this can be left blank
-        String openAiKey = System.getenv("OPENAI_API_KEY");
-        if (openAiKey == null || openAiKey.isEmpty()) {
-            System.err.println("⚠️ OPENAI_API_KEY is not set. GPT features will be disabled.");
-        }
+    /**
+     * This @Bean will be run automatically after Spring starts.
+     * We ask for the handlers in the parameters, and Spring gives them to us.
+     */
+    @Bean
+    public CommandLineRunner runBot(
+            @Autowired CommandHandler commandHandler,
+            @Autowired InteractionHandler interactionHandler
+    ) {
+        return args -> {
+            // --- 1. Load your Environment Variables ---
+            String discordToken = System.getenv("DISCORD_TOKEN");
+            if (discordToken == null || discordToken.isEmpty()) {
+                System.err.println("DISCORD_TOKEN is not set in environment variables.");
+                System.err.println("Aborting bot login.");
+                return; // Don't try to log in if the token is missing
+            }
 
-        // 3. Create GPTClient only if a valid OpenAI key is present
-        GPTClient gptClient = null;
-        if (openAiKey != null && !openAiKey.isEmpty()) {
-            gptClient = new GPTClient(openAiKey); // This enables GPT-based features
-        }
+            // --- 2. Handlers are now Injected ---
+            // Spring has already built them and injected their dependencies.
 
-        // 4. Build the JDA Discord client with required configuration
-        JDABuilder builder = JDABuilder.createDefault(discordToken)
-                // Enable gateway intents for message handling in both DMs and servers
-                .enableIntents(
-                        GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.DIRECT_MESSAGES,
-                        GatewayIntent.MESSAGE_CONTENT
-                )
-                // Set the activity text shown in Discord as "Listening to !start"
-                .setActivity(Activity.listening("!start"));
+            // --- 3. Build the JDA Bot ---
+            try {
+                JDA jda = JDABuilder.createDefault(discordToken)
+                        .addEventListeners(commandHandler, interactionHandler) // Register your handlers
+                        .enableIntents(
+                                GatewayIntent.GUILD_MESSAGES,
+                                GatewayIntent.MESSAGE_CONTENT,
+                                GatewayIntent.GUILD_MEMBERS
+                        )
+                        .build();
 
-        // 5. Register your event listeners (handlers for commands and button interactions)
-        builder.addEventListeners(
-                new CommandHandler(gptClient),   // Handles commands like !start, !ask, etc.
-                new InteractionHandler()         // Handles buttons and select menu interactions
-        );
+                jda.awaitReady(); // Wait for the bot to be fully online
+                System.out.println("JDA Bot is online and ready!");
 
-        // 6. Login and start the bot
-        builder.build();
+            } catch (InterruptedException e) {
+                System.err.println("Failed to log in to Discord.");
+                e.printStackTrace();
+            }
+        };
     }
 }

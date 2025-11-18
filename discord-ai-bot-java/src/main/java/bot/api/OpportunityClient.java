@@ -76,7 +76,8 @@ public class OpportunityClient {
             if (!response.isSuccessful()) throw new IOException("API error: " + response.code());
 
             JsonObject root = JsonParser.parseString(response.body().string()).getAsJsonObject();
-            if (!root.has("opportunityPreviewDtos") || root.get("opportunityPreviewDtos").isJsonNull()) return List.of();
+            if (!root.has("opportunityPreviewDtos") || root.get("opportunityPreviewDtos").isJsonNull())
+                return List.of();
 
             JsonArray items = root.getAsJsonArray("opportunityPreviewDtos");
             List<Opportunity> results = new ArrayList<>();
@@ -204,7 +205,8 @@ public class OpportunityClient {
             if (!homeOffice.isBlank()) embed.addField("🏠 Home Office", homeOffice, true);
             if (!formReq.isBlank()) embed.addField("📚 Formal Req.", formReq, true);
             if (!techReq.isBlank()) embed.addField("🛠 Tech Req.", techReq, true);
-            if (!benefits.isBlank()) embed.addField("🎁 Benefits", benefits.length() > 500 ? benefits.substring(0, 500) + "..." : benefits, false);
+            if (!benefits.isBlank())
+                embed.addField("🎁 Benefits", benefits.length() > 500 ? benefits.substring(0, 500) + "..." : benefits, false);
             if (!contactPerson.isBlank()) embed.addField("📞 Contact", contactPerson, true);
 
             embed.setColor(0x00AEEF); // CVUT blue
@@ -223,6 +225,9 @@ public class OpportunityClient {
         @Override
         public int hashCode() {
             return Objects.hash(id);
+
         }
     }
 }
+
+

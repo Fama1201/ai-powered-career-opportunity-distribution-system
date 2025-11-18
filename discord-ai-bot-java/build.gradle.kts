@@ -1,52 +1,51 @@
-import org.gradle.api.tasks.compile.JavaCompile
-
 plugins {
-    id("application")
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
     id("java")
+    application
 }
 
-group = "com.experts"
-version = "1.0"
+group = "bot"
+version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
+// You were missing this opening block!
 dependencies {
-    // Discord API
-    implementation("net.dv8tion:JDA:5.0.0-beta.23")
+    // --- Spring Boot ---
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
-    // JSON con Gson
+    // --- PDF Util ---
+    implementation("org.apache.pdfbox:pdfbox:3.0.2")
+
+    // --- Discord Bot (Local File) ---
+    implementation(files("libs/JDA-5.6.1.jar"))
+
+    // --- JDA Transitive Dependencies (Required because we use a local jar) ---
     implementation("com.google.code.gson:gson:2.10.1")
-
-    // Cliente HTTP para OpenAI
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // Logging
-    implementation("org.slf4j:slf4j-simple:2.0.9")
+    // --- Database ---
+    runtimeOnly("org.postgresql:postgresql")
 
-    // PostgreSQL
-    implementation("org.postgresql:postgresql:42.5.4")
+    // --- Testing ---
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-    // Connection Pool
-    implementation("com.zaxxer:HikariCP:5.0.1")
+    // --- Testcontainers (Docker Support) ---
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
+}
 
-    // PDF parsing
-    implementation("org.apache.pdfbox:pdfbox:2.0.30")
+tasks.test {
+    useJUnitPlatform()
 }
 
 application {
-    // Clase principal del bot
     mainClass.set("bot.BotMain")
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
-// ✅ Soporte para emojis y caracteres especiales (UTF-8)
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
 }
