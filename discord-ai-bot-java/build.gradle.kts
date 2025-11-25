@@ -3,6 +3,8 @@ import org.gradle.api.tasks.compile.JavaCompile
 plugins {
     id("application")
     id("java")
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "com.experts"
@@ -13,6 +15,10 @@ repositories {
 }
 
 dependencies {
+    //spring boot
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
     // Discord API
     implementation("net.dv8tion:JDA:5.0.0-beta.23")
 
@@ -23,7 +29,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Logging
-    implementation("org.slf4j:slf4j-simple:2.0.9")
+    //implementation("org.slf4j:slf4j-simple:2.0.9")
 
     // PostgreSQL
     implementation("org.postgresql:postgresql:42.5.4")
