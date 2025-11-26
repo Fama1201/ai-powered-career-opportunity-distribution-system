@@ -4,29 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Sign Up - Jobify CVUT</title>
-    <link rel="stylesheet" href="css/signup-style.css">
+    
+    <!-- For phone numbers specifically, the industry standard is a library called International Telephone Input (intl-tel-input). -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    
+    <!-- Global Styles (Colors, Fonts, Animations from the main site) -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Page-Specific Styles (The form card styling) -->
+    <link rel="stylesheet" href="css/signup.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="signup-container">
+    <section class="hero">
+        <!-- The moving background -->
+        <div class="animated-background"></div>
+        
         <div class="form-card">
-            <h2>Create Student Account</h2>
-            <p class="subtitle">Join Jobify CVUT to find your dream career</p>
+            <h2 class="form-title">Create Student Account</h2>
+            <p class="form-subtitle">Join Jobify CVUT to find your dream career</p>
 
-            <form id="signupForm">
-                <div class="input-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" placeholder="e.g. Your Name" required>
+            <form id="signupForm"> <!--forms hold the actual information in html (Usernames, Passwords).-->
+                <!-- Name Row -->
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" placeholder="Your Name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="lastName">Surname</label>
+                        <input type="text" id="lastName" placeholder="Your Surname" required>
+                    </div>
                 </div>
 
                 <div class="input-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="e.g. Your Username" required>
+                    <input type="text" id="username" placeholder="Your Username" required>
                 </div>
 
                 <div class="input-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="student@cvut.cz" required>
+                    <input type="email" id="email" placeholder="Your Email Address" required>
+                </div>
+                
+                <!-- Phone Number with Country Code.
+                Since the library handles the dropdown, you delete the <select> element you created earlier. 
+                You only need the single <input> element now -->
+                <div class="input-group">
+                    <label for="phone">Phone Number</label>       
+                    <input type="tel" id="phone" placeholder="123 456 789" required style="width: 100%;">
+                </div>
+            <div class="input-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" required>
+                        <option value="" selected>Select your gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other (specify below)</option>
+                    </select>
+                    <!-- Hidden input for "Other" -->
+                    <input type="text" id="otherGenderInput" placeholder="Please specify your gender">
                 </div>
 
                 <div class="input-group">
@@ -40,13 +83,17 @@
                 </div>
 
                 <div class="button-container">
-                    <a href="index.html" class="btn-cancel">Cancel</a>
-                    <button type="submit" class="btn-signup">Sign Up</button>
+                    <a href="index.html" class="btn btn-secondary btn-form">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-form">Sign Up</button>
                 </div>
             </form>
         </div>
-    </div>
+    </section>
 
+    <!-- Logic Scripts -->
     <script src="js/signup-script.js"></script>
+    <script src="js/animations.js"></script>
+    <!-- Adding the Library to your HTML (.js)-->
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 </body>
 </html>

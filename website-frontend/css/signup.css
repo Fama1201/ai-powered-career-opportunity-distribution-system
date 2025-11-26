@@ -1,0 +1,187 @@
+/* Specific styles for the Sign Up Form Card.
+   This file relies on variables defined in style.css
+*/
+.hero {
+    /*  The main style.css gives .hero huge padding (8rem). 
+   We set it to 0 here so Flexbox can center the form perfectly.
+*/ 
+    padding: 0; 
+    
+    /* Ensure the container takes full screen heightSays "Be at least the size of the screen. 
+    But if the form is taller, grow bigger so the user can scroll." Always use this for containers. */ 
+    min-height: 100vh;
+    
+    /* Turn on the Flexbox Magnet */
+    display: flex;
+    justify-content: center; /* Center Horizontal */
+    align-items: center;     /* Center Vertical */
+}
+.form-card {
+    background: var(--card-bg); /*You are reusing a color defined in your main style.css.
+Why? If you decide later to change the card color, you only change it in one place (the root file), and it updates everywhere.*/
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px; /*we are using max bc of the different screen sizes that users can use*/
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 2; /*  z-index: 2 makes sure this sits ON TOP of the moving stars */ 
+}
+
+
+.form-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.form-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+/* Helper class for side-by-side inputs (Name/Surname) */
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Make flex items grow equally */
+.form-row .input-group {
+    flex: 1;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Inputs and Selects */
+.input-group input, 
+.input-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: rgba(15, 23, 42, 0.6); /* Semi-transparent dark */
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus, 
+.input-group select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* 1. Make the container fill the width */
+.iti {
+    width: 100%;
+    margin-bottom: 1rem; /* Match spacing of other inputs */
+}
+
+/* 2. Style the actual input box to match your theme */
+.iti input {
+    width: 100%;
+    padding: 0.75rem;
+    /* padding-left: 50px !important; /* Make room for the flag */
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: rgba(15, 23, 42, 0.6); /* Your dark semi-transparent bg */
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+/* 3. Style the Dropdown List (The part that looks white/broken currently) */
+.iti__country-list {
+    background-color: var(--dark-secondary); /* Dark Blue background */
+    color: var(--text-primary);              /* White Text */
+    border: 1px solid var(--border-color);
+    scrollbar-color: var(--primary-blue) var(--dark-bg); /* Firefox Scrollbar */
+}
+
+/* 4. Hover effects for the list items */
+.iti__country-list .iti__country:hover, 
+.iti__country-list .iti__country--highlight {
+    background-color: rgba(37, 99, 235, 0.2); /* Light blue hover */
+}
+
+/* 5. Fix the text color of the dialing code in the list */
+.iti__dial-code {
+    color: var(--text-secondary);
+}
+
+/* Hidden "Other" input */
+#otherGenderInput {
+    display: none;
+    margin-top: 0.5rem;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.btn-form {
+    width: 48%;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none; /* Removes underline from Cancel link */
+}
+/* Animate the form inputs group by group. The class attribute requires a . (dot) selector in CSS.*/
+.form-title {
+    animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+.form-subtitle {
+    animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+/* Animate the form inputs group by group The # symbol tells CSS: "Look for an element with id="form-title"."*/
+#signupForm {
+    animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+/* --- PHONE DROPDOWN ALIGNMENT FIX --- */
+
+/* 1. Turn on Flexbox for each country row */
+.iti__country {
+    display: flex;
+    align-items: center; /* Vertically center everything */
+    padding: 10px 10px;  /* Add some breathing room */
+}
+
+/* 2. The Flag Box */
+.iti__flag-box {
+    margin-right: 15px; /* Add space between flag and name */
+}
+
+/* 3. The Country Name (The Magic Part) */
+.iti__country-name {
+    margin-right: auto; /* This tells the browser: "Push everything after me to the far right" */
+    color: white;       /* Ensure text is white */
+}
+
+/* 4. The Dial Code (+1) */
+.iti__dial-code {
+    color: #cbd5e1;     /* Make the number slightly gray so it stands out less than the name */
+    font-weight: 600;
+}
