@@ -158,7 +158,8 @@ Why? If you decide later to change the card color, you only change it in one pla
 }
 
 /* Hidden "Other" input */
-#otherGenderInput {
+#otherGenderInput,
+#otherPositionInput {
     display: none;
     margin-top: 0.5rem;
 }
