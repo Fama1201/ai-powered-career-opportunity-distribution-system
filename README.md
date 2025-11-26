@@ -155,7 +155,7 @@ For help or questions, please contact:
 
 - Email: ErdemYusufEmre@gmail.com
 
--Email: emreyuce228@gmail.com
+- Email: emreyuce228@gmail.com
 
 - GitLab Issues: [Open a ticket](https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system/-/issues)
 
