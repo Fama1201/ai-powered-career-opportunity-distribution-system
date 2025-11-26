@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Sign Up - Jobify CVUT</title>
+    
+    <!-- For phone numbers specifically, the industry standard is a library called International Telephone Input (intl-tel-input). -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    
+    <!-- Global Styles (Colors, Fonts, Animations from the main site) -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Page-Specific Styles (The form card styling) -->
+    <link rel="stylesheet" href="css/signup.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <section class="hero">
+        <!-- The moving background -->
+        <div class="animated-background"></div>
+        
+        <div class="form-card">
+            <h2 class="form-title">Create HR Account</h2>
+            <p class="form-subtitle">Post jobs and find the best talent for your company</p>
+
+            <form id="hrSignupForm">
+                <!-- Name Row -->
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="hrFirstName">First Name</label>
+                        <input type="text" id="hrFirstName" placeholder="Your Name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="hrLastName">Surname</label>
+                        <input type="text" id="hrLastName" placeholder="Your Surname" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="hrEmail">Email Address</label>
+                    <input type="email" id="hrEmail" placeholder="your.email@company.com" required>
+                </div>
+
+                <!-- Company Information -->
+                <div class="input-group">
+                    <label for="companyName">Company Name</label>
+                    <input type="text" id="companyName" placeholder="Your Company Name" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="companySize">Company Size</label>
+                        <select id="companySize" required>
+                            <option value="" selected>Select company size</option>
+                            <option value="1-10">1-10 employees</option>
+                            <option value="11-50">11-50 employees</option>
+                            <option value="50-100">50-100 employees</option>
+                            <option value="100-500">100-500 employees</option>
+                            <option value="500+">500+ employees</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="industry">Industry</label>
+                        <input type="text" id="industry" placeholder="e.g., Software Development" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="position">Your Position</label>
+                    <select id="position" required>
+                        <option value="" selected>Select your position</option>
+                        <option value="HR Manager">HR Manager</option>
+                        <option value="Recruiter">Recruiter</option>
+                        <option value="Talent Acquisition">Talent Acquisition</option>
+                        <option value="HR Director">HR Director</option>
+                        <option value="Other">Other (specify below)</option>
+                    </select>
+                    <!-- Hidden input for "Other" -->
+                    <input type="text" id="otherPositionInput" placeholder="Please specify your position">
+                </div>
+                
+                <!-- Phone Number with Country Code (Optional) -->
+                <div class="input-group">
+                    <label for="hrPhone">Phone Number (Optional)</label>       
+                    <input type="tel" id="hrPhone" placeholder="123 456 789" style="width: 100%;">
+                </div>
+
+                <div class="input-group">
+                    <label for="hrPassword">Password</label>
+                    <input type="password" id="hrPassword" placeholder="Enter your password" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="hrConfirmPassword">Repeat Password</label>
+                    <input type="password" id="hrConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+
+                <div class="button-container">
+                    <a href="index.html" class="btn btn-secondary btn-form">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-form">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Logic Scripts -->
+    <script src="js/hr-signup-script.js"></script>
+    <script src="js/animations.js"></script>
+    <!-- Adding the Library to your HTML (.js)-->
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+</body>
+</html>
+
