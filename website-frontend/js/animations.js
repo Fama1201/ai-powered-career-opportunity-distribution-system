@@ -137,7 +137,8 @@ function createAnimatedParticles() {
         '.about-section',
         '.features-section',
         '.how-it-works-section',
-        '.team-section'
+        '.team-section',
+        '.contact-section'
     ];
     
     sections.forEach(sectionSelector => {
