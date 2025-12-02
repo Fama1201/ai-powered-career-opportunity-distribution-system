@@ -3,6 +3,7 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeAnimations();
+    createAnimatedParticles();
 });
 
 function initializeAnimations() {
@@ -130,6 +131,67 @@ function fadeOut(element, duration = 500) {
     requestAnimationFrame(animate);
 }
 
+// Create Animated Particles for Sections
+function createAnimatedParticles() {
+    const sections = [
+        '.about-section',
+        '.features-section',
+        '.how-it-works-section',
+        '.team-section'
+    ];
+    
+    sections.forEach(sectionSelector => {
+        const section = document.querySelector(sectionSelector);
+        if (!section) return;
+        
+        const particlesContainer = section.querySelector('.animated-particles');
+        if (!particlesContainer) return;
+        
+        // Create multiple floating particles
+        const particleCount = 12;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'floating-particle';
+        
+        // Random position
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        
+        // Random size
+        const size = Math.random() * 4 + 2;
+        
+        // Random color (blue or purple)
+        const colors = [
+            'rgba(37, 99, 235, 0.6)',
+            'rgba(124, 58, 237, 0.6)',
+            'rgba(255, 255, 255, 0.4)'
+        ];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Random animation duration
+        const duration = Math.random() * 10 + 8;
+        const delay = Math.random() * 5;
+        
+        particle.style.cssText = `
+            position: absolute;
+            left: ${x}%;
+            top: ${y}%;
+            width: ${size}px;
+            height: ${size}px;
+            background: ${color};
+            border-radius: 50%;
+            box-shadow: 0 0 ${size * 3}px ${color};
+            animation: particleFloat ${duration}s ease-in-out infinite;
+            animation-delay: ${delay}s;
+            pointer-events: none;
+        `;
+        
+        particlesContainer.appendChild(particle);
+    }
+    });
+}
+
 // Export functions for use in other files (if needed)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -138,7 +200,8 @@ if (typeof module !== 'undefined' && module.exports) {
         typeWriter,
         animateCounter,
         fadeIn,
-        fadeOut
+        fadeOut,
+        createAnimatedParticles
     };
 }
 
