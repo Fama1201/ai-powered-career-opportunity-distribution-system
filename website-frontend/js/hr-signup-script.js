@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const email = document.getElementById('hrEmail').value;
             const companyName = document.getElementById('companyName').value;
-            const companySize = document.getElementById('companySize').value;
             const industry = document.getElementById('industry').value;
             
             // Gather Position
@@ -87,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 email: email,
                 password: password,
                 companyName: companyName,
-                companySize: companySize,
                 industry: industry,
                 position: positionValue,
                 phone: fullPhone || null
@@ -98,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Name:", fullName);
             console.log("Email:", email);
             console.log("Company:", companyName);
-            console.log("Company Size:", companySize);
             console.log("Industry:", industry);
             console.log("Position:", positionValue);
             console.log("Phone:", fullPhone || "Not provided");
