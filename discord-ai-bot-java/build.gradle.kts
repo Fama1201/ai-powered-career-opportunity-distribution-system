@@ -1,4 +1,6 @@
 import org.gradle.api.tasks.compile.JavaCompile
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 
 plugins {
     id("application")
@@ -57,4 +59,8 @@ java {
 // ✅ Soporte para emojis y caracteres especiales (UTF-8)
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+// Run ONLY the Spring Boot backend
+tasks.register<BootRun>("bootRunBackend") {
+    mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
 }
