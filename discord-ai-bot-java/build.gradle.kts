@@ -1,4 +1,6 @@
 import org.gradle.api.tasks.compile.JavaCompile
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 
 plugins {
     id("application")
@@ -15,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot
+    //spring boot
     implementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -30,8 +32,13 @@ dependencies {
     // Cliente HTTP para OpenAI
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // PostgreSQL & Connection Pool
+    // Logging
+    //implementation("org.slf4j:slf4j-simple:2.0.9")
+
+    // PostgreSQL
     implementation("org.postgresql:postgresql:42.5.4")
+
+    // Connection Pool
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     // PDF parsing
@@ -53,18 +60,7 @@ java {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
-
-// ✅ CRITICAL FIX: Enable JUnit 5 Support
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-// ✅ CRITICAL FIX: Enable JUnit 5 Support AND Pass Environment Variables
-tasks.withType<Test> {
-    useJUnitPlatform()
-
-    // You are MISSING these lines in your screenshot! Paste them in:
-    environment("DB_URL", "jdbc:postgresql://ep-spring-rice-agpo2o6m-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require")
-    environment("DB_USER", "neondb_owner")
-    environment("DB_PASSWORD", "npg_1nkGuaU6KLZO")
+// Run ONLY the Spring Boot backend
+tasks.register<BootRun>("bootRunBackend") {
+    mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
 }
