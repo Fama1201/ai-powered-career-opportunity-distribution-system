@@ -15,13 +15,13 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/student/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request){
         AuthResponse authResponse = authenticationService.register(request);
         return ResponseEntity.ok(authResponse);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/student/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request){
         AuthResponse authResponse = authenticationService.login(request);
         return ResponseEntity.ok(authResponse);
