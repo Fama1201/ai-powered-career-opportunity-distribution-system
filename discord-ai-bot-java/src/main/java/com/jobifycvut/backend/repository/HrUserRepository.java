@@ -1,47 +1,33 @@
 package com.jobifycvut.backend.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jobifycvut.backend.model.HrUser;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.util.Optional;
 
+/**
+ * Repository interface for managing HrUser entities (the 'hr' table).
+ * Extends JpaRepository, providing standard CRUD operations.
+ * * NOTE: The primary key type is set to Long, ensure this matches the 'id' type
+ * in the HrUser entity and the corresponding database column.
+ */
 @Repository
-public class HrUserRepository {
-
-    @Autowired
-    private DataSource dataSource;
+public interface HrUserRepository extends JpaRepository<HrUser, Long> {
 
     /**
-     * Checks if the email exists and the password matches.
-     * @param email The email provided by the user.
-     * @param password The password provided by the user.
-     * @return true if credentials are correct, false otherwise.
+     * Spring Data JPA method derived from the property name.
+     * Searches for a user by their email address.
+     * * @param email The email address to search for.
+     * @return An Optional containing the HrUser if found.
      */
-    public boolean validateCredentials(String email, String password) {
-        // Query to get the password_hash for the given email
-        String sql = "SELECT password_hash FROM hr WHERE email = ?";
+    Optional<HrUser> findByEmail(String email);
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, email);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    String storedHash = rs.getString("password_hash");
-
-                    // ⚠️ SECURITY NOTE:
-                    // In a real production app, we would use BCrypt here.
-                    // Since you manually inserted plain text 'hash123', we compare plain text.
-                    return storedHash.equals(password);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false; // User not found or error
-    }
+    /**
+     * Spring Data JPA method to quickly check if a user with the given email already exists.
+     * This is typically used during the registration process to enforce uniqueness.
+     * * @param email The email address to check.
+     * @return True if a record with this email exists, false otherwise.
+     */
+    boolean existsByEmail(String email);
 }

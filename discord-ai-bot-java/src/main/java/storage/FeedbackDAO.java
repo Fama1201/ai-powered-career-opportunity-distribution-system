@@ -1,6 +1,6 @@
 package storage;
 
-import config.DBConnection;
+import com.jobifycvut.backend.config.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
