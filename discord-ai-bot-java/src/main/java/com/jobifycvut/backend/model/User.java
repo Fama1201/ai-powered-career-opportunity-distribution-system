@@ -41,7 +41,7 @@ public class User {
     @Column(name="email_verified_at")
     private Instant emailVerifiedAt;
 
-    @Column(name="password_rest_token")
+    @Column(name="password_reset_token")
     private String passwordResetToken;
 
     @Column(name="password_reset_token_expiration")
