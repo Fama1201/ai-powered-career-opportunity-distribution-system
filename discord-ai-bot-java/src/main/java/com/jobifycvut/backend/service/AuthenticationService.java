@@ -10,6 +10,7 @@ import com.jobifycvut.backend.util.PasswordHasher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import java.util.UUID;
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
+    private static final boolean EMAIL_VERIFICATION_ENABLED = false;
+
 
     public AuthenticationService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -31,10 +34,20 @@ public class AuthenticationService {
         user.setPassword(PasswordHasher.hashPassword(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        user.setActive(false);
+        user.setActive(true);
         user.setRole(UserRole.STUDENT);
         user.setCreatedAt(Instant.now());
         user.setEmailVerificationToken(UUID.randomUUID().toString());
+
+        if (EMAIL_VERIFICATION_ENABLED) {
+            // real email flow will go here
+            user.setEmailVerifiedAt(null);
+            user.setEmailVerificationToken(UUID.randomUUID().toString());
+        } else {
+            // 🔥 Dev Mode: User verified instantly
+            user.setEmailVerifiedAt(Instant.now());
+            user.setEmailVerificationToken(null);
+        }
 
         User savedUser = userRepository.save(user);
 
@@ -54,9 +67,6 @@ public class AuthenticationService {
 
         if(!PasswordHasher.verifyPassword(request.getPassword(), user.getPassword())){
             throw new AuthException("Invalid password.");
-        }
-        if(!user.isActive()){
-            throw new AuthException("Account not verified. Please check your email.");
         }
         String accessToken=JwtUtil.generateAccessToken(user);
         String refreshToken=JwtUtil.generateRefreshToken(user);
@@ -93,9 +103,6 @@ public class AuthenticationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AuthException("User not found."));
 
-        if (!user.isActive()) {
-            throw new AuthException("Account is disabled.");
-        }
         String newAccessToken = JwtUtil.generateAccessToken(user);
 
         long expiresInSeconds = 15 * 60L;
