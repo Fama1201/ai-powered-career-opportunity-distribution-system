@@ -1,7 +1,7 @@
 package storage;
 
 import bot.api.OpportunityClient.Opportunity;
-import config.DBConnection;
+import com.jobifycvut.backend.config.DBConnection;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
