@@ -1,4 +1,4 @@
-package config;
+package com.jobifycvut.backend.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

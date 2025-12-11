@@ -17,12 +17,17 @@ repositories {
 }
 
 dependencies {
+
+
+    implementation("org.springframework.boot:spring-boot-starter-security")
     //spring boot
     implementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.postgresql:postgresql:42.7.2")
 
+    compileOnly("org.projectlombok:lombok:1.18.34")
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
     // Discord API
     implementation("net.dv8tion:JDA:5.0.0-beta.23")
 
@@ -60,13 +65,7 @@ java {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
-// Run ONLY the Spring Boot backend (without starting the Discord bot)
-// ✅ Soporte para emojis y caracteres especiales (UTF-8)
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-}
 // Run ONLY the Spring Boot backend
 tasks.register<BootRun>("bootRunBackend") {
     mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
 }
-
