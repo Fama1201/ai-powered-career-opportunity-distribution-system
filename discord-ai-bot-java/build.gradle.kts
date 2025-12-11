@@ -60,14 +60,8 @@ java {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
-// Run ONLY the Spring Boot backend (without starting the Discord bot)
+// Run ONLY the Spring Boot backend
 tasks.register<BootRun>("bootRunBackend") {
-    group = "application"
-    description = "Run the Spring Boot backend only"
-
     mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
-
-    // ⬅️ THIS is the missing piece: put compiled classes + deps on the classpath
-    classpath = sourceSets["main"].runtimeClasspath
 }
 
