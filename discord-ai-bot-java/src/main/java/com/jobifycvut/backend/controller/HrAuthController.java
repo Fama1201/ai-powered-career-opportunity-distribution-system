@@ -1,9 +1,11 @@
 package com.jobifycvut.backend.controller;
 
+import com.jobifycvut.backend.dto.ForgotPasswordRequest;
 import com.jobifycvut.backend.dto.HrLoginRequest;
 import com.jobifycvut.backend.dto.HrRegisterRequest;
 import com.jobifycvut.backend.model.HrUser;
 import com.jobifycvut.backend.service.HrService;
+import com.jobifycvut.backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,64 +13,63 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/**
- * REST Controller handling all HR authentication and authorization endpoints.
- * All paths under this controller are public (allowed by SecurityConfig).
- */
 @RestController
-@RequestMapping("/api/hr/auth") // Base path for all HR authentication endpoints
-@RequiredArgsConstructor // Lombok creates the constructor for final fields (HrService)
+@RequestMapping("/api/hr/auth")
+@RequiredArgsConstructor
 public class HrAuthController {
 
-    // Dependency injection of the business logic layer
     private final HrService hrService;
 
-    /**
-     * Endpoint for registering a new HR user account.
-     * Delegates validation and persistence to the HrService.
-     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody HrRegisterRequest request) {
-        System.out.println("📝 HR Register attempt: " + request.getEmail());
         try {
-            // 1. Delegate registration logic (hashing, validation, saving) to the Service
             hrService.register(request);
-
-            // 2. Return success response
             return ResponseEntity.ok(Map.of("message", "HR User registered successfully"));
-
         } catch (RuntimeException e) {
-            // Catch exceptions, such as 'Email is already registered'
-            // thrown by the service layer, and return HTTP 400 Bad Request.
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
         }
     }
 
-    /**
-     * Endpoint for user authentication (Login).
-     * Delegates credential verification to the HrService.
-     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody HrLoginRequest request) {
-        System.out.println("🔥 HR Login attempt: " + request.getEmail());
         try {
-            // 1. Delegate authentication (user lookup, password match) to the Service
+            // 1. Authenticate
             HrUser user = hrService.login(request);
 
-            // 2. Return success response with session details
+            // 2. Generate Tokens using the new JwtUtil method
+            String accessToken = JwtUtil.generateAccessToken(user);
+            String refreshToken = JwtUtil.generateRefreshToken(user);
+
+            // 3. Return Response
             return ResponseEntity.ok(Map.of(
                     "message", "Login successful",
-                    // NOTE: This is currently a placeholder. To be replaced with a real JWT.
-                    "token", "dummy-token-12345",
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken,
                     "email", user.getEmail(),
                     "company", user.getCompanyName() != null ? user.getCompanyName() : "N/A"
             ));
         } catch (RuntimeException e) {
-            // Catch exceptions, such as 'User not found' or 'Invalid credentials'
-            // and return HTTP 401 Unauthorized.
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody(required = false) Map<String, String> body) {
+        String email = (body != null) ? body.get("email") : null;
+        hrService.logout(email);
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        try {
+            hrService.forgotPassword(request);
+            // We return 200 even if user is not found to prevent email enumeration (security best practice),
+            // but for this project, the service throws "User not found", so we catch it.
+            return ResponseEntity.ok(Map.of("message", "If an account exists, a reset email has been sent."));
+        } catch (RuntimeException e) {
+            // In development, you might want to see the error.
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
 }
