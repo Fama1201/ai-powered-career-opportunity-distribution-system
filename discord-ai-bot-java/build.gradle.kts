@@ -69,3 +69,7 @@ tasks.withType<JavaCompile> {
 tasks.register<BootRun>("bootRunBackend") {
     mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
 }
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
