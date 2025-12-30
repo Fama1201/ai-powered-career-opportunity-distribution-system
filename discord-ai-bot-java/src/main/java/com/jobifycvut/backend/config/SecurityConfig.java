@@ -43,6 +43,9 @@ public class SecurityConfig {
                         // Permit public access to all authentication endpoints (/register, /login, etc.)
                         .requestMatchers("/api/hr/auth/**").permitAll()
 
+                        // --- ADD THIS LINE TO ALLOW DASHBOARD TESTING ---
+                        .requestMatchers("/api/dashboard/**").permitAll()
+
                         // Require authentication (a valid token/session) for all other API requests
                         .anyRequest().authenticated()
                 )
