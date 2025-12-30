@@ -383,8 +383,8 @@ function setupClickOutside() {
 function getUserData() {
     // TODO: Fetch user data from API or localStorage
     const userData = {
-        name: 'Erin Monley',
-        email: 'erin@example.com',
+        name: 'Emre Erdem',
+        email: 'emre@example.com',
         role: 'Student'
     };
     
