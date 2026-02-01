@@ -1,13 +1,12 @@
 package storage;
 
-import config.DBConnection;
+import com.jobifycvut.backend.config.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.SQLException;
 
 /**
  * Data Access Object for the 'student' table.
