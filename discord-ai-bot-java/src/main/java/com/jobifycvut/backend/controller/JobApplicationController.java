@@ -4,6 +4,7 @@ import com.jobifycvut.backend.dto.ApplicationResponse;
 import com.jobifycvut.backend.service.ApplicationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.jobifycvut.backend.security.*;
 
 import java.util.List;
 
@@ -19,12 +20,13 @@ public class JobApplicationController {
 
     @GetMapping
     public ResponseEntity<List<ApplicationResponse>> getApplications(
-            @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long opportunityId,
             @RequestParam(required = false) String status
     ) {
+        Long userId = SecurityUtil.requireUserId();
         return ResponseEntity.ok(service.getApplications(userId, opportunityId, status));
     }
+
 
     @GetMapping("/{applicationId}")
     public ResponseEntity<ApplicationResponse> getById(@PathVariable Long applicationId) {
