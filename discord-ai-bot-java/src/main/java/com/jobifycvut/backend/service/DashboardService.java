@@ -10,99 +10,113 @@ import com.jobifycvut.backend.repository.JobApplicationRepository;
 import com.jobifycvut.backend.repository.OpportunityRepository;
 import com.jobifycvut.backend.repository.SavedJobRepository;
 import com.jobifycvut.backend.repository.StudentRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-/**
- * Service to handle Student Dashboard logic.
- * Aggregates data from multiple repositories.
- */
 @Service
-@RequiredArgsConstructor
 public class DashboardService {
 
     private final StudentRepository studentRepository;
     private final OpportunityRepository opportunityRepository;
     private final JobApplicationRepository applicationRepository;
-    private final SavedJobRepository savedJobRepository; // You need to add countByUserId in repo if not exists
+    private final SavedJobRepository savedJobRepository;
 
-    // 1. GET OVERVIEW
-    public DashboardOverviewResponse getOverview(Long userId, String discordId) {
-        // Fetch student name
-        StudentEntity student = studentRepository.findByDiscordId(discordId)
-                .orElse(new StudentEntity()); // Return empty if not found
+    public DashboardService(StudentRepository studentRepository,
+                            OpportunityRepository opportunityRepository,
+                            JobApplicationRepository applicationRepository,
+                            SavedJobRepository savedJobRepository) {
+        this.studentRepository = studentRepository;
+        this.opportunityRepository = opportunityRepository;
+        this.applicationRepository = applicationRepository;
+        this.savedJobRepository = savedJobRepository;
+    }
 
-        // Count applications (assuming you have a method countByUserId in JobApplicationRepository)
-        // If not, we will add it to the Repo in next steps, for now let's assume 0 or fetch list size
-        long appCount = applicationRepository.count(); // TODO: Filter by userId properly later
+    // 1) OVERVIEW
+    public DashboardOverviewResponse getOverview(Long userId, String email) {
+        StudentEntity student = findStudent(userId, email);
 
-        // Fetch recent 3 matches
-        List<OpportunityListResponse> matches = getMatches(discordId).stream().limit(3).collect(Collectors.toList());
+        String name = (student != null && student.getName() != null && !student.getName().isBlank())
+                ? student.getName()
+                : "Student";
+
+        long appCount = applicationRepository.countByUserId(userId);
+        long savedCount = savedJobRepository.countByUserId(userId);
+
+        List<OpportunityListResponse> matches = getMatches(userId, email).stream()
+                .limit(3)
+                .toList();
 
         return new DashboardOverviewResponse(
-                student.getName() != null ? student.getName() : "Student",
-                (int) appCount, // Cast for now
-                0, // Placeholder for saved jobs
+                name,
+                (int) appCount,
+                (int) savedCount,
                 matches
         );
     }
 
-    // 2. GET MATCHES (Based on Career Interest)
-    public List<OpportunityListResponse> getMatches(String discordId) {
-        StudentEntity student = studentRepository.findByDiscordId(discordId)
-                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+    // 2) MATCHES
+    public List<OpportunityListResponse> getMatches(Long userId, String email) {
+        StudentEntity student = findStudent(userId, email);
+        if (student == null) return List.of();
 
         String interest = student.getCareerInterest();
-        if (interest == null || interest.isEmpty()) {
-            return List.of(); // No interest = No matches
-        }
+        if (interest == null || interest.isBlank()) return List.of();
 
-        // Search opportunities containing the career interest (e.g., "Java", "Python")
-        // We use the existing repository method
-        return opportunityRepository.findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(interest, interest, PageRequest.of(0, 10))
+        return opportunityRepository
+                .findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
+                        interest, interest, PageRequest.of(0, 10)
+                )
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    // 3. GET NEW JOBS (Last 5 added)
+    // 3) NEW JOBS
     public List<OpportunityListResponse> getNewJobs() {
         return opportunityRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
                 .limit(5)
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    // 4. GET STATS
+    // 4) STATS
     public ApplicationStatsResponse getStats(Long userId) {
-        // In a real scenario: applicationRepository.countByUserId(userId)
-        long count = applicationRepository.count();
+        long count = applicationRepository.countByUserId(userId);
         return new ApplicationStatsResponse((int) count);
     }
 
-    // 5. GET PROGRESS
-    public ProgressResponse getProgress(String discordId) {
-        StudentEntity student = studentRepository.findByDiscordId(discordId)
-                .orElse(null);
-
+    // 5) PROGRESS
+    public ProgressResponse getProgress(Long userId, String email) {
+        StudentEntity student = findStudent(userId, email);
         if (student == null) return new ProgressResponse(0, "Profile not created");
 
         int score = 0;
-        if (student.getName() != null) score += 25;
-        if (student.getEmail() != null) score += 25;
-        if (student.getSkills() != null) score += 25;
-        if (student.getCareerInterest() != null) score += 25;
+        if (student.getName() != null && !student.getName().isBlank()) score += 25;
+        if (student.getEmail() != null && !student.getEmail().isBlank()) score += 25;
+        if (student.getSkills() != null && !student.getSkills().isBlank()) score += 25;
+        if (student.getCareerInterest() != null && !student.getCareerInterest().isBlank()) score += 25;
 
         String msg = score == 100 ? "Profile Complete! 🎉" : "Keep going! 🚀";
         return new ProgressResponse(score, msg);
     }
 
-    // Helper to convert Entity -> DTO
+    // ---- helpers ----
+
+    private StudentEntity findStudent(Long userId, String email) {
+        // Primary: match by ID (JWT userId)
+        var byId = studentRepository.findById(userId);
+        if (byId.isPresent()) return byId.get();
+
+        // Fallback: match by email (if your auth userId differs from student.id)
+        if (email != null && !email.isBlank()) {
+            return studentRepository.findByEmail(email).orElse(null);
+        }
+        return null;
+    }
+
     private OpportunityListResponse mapToResponse(Opportunity opp) {
         return new OpportunityListResponse(
                 opp.getId(),

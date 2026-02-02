@@ -6,10 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplicationEntity, Long> {
+    boolean existsByUserIdAndOpportunityId(Long userId, Long opportunityId);
+
     List<JobApplicationEntity> findByUserId(Long userId);
     List<JobApplicationEntity> findByStatusIgnoreCase(String status);
     List<JobApplicationEntity> findByOpportunityId(Long opportunityId);
     List<JobApplicationEntity> findByUserIdAndOpportunityId(Long userId,  Long opportunityId);
     List<JobApplicationEntity> findByUserIdAndStatusIgnoreCase(Long userId, String status);
+
+    long countByUserId(Long userId);
+
 
 }

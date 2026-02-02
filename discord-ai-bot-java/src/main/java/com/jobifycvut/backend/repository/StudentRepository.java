@@ -23,4 +23,6 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
      * @return Optional (A container that may or may not contain the student).
      */
     Optional<StudentEntity> findByDiscordId(String discordId);
+    Optional<StudentEntity> findByEmail(String email);
+
 }

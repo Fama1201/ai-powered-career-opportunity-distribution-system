@@ -19,6 +19,7 @@ import java.util.Map;
 public class HrAuthController {
 
     private final HrService hrService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody HrRegisterRequest request) {
@@ -37,8 +38,8 @@ public class HrAuthController {
             HrUser user = hrService.login(request);
 
             // 2. Generate Tokens using the new JwtUtil method
-            String accessToken = JwtUtil.generateAccessToken(user);
-            String refreshToken = JwtUtil.generateRefreshToken(user);
+            String accessToken = jwtUtil.generateAccessToken(user);
+            String refreshToken = jwtUtil.generateRefreshToken(user);
 
             // 3. Return Response
             return ResponseEntity.ok(Map.of(

@@ -3,7 +3,7 @@ package com.jobifycvut.backend.service;
 import com.jobifycvut.backend.dto.OpportunityDetailResponse;
 import com.jobifycvut.backend.dto.OpportunityListResponse;
 import com.jobifycvut.backend.exception.ResourceNotFoundException;
-import com.jobifycvut.backend.model.JobApplication;
+import com.jobifycvut.backend.model.JobApplicationEntity;
 import com.jobifycvut.backend.model.Opportunity;
 import com.jobifycvut.backend.model.SavedJob;
 import com.jobifycvut.backend.repository.JobApplicationRepository;
@@ -13,8 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+
 @Service
 public class OpportunityService {
+
     private final OpportunityRepository opportunityRepository;
     private final JobApplicationRepository jobApplicationRepository;
     private final SavedJobRepository savedJobRepository;
@@ -27,13 +30,12 @@ public class OpportunityService {
         this.savedJobRepository = savedJobRepository;
     }
 
-
-
-    //get /api/jobs
+    // GET /api/jobs
     public Page<OpportunityListResponse> getAllOpportunities(Pageable pageable) {
         return opportunityRepository.findAll(pageable).map(this::mapToListResponse);
     }
-    // GET /api/jobs/ {jobId} details
+
+    // GET /api/jobs/{jobId} details (without applied/saved flags)
     public OpportunityDetailResponse getOpportunityById(Long id) {
         Opportunity opportunity = opportunityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Opportunity not found with id: " + id));
@@ -41,23 +43,38 @@ public class OpportunityService {
         return mapToDetailResponse(opportunity);
     }
 
-    // GET /api/jobs/search?keyword= means shows every job opportunity avaiable
+    // Recommended: GET /api/jobs/{jobId} with applied/saved flags for current user
+    public OpportunityDetailResponse getOpportunityById(Long id, Long userId) {
+        Opportunity opportunity = opportunityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Opportunity not found with id: " + id));
+
+        OpportunityDetailResponse response = mapToDetailResponse(opportunity);
+
+        if (userId != null) {
+            boolean applied = jobApplicationRepository.existsByUserIdAndOpportunityId(userId, id);
+            boolean saved = savedJobRepository.existsByUserIdAndOpportunityId(userId, id);
+            response.setApplied(applied);
+            response.setSaved(saved);
+        }
+
+        return response;
+    }
+
+    // GET /api/jobs/search?keyword=...
     public Page<OpportunityListResponse> searchOpportunities(String keyword, Pageable pageable) {
         return opportunityRepository
                 .findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(keyword, keyword, pageable)
                 .map(this::mapToListResponse);
     }
 
-    // Book or save the job opportunity.
+    // POST /api/jobs/{id}/save
     public void saveOpportunity(Long jobId, Long userId) {
-
         Opportunity opportunity = opportunityRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException(("Opportunity not found with id: " + jobId)));
+                .orElseThrow(() -> new ResourceNotFoundException("Opportunity not found with id: " + jobId));
 
-        boolean alreadySaved=savedJobRepository.existsByUserIdAndOpportunityId(userId, opportunity.getId());
-
-        if(alreadySaved){
-            throw new IllegalStateException(("Opportunity already saved."));
+        boolean alreadySaved = savedJobRepository.existsByUserIdAndOpportunityId(userId, opportunity.getId());
+        if (alreadySaved) {
+            throw new IllegalStateException("Opportunity already saved.");
         }
 
         SavedJob savedJob = new SavedJob();
@@ -67,32 +84,31 @@ public class OpportunityService {
         savedJobRepository.save(savedJob);
     }
 
-    //Apply for a job opportunity
+    // POST /api/jobs/{id}/apply
     public void applyToOpportunity(Long jobId, Long userId) {
-
-        Opportunity opportunity= opportunityRepository.findById(jobId)
+        Opportunity opportunity = opportunityRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Opportunity not found with id: " + jobId));
 
-        boolean alreadyApplied=jobApplicationRepository.existsByUserIdAndOpportunityId(userId, opportunity.getId());
-
-        if(alreadyApplied){
-            throw new IllegalStateException(("Opportunity already applied."));
+        boolean alreadyApplied = jobApplicationRepository.existsByUserIdAndOpportunityId(userId, opportunity.getId());
+        if (alreadyApplied) {
+            throw new IllegalStateException("Opportunity already applied.");
         }
-        JobApplication jobApplication = new JobApplication();
 
+        // IMPORTANT: save JobApplicationEntity (not JobApplication)
+        JobApplicationEntity jobApplication = new JobApplicationEntity();
         jobApplication.setUserId(userId);
-        jobApplication.setOpportunity(opportunity);
+        jobApplication.setOpportunityId(opportunity.getId());
+        jobApplication.setAppliedAt(OffsetDateTime.now());
+        jobApplication.setStatus("APPLIED");
+        jobApplication.setNotes(null);
 
         jobApplicationRepository.save(jobApplication);
-
     }
 
+    // ---- mappers ----
 
-
-
-
-    private OpportunityListResponse mapToListResponse(Opportunity o){
-        OpportunityListResponse response=new OpportunityListResponse();
+    private OpportunityListResponse mapToListResponse(Opportunity o) {
+        OpportunityListResponse response = new OpportunityListResponse();
         response.setId(o.getId());
         response.setTitle(o.getTitle());
         response.setCompany(o.getCompany());
@@ -100,12 +116,11 @@ public class OpportunityService {
         response.setHomeOffice(o.getHomeOffice());
         response.setWage(o.getWage());
         response.setApplicationDeadline(o.getApplicationDeadline());
-
         return response;
     }
 
-    private OpportunityDetailResponse mapToDetailResponse(Opportunity o){
-        OpportunityDetailResponse response=new OpportunityDetailResponse();
+    private OpportunityDetailResponse mapToDetailResponse(Opportunity o) {
+        OpportunityDetailResponse response = new OpportunityDetailResponse();
         response.setId(o.getId());
         response.setTitle(o.getTitle());
         response.setCompany(o.getCompany());
@@ -120,25 +135,4 @@ public class OpportunityService {
         response.setUrl(o.getUrl());
         return response;
     }
-
-    private OpportunityDetailResponse getOpportunityById(Long id, Long userId) {
-        Opportunity opportunity = opportunityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Opportunity not found with id: " + id));
-
-        OpportunityDetailResponse response = mapToDetailResponse(opportunity);
-
-        if (userId != null) {
-            boolean applied = jobApplicationRepository
-                    .existsByUserIdAndOpportunityId(userId, id);
-            boolean saved = savedJobRepository
-                    .existsByUserIdAndOpportunityId(userId, id);
-
-            response.setApplied(applied);
-            response.setSaved(saved);
-        }
-
-        return response;
-    }
-
-
 }
