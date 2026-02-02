@@ -66,6 +66,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/profile/**").hasRole("STUDENT")
                         .requestMatchers("/api/notifications/**").hasRole("STUDENT")
                         .requestMatchers("/api/cv/**").hasRole("STUDENT")
+                        .requestMatchers("/api/notifications/**").hasRole("STUDENT")
+
 
                         // everything else under /api needs auth (safe fallback)
                         .requestMatchers("/api/**").authenticated()
