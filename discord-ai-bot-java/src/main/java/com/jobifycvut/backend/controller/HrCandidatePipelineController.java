@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hr")
 public class HrCandidatePipelineController {
+    
 
     private final HrCandidatePipelineService service;
 
