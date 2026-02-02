@@ -21,6 +21,28 @@ public class HrAuthController {
     private final HrService hrService;
     private final JwtUtil jwtUtil;
 
+    @GetMapping("/verify-token")
+    public ResponseEntity<?> verifyToken(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Missing or invalid Authorization header"));
+        }
+
+        String token = authHeader.substring(7).trim();
+        Map<String, Object> claims = jwtUtil.validateToken(token);
+
+        if (claims == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Token invalid/expired"));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Token valid",
+                "claims", claims
+        ));
+    }
+
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody HrRegisterRequest request) {
         try {
