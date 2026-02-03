@@ -7,6 +7,7 @@ public class ChatResponse {
     private java.util.List<String> missingSkills;
     private java.util.List<String> recommendations;
     private java.util.List<MatchItem> topMatches;
+    private java.util.List<AssignmentItem> assignments;
 
     public ChatResponse() {
     }
@@ -20,13 +21,15 @@ public class ChatResponse {
                         String summary,
                         java.util.List<String> missingSkills,
                         java.util.List<String> recommendations,
-                        java.util.List<MatchItem> topMatches) {
+                        java.util.List<MatchItem> topMatches,
+                        java.util.List<AssignmentItem> assignments) {
         this.reply = reply;
         this.cvScore = cvScore;
         this.summary = summary;
         this.missingSkills = missingSkills;
         this.recommendations = recommendations;
         this.topMatches = topMatches;
+        this.assignments = assignments;
     }
 
     public String getReply() {
@@ -64,6 +67,12 @@ public class ChatResponse {
     }
     public void setTopMatches(java.util.List<MatchItem> topMatches) {
         this.topMatches = topMatches;
+    }
+    public java.util.List<AssignmentItem> getAssignments() {
+        return assignments;
+    }
+    public void setAssignments(java.util.List<AssignmentItem> assignments) {
+        this.assignments = assignments;
     }
 
     public static class MatchItem {
@@ -121,6 +130,40 @@ public class ChatResponse {
         }
         public void setMatchReason(String matchReason) {
             this.matchReason = matchReason;
+        }
+    }
+
+    public static class AssignmentItem {
+        private String title;
+        private String description;
+        private String estimatedTime;
+
+        public AssignmentItem() {
+        }
+
+        public AssignmentItem(String title, String description, String estimatedTime) {
+            this.title = title;
+            this.description = description;
+            this.estimatedTime = estimatedTime;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+        public void setTitle(String title) {
+            this.title = title;
+        }
+        public String getDescription() {
+            return description;
+        }
+        public void setDescription(String description) {
+            this.description = description;
+        }
+        public String getEstimatedTime() {
+            return estimatedTime;
+        }
+        public void setEstimatedTime(String estimatedTime) {
+            this.estimatedTime = estimatedTime;
         }
     }
 }

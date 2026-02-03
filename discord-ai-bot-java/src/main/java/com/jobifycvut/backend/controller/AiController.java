@@ -2,6 +2,8 @@ package com.jobifycvut.backend.controller;
 
 import com.jobifycvut.backend.dto.ChatRequest;
 import com.jobifycvut.backend.dto.ChatResponse;
+import com.jobifycvut.backend.dto.CodeReviewRequest;
+import com.jobifycvut.backend.dto.CodeReviewResponse;
 import com.jobifycvut.backend.dto.HistoryItemResponse;
 import com.jobifycvut.backend.security.SecurityUtil;
 import com.jobifycvut.backend.service.AiService;
@@ -51,5 +53,11 @@ public class AiController {
         Long userId = SecurityUtil.requireUserId();
         String reply = aiService.careerAdvice(userId, req.getMessage());
         return ResponseEntity.ok(new ChatResponse(reply));
+    }
+
+    @PostMapping("/code-review")
+    public ResponseEntity<CodeReviewResponse> codeReview(@RequestBody CodeReviewRequest req) {
+        Long userId = SecurityUtil.requireUserId();
+        return ResponseEntity.ok(aiService.codeReview(userId, req));
     }
 }
