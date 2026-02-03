@@ -23,8 +23,8 @@ public class AiController {
     @PostMapping("/chat")
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest req) {
         Long userId = SecurityUtil.requireUserId();
-        String reply = aiService.chat(userId, req.getMessage());
-        return ResponseEntity.ok(new ChatResponse(reply));
+        ChatResponse reply = aiService.chat(userId, req.getMessage());
+        return ResponseEntity.ok(reply);
     }
 
     @GetMapping("/chat/history")
