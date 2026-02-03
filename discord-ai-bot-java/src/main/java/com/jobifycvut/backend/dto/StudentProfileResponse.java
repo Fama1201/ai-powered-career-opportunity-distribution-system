@@ -14,6 +14,7 @@ public class StudentProfileResponse {
         this.name = name;
         this.email = email;
         this.skills = skills;
+        this.careerInterest = careerInterest;
     }
 
     public Long getId(){
