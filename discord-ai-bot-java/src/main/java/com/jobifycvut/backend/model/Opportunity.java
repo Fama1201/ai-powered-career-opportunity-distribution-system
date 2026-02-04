@@ -55,7 +55,22 @@ public class Opportunity {
     @Column(name= "contact_person")
     private String contactPerson;
 
+    @Column(name = "company")
     private String company;
+
+    // Note: Database schema uses 'company' as TEXT, not 'company_id' as FK
+    // If you need to link to Company table, you'll need to add company_id column to database first
+
+    // Note: The following fields are NOT in the database schema, so they are marked as @Transient
+    // If you need them, add the columns to the database first
+    @Transient
+    private String requirements;
+
+    @Transient
+    private String location;
+
+    @Transient
+    private java.time.Instant createdAt;
 
     public  Opportunity() {
     }
@@ -155,6 +170,24 @@ public class Opportunity {
         this.company = company;
     }
 
+    public String getRequirements() {
+        return requirements;
+    }
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
+    }
 
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
+    public java.time.Instant getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(java.time.Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }

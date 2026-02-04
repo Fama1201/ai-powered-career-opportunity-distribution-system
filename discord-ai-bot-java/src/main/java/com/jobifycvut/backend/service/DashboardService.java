@@ -10,7 +10,6 @@ import com.jobifycvut.backend.repository.JobApplicationRepository;
 import com.jobifycvut.backend.repository.OpportunityRepository;
 import com.jobifycvut.backend.repository.SavedJobRepository;
 import com.jobifycvut.backend.repository.StudentRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +22,18 @@ public class DashboardService {
     private final OpportunityRepository opportunityRepository;
     private final JobApplicationRepository applicationRepository;
     private final SavedJobRepository savedJobRepository;
+    private final MatchService matchService;
 
     public DashboardService(StudentRepository studentRepository,
                             OpportunityRepository opportunityRepository,
                             JobApplicationRepository applicationRepository,
-                            SavedJobRepository savedJobRepository) {
+                            SavedJobRepository savedJobRepository,
+                            MatchService matchService) {
         this.studentRepository = studentRepository;
         this.opportunityRepository = opportunityRepository;
         this.applicationRepository = applicationRepository;
         this.savedJobRepository = savedJobRepository;
+        this.matchService = matchService;
     }
 
     // 1) OVERVIEW
@@ -57,21 +59,13 @@ public class DashboardService {
         );
     }
 
-    // 2) MATCHES
+    // 2) MATCHES - Uses improved MatchService for better scoring
     public List<OpportunityListResponse> getMatches(Long userId, String email) {
         StudentEntity student = findStudent(userId, email);
         if (student == null) return List.of();
 
-        String interest = student.getCareerInterest();
-        if (interest == null || interest.isBlank()) return List.of();
-
-        return opportunityRepository
-                .findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
-                        interest, interest, PageRequest.of(0, 10)
-                )
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        // Use MatchService for intelligent matching
+        return matchService.findMatches(student, 10);
     }
 
     // 3) NEW JOBS

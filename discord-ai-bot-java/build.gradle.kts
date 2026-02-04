@@ -27,7 +27,9 @@
         testImplementation("org.mockito:mockito-inline:5.2.0")
         testImplementation("com.h2database:h2:2.2.224")
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-        implementation("org.postgresql:postgresql:42.7.2")
+        
+        // PostgreSQL Driver - Latest version for Neon compatibility
+        implementation("org.postgresql:postgresql:42.7.3")
 
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
@@ -42,9 +44,6 @@
 
         // Logging
         //implementation("org.slf4j:slf4j-simple:2.0.9")
-
-        // PostgreSQL
-        implementation("org.postgresql:postgresql:42.5.4")
 
         // Connection Pool
         implementation("com.zaxxer:HikariCP:5.0.1")
@@ -68,7 +67,13 @@
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
-    // Run ONLY the Spring Boot backend
+    
+    // Configure bootRun to run Spring Boot backend
+    tasks.named<BootRun>("bootRun") {
+        mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
+    }
+    
+    // Run ONLY the Spring Boot backend (alternative task name)
     tasks.register<BootRun>("bootRunBackend") {
         dependsOn("classes")
         mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")

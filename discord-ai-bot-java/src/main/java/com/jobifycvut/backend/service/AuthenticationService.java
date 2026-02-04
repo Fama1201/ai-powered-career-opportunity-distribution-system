@@ -82,6 +82,8 @@ public class AuthenticationService {
         response.setExpiresIn(String.valueOf(expiresInSeconds));
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
         response.setRole(user.getRole().toString());
         response.setMessage("Login Successful");
 

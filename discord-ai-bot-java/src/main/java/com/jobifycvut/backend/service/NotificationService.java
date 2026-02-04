@@ -25,8 +25,17 @@ public class NotificationService {
 
     public List<NotificationResponse> getMyNotifications() {
         StudentEntity student = studentContextService.getOrCreateCurrentStudent();
+        // Get user_id from student's user relationship or userId field
+        Long userId = student.getUserId();
+        if (userId == null && student.getUser() != null) {
+            userId = student.getUser().getId();
+        }
+        if (userId == null) {
+            // Fallback: if no user relationship, try to use student ID (for backward compatibility)
+            userId = student.getId();
+        }
 
-        return repository.findByStudentIdOrderByCreatedAtDesc(student.getId())
+        return repository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream()
                 .map(n -> new NotificationResponse(
                         n.getId(),
@@ -40,32 +49,48 @@ public class NotificationService {
     @Transactional
     public void markRead(Long notificationId) {
         StudentEntity student = studentContextService.getOrCreateCurrentStudent();
+        Long userId = student.getUserId();
+        if (userId == null && student.getUser() != null) {
+            userId = student.getUser().getId();
+        }
+        if (userId == null) {
+            userId = student.getId();
+        }
 
         NotificationEntity n = repository.findById(notificationId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Notification not found"
                 ));
 
-        // If this notification is not for this student, forbid it
-        if (n.getStudentId() == null || !n.getStudentId().equals(student.getId())) {
+        // If this notification is not for this user, forbid it
+        if (n.getUserId() == null || !n.getUserId().equals(userId)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Not allowed to modify this notification"
             );
         }
 
         n.setRead(true);
+        repository.save(n);
     }
 
     @Transactional
     public int markAllRead() {
         StudentEntity student = studentContextService.getOrCreateCurrentStudent();
+        Long userId = student.getUserId();
+        if (userId == null && student.getUser() != null) {
+            userId = student.getUser().getId();
+        }
+        if (userId == null) {
+            userId = student.getId();
+        }
 
         List<NotificationEntity> unread =
-                repository.findByStudentIdAndReadFalseOrderByCreatedAtDesc(student.getId());
+                repository.findByUserIdAndReadFalseOrderByCreatedAtDesc(userId);
 
         for (NotificationEntity n : unread) {
             n.setRead(true);
         }
+        repository.saveAll(unread);
 
         return unread.size();
     }

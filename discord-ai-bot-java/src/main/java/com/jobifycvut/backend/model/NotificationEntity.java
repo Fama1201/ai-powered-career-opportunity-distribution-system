@@ -10,17 +10,17 @@ public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "student_id")
-    private Long studentId;
-
-    @Column(name="company_id")
-    private Long companyId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(name="message", columnDefinition ="text", nullable = false)
     private String message;
 
-    @Column(name="is_read", nullable = false)
-    private Boolean read=false;
+    @Column(name="type")
+    private String type;
+
+    @Column(name="\"read\"", nullable = false) // PostgreSQL'de "read" reserved keyword olduğu için tırnak içinde
+    private Boolean read = false;
 
     @Column(name="created_at", nullable = false)
     private Instant createdAt;
@@ -33,17 +33,21 @@ public class NotificationEntity {
     public void setId(Long id) {
         this.id = id;
     }
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+    
+    // Backward compatibility - deprecated, use getUserId instead
+    @Deprecated
     public Long getStudentId() {
-        return studentId;
+        return userId;
     }
+    @Deprecated
     public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-    public Long getCompanyId() {
-        return companyId;
-    }
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+        this.userId = studentId;
     }
     public String getMessage() {
         return message;
@@ -64,6 +68,10 @@ public class NotificationEntity {
         this.createdAt = createdAt;
     }
 
-
-
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
 }

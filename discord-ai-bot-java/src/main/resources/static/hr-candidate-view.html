@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Dashboard - Jobify CVUT</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/hr-dashboard.css">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+    <!-- Light Theme Animated Background Shapes -->
+    <div class="light-shape light-shape-1"></div>
+    <div class="light-shape light-shape-2"></div>
+    <div class="light-shape light-shape-3"></div>
+
+    <!-- Top Header Bar -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-briefcase logo-icon"></i>
+                <span class="logo-text">Jobify CVUT</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="header-btn" id="dashboardsBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span>Dashboards</span>
+                </button>
+                <div class="language-dropdown">
+                    <button class="header-btn" id="languageBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M2 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path
+                                d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span id="currentLanguage">English</span>
+                        <svg class="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    <div class="language-menu" id="languageMenu">
+                        <button class="language-option" data-lang="en" data-lang-name="English">
+                            <span class="lang-flag">🇬🇧</span>
+                            <span>English</span>
+                        </button>
+                        <button class="language-option" data-lang="cs" data-lang-name="Čeština">
+                            <span class="lang-flag">🇨🇿</span>
+                            <span>Čeština</span>
+                        </button>
+                        <button class="language-option" data-lang="tr" data-lang-name="Türkçe">
+                            <span class="lang-flag">🇹🇷</span>
+                            <span>Türkçe</span>
+                        </button>
+                        <button class="language-option" data-lang="es" data-lang-name="Español">
+                            <span class="lang-flag">🇪🇸</span>
+                            <span>Español</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="user-profile-dropdown">
+                <div class="user-profile" id="userProfileBtn">
+                    <div class="profile-badge">
+                        <span class="profile-initials">EE</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Emre Erdem</span>
+                        <span class="profile-role">Student</span>
+                    </div>
+                    <svg class="chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="user-dropdown-menu" id="userDropdownMenu">
+                    <a href="#" class="dropdown-item" id="profileItem">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <span data-i18n="profile">Profile</span>
+                    </a>
+                    <a href="#" class="dropdown-item notification-item" id="notificationsItem">
+                        <i class="fas fa-bell notification-icon"></i>
+                        <span data-i18n="notifications">Notifications</span>
+                        <span class="notification-count">3</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="login.html" class="dropdown-item logout-item" id="logoutItem">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <span data-i18n="logout">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        <!-- Left Sidebar -->
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <a href="hr-dashboard.html" class="sidebar-item">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hr-job-openings.html" class="sidebar-item">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>Job Openings</span>
+                </a>
+                <a href="hr-candidates.html" class="sidebar-item active">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>Candidates</span>
+                </a>
+                <a href="hr-hires.html" class="sidebar-item">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>Hires</span>
+                </a>
+                <a href="hr-analytics.html" class="sidebar-item">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>Analytics</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+                    <div class="theme-icon-wrapper">
+                        <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 1V3" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M12 21V23" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M4.22 4.22L5.64 5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M18.36 18.36L19.78 19.78" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M1 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M21 12H23" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M4.22 19.78L5.64 18.36" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <div class="dashboard-content">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h1 class="welcome-title">Welcome HR Manager, <span class="user-name">Emre</span>!</h1>
+                </div>
+
+                <!-- Candidate CV View Section -->
+                <section class="candidate-view-section">
+                    <div class="section-header">
+                        <div class="header-left-content">
+                            <a href="hr-candidates.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to
+                                Candidates</a>
+                            <h2 class="section-title" style="margin-top: 0.5rem;">Candidate Profile</h2>
+                        </div>
+                        <div class="header-actions">
+                            <button class="action-btn secondary"><i class="fas fa-download"></i> Download PDF</button>
+                            <button class="action-btn primary"><i class="fas fa-calendar-alt"></i> Schedule
+                                Interview</button>
+                        </div>
+                    </div>
+
+                    <div class="cv-container">
+                        <!-- Sidebar / Header Info -->
+                        <div class="cv-sidebar">
+                            <div class="cv-profile-header">
+                                <div class="cv-avatar">JW</div>
+                                <h2 class="cv-name">Jane Williams</h2>
+                                <p class="cv-role">Frontend Developer</p>
+                                <div class="cv-match-badge high">95% Match</div>
+                            </div>
+
+                            <div class="cv-contact-info">
+                                <h3>Contact Info</h3>
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>jane.williams@example.com</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>+420 123 456 789</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Prague, Czechia</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fab fa-linkedin"></i>
+                                    <span>linkedin.com/in/janewilliams</span>
+                                </div>
+                            </div>
+
+                            <div class="cv-skills-section">
+                                <h3>Skills</h3>
+                                <div class="cv-tags">
+                                    <span>React</span>
+                                    <span>TypeScript</span>
+                                    <span>JavaScript (ES6+)</span>
+                                    <span>HTML5 & CSS3</span>
+                                    <span>Redux</span>
+                                    <span>Tailwind CSS</span>
+                                    <span>Git</span>
+                                    <span>Jest</span>
+                                </div>
+                            </div>
+
+                            <div class="cv-languages-section">
+                                <h3>Languages</h3>
+                                <div class="language-item">
+                                    <span>English</span>
+                                    <span class="level">Native</span>
+                                </div>
+                                <div class="language-item">
+                                    <span>Czech</span>
+                                    <span class="level">B1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main CV Content -->
+                        <div class="cv-main-content">
+                            <section class="cv-section">
+                                <h3 class="cv-section-title">Professional Summary</h3>
+                                <p>Passionate and experienced Frontend Developer with over 3 years of expertise in
+                                    building responsive and user-friendly web applications. Proficient in the React
+                                    ecosystem, TypeScript, and modern CSS frameworks. Strong problem-solving skills and
+                                    a proven track record of delivering high-quality code in agile environments. Eager
+                                    to contribute to innovative projects and enhance user experiences.</p>
+                            </section>
+
+                            <section class="cv-section">
+                                <h3 class="cv-section-title">Experience</h3>
+
+                                <div class="experience-item">
+                                    <div class="exp-header">
+                                        <h4>Frontend Developer</h4>
+                                        <span class="exp-date">Jan 2022 - Present</span>
+                                    </div>
+                                    <p class="exp-company">TechSolutions Inc., Prague</p>
+                                    <ul class="exp-list">
+                                        <li>Developed and maintained key features for the company's flagship SaaS
+                                            product using React and TypeScript.</li>
+                                        <li>Improved application performance by 40% through code splitting and
+                                            optimizing rendering cycles.</li>
+                                        <li>Collaborated closely with UX/UI designers to implement pixel-perfect
+                                            responsive designs.</li>
+                                        <li>Mentored junior developers and conducted code reviews to ensure code quality
+                                            and best practices.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="experience-item">
+                                    <div class="exp-header">
+                                        <h4>Junior Web Developer</h4>
+                                        <span class="exp-date">Jun 2020 - Dec 2021</span>
+                                    </div>
+                                    <p class="exp-company">CreativeWeb Agency, Brno</p>
+                                    <ul class="exp-list">
+                                        <li>Built custom websites for diverse clients using HTML, CSS, JavaScript, and
+                                            WordPress.</li>
+                                        <li>Implemented animations and interactive elements to enhance user engagement.
+                                        </li>
+                                        <li>Ensured cross-browser compatibility and optimized websites for SEO and
+                                            accessibility.</li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <section class="cv-section">
+                                <h3 class="cv-section-title">Education</h3>
+                                <div class="education-item">
+                                    <div class="edu-header">
+                                        <h4>Bachelor's in Computer Science</h4>
+                                        <span class="edu-date">2017 - 2020</span>
+                                    </div>
+                                    <p class="edu-school">Czech Technical University (CVUT), Prague</p>
+                                </div>
+                            </section>
+
+                            <section class="cv-section">
+                                <h3 class="cv-section-title">Certifications</h3>
+                                <ul class="cert-list">
+                                    <li>Meta Front-End Developer Professional Certificate (2021)</li>
+                                    <li>AWS Certified Cloud Practitioner (2022)</li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/hr-dashboard.js"></script>
+</body>
+
+</html>

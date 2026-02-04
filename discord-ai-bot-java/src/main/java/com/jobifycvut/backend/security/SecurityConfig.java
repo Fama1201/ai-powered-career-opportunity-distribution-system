@@ -45,6 +45,9 @@ public class SecurityConfig {
                         // allow Spring error endpoint
                         .requestMatchers("/error").permitAll()
 
+                        // PUBLIC: health check endpoint
+                        .requestMatchers("/api/status").permitAll()
+
                         // PUBLIC: auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/hr/auth/**").permitAll()
@@ -66,15 +69,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/profile/**").hasRole("STUDENT")
                         .requestMatchers("/api/notifications/**").hasRole("STUDENT")
                         .requestMatchers("/api/cv/**").hasRole("STUDENT")
-                        .requestMatchers("/api/notifications/**").hasRole("STUDENT")
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/hr/auth/**").permitAll()
-                        .requestMatchers("/api/hr/**").hasRole("HR")
-
 
                         // everything else under /api needs auth (safe fallback)
                         .requestMatchers("/api/**").authenticated()
 
+                        // All other requests (static resources) are public
                         .anyRequest().permitAll()
                 )
 

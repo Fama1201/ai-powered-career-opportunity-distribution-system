@@ -5,11 +5,14 @@ import com.jobifycvut.backend.dto.CvUpdateRequest;
 import com.jobifycvut.backend.model.StudentEntity;
 import com.jobifycvut.backend.repository.StudentRepository;
 import com.jobifycvut.backend.service.StudentContextService;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @RestController
@@ -48,7 +51,7 @@ public class CvController {
             finalText = extractedText.trim();
         }
 
-        // 2) Otherwise allow uploading a .txt file
+        // 2) Otherwise allow uploading a file (.txt or .pdf)
         if (finalText == null && file != null && !file.isEmpty()) {
 
             long maxBytes = 5L * 1024L * 1024L; // 5MB
@@ -60,15 +63,25 @@ public class CvController {
             String contentType = file.getContentType() != null ? file.getContentType() : "";
             String filename = file.getOriginalFilename() != null ? file.getOriginalFilename().toLowerCase() : "";
 
-            boolean isTxt = contentType.contains("text/plain") || filename.endsWith(".txt");
-            if (!isTxt) {
+            // Handle PDF files
+            if (contentType.contains("application/pdf") || filename.endsWith(".pdf")) {
+                try {
+                    finalText = extractTextFromPdf(file.getInputStream());
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest()
+                            .body(new CvResponse(false, "Error parsing PDF: " + e.getMessage()));
+                }
+            }
+            // Handle TXT files
+            else if (contentType.contains("text/plain") || filename.endsWith(".txt")) {
+                finalText = new String(file.getBytes(), StandardCharsets.UTF_8).trim();
+            }
+            else {
                 return ResponseEntity.badRequest().body(
                         new CvResponse(false,
-                                "Unsupported file type. Upload a .txt file OR send 'extractedText' (recommended for PDF/DOCX).")
+                                "Unsupported file type. Please upload a PDF or TXT file.")
                 );
             }
-
-            finalText = new String(file.getBytes(), StandardCharsets.UTF_8).trim();
         }
 
         // 3) Validate we got something
@@ -76,11 +89,23 @@ public class CvController {
             return ResponseEntity.badRequest().body(new CvResponse(false, "No CV content provided."));
         }
 
-        // 4) Save
+        // 4) Save (automatically replaces existing CV - database constraint ensures one CV per student)
         student.setCvText(finalText);
         StudentEntity saved = repository.save(student);
 
         return ResponseEntity.ok(new CvResponse(true, saved.getCvText()));
+    }
+
+    /**
+     * Extract text from PDF file using Apache PDFBox
+     */
+    private String extractTextFromPdf(InputStream pdfInputStream) throws Exception {
+        try (PDDocument document = PDDocument.load(pdfInputStream)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setStartPage(1);
+            stripper.setEndPage(document.getNumberOfPages());
+            return stripper.getText(document).trim();
+        }
     }
 
     // PUT /api/cv/update (JSON)
