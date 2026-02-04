@@ -37,8 +37,15 @@ public class PasswordHasher {
 
     public static boolean verifyPassword(String password, String storedHash) {
         try {
+            if (storedHash == null || storedHash.isEmpty()) {
+                System.err.println("PasswordHasher: storedHash is null or empty");
+                return false;
+            }
+            
             String[] parts = storedHash.split(":");
             if (parts.length != 3) {
+                System.err.println("PasswordHasher: Invalid hash format. Expected 3 parts, got " + parts.length);
+                System.err.println("Hash format: " + storedHash.substring(0, Math.min(50, storedHash.length())) + "...");
                 return false;
             }
 
@@ -48,9 +55,15 @@ public class PasswordHasher {
 
             byte[] testHash = pbkdf2(password.toCharArray(), salt, iterations, HASH_LENGTH);
 
-            return slowEquals(storedHashBytes, testHash);
+            boolean result = slowEquals(storedHashBytes, testHash);
+            if (!result) {
+                System.err.println("PasswordHasher: Password verification failed - hashes do not match");
+            }
+            return result;
 
         } catch (Exception e) {
+            System.err.println("PasswordHasher: Exception during verification: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

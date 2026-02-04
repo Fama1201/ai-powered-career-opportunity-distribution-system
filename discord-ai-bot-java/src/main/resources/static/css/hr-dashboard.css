@@ -2063,3 +2063,341 @@ body.light-theme .back-link {
 body.light-theme .back-link:hover {
     color: #ef4444;
 }
+
+/* ========== HR Notifications & Profile Styles ========== */
+
+/* Notifications */
+.notifications-actions {
+    margin-bottom: 2rem;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notifications-count-info {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.notifications-count-info span {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.notifications-section {
+    margin-top: 2rem;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notification-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
+}
+
+.notification-card.unread {
+    background: rgba(239, 68, 68, 0.08);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.15);
+}
+
+.notification-card.read {
+    opacity: 0.7;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.notification-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.notification-icon.unread-dot {
+    position: relative;
+}
+
+.notification-icon.unread-dot::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 14px;
+    height: 14px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    border: 3px solid var(--card-bg);
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+}
+
+.notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notification-message {
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 400;
+}
+
+.notification-card.unread .notification-message {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.notification-date {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.notification-mark-read-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--primary-color);
+    border-radius: 10px;
+    color: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+
+.notification-mark-read-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Profile */
+.profile-section {
+    margin-top: 2rem;
+}
+
+.profile-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-card-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-card-title {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.form-input,
+.form-textarea {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-hint {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
+}
+
+/* Light Theme - Notifications & Profile */
+body.light-theme .notifications-header {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .notifications-count-info {
+    color: #0f172a;
+}
+
+body.light-theme .notification-card {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .notification-card.unread {
+    background: rgba(239, 68, 68, 0.05);
+    border-left-color: var(--primary-color);
+}
+
+body.light-theme .notification-card:hover {
+    background: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+body.light-theme .notification-message {
+    color: #0f172a;
+}
+
+body.light-theme .notification-date {
+    color: #64748b;
+}
+
+body.light-theme .notification-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--primary-color);
+}
+
+body.light-theme .profile-card {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .profile-card-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-theme .profile-card-title {
+    color: #0f172a;
+}
+
+body.light-theme .form-label {
+    color: #0f172a;
+}
+
+body.light-theme .form-input,
+body.light-theme .form-textarea {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+body.light-theme .form-input:focus,
+body.light-theme .form-textarea:focus {
+    background: #ffffff;
+    border-color: var(--primary-color);
+}
+
+body.light-theme .form-hint {
+    color: #64748b;
+}
+
+body.light-theme .form-actions {
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Light Theme - Buttons */
+body.light-theme .btn-secondary {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 2px solid #e2e8f0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-theme .btn-secondary:hover {
+    background: #f8fafc !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.15) !important;
+}
+
+body.light-theme .btn-secondary:active {
+    background: #f1f5f9 !important;
+}
+
+body.light-theme .btn-secondary i {
+    color: inherit !important;
+}

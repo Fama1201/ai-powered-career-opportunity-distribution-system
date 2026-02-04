@@ -16,10 +16,10 @@ public class NotificationEntity {
     @Column(name="message", columnDefinition ="text", nullable = false)
     private String message;
 
-    @Column(name="type")
+    @Transient // type kolonu database'de yok, bu yüzden transient yapıyoruz
     private String type;
 
-    @Column(name="\"read\"", nullable = false) // PostgreSQL'de "read" reserved keyword olduğu için tırnak içinde
+    @Column(name="is_read", nullable = false) // PostgreSQL'de "read" reserved keyword olduğu için is_read kullanıyoruz
     private Boolean read = false;
 
     @Column(name="created_at", nullable = false)

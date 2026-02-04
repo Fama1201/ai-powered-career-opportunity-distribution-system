@@ -123,13 +123,18 @@ const router = new Router();
 
 // Register default routes
 router.register('/student/dashboard', () => {
-    // Already on dashboard, just update active state
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href') === 'student-dashboard.html' || item.textContent.includes('Dashboard')) {
-            item.classList.add('active');
-        }
-    });
+    // If we're already on dashboard, just update active state
+    if (window.location.pathname.includes('student-dashboard.html') || window.location.pathname.includes('dashboard.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('dashboard') || item.getAttribute('data-route')?.includes('dashboard') || item.textContent.includes('Dashboard')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        // Navigate to dashboard page
+        window.location.href = '/pages/student/student-dashboard.html';
+    }
 });
 
 router.register('/student/job-matches', () => {
@@ -147,8 +152,30 @@ router.register('/student/job-matches', () => {
 });
 
 router.register('/student/applications', (params) => {
-    const url = '/pages/student/applications.html' + (params.status ? `?status=${params.status}` : '');
-    window.location.href = url;
+    // If we're already on applications.html, just update active state
+    if (window.location.pathname.includes('applications.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('applications') || item.textContent.includes('Applications')) {
+                item.classList.add('active');
+            }
+        });
+        // Apply status filter if provided
+        if (params.status) {
+            const filterBtn = document.querySelector(`[data-status="${params.status}"]`);
+            if (filterBtn) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                filterBtn.classList.add('active');
+                // Trigger filter
+                if (typeof handleStatusFilter === 'function') {
+                    handleStatusFilter(params.status);
+                }
+            }
+        }
+    } else {
+        const url = '/pages/student/applications.html' + (params.status ? `?status=${params.status}` : '');
+        window.location.href = url;
+    }
 });
 
 router.register('/student/cv', () => {
@@ -170,15 +197,98 @@ router.register('/student/advisor', () => {
 });
 
 router.register('/student/profile', () => {
-    window.location.href = '/pages/student/profile.html';
+    // If we're already on profile.html, just update active state
+    if (window.location.pathname.includes('profile.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const profileItem = document.getElementById('profileItem');
+        if (profileItem) {
+            profileItem.classList.add('active');
+        }
+    } else {
+        window.location.href = '/pages/student/profile.html';
+    }
 });
 
 router.register('/student/notifications', () => {
-    window.location.href = '/pages/student/notifications.html';
+    // If we're already on notifications.html, just update active state
+    if (window.location.pathname.includes('notifications.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const notificationsItem = document.getElementById('notificationsItem');
+        if (notificationsItem) {
+            notificationsItem.classList.add('active');
+        }
+    } else {
+        window.location.href = '/pages/student/notifications.html';
+    }
 });
 
 router.register('/student/login', () => {
     window.location.href = '/pages/auth/login.html';
+});
+
+// HR Routes
+router.register('/hr/dashboard', () => {
+    // If we're already on hr-dashboard.html, just update active state
+    if (window.location.pathname.includes('hr-dashboard.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('dashboard') || item.getAttribute('data-route')?.includes('dashboard') || item.textContent.includes('Dashboard')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        window.location.href = '/pages/hr/hr-dashboard.html';
+    }
+});
+
+router.register('/hr/job-openings', () => {
+    window.location.href = '/pages/hr/hr-job-openings.html';
+});
+
+router.register('/hr/candidates', () => {
+    window.location.href = '/pages/hr/hr-candidates.html';
+});
+
+router.register('/hr/hires', () => {
+    window.location.href = '/pages/hr/hr-hires.html';
+});
+
+router.register('/hr/analytics', () => {
+    window.location.href = '/pages/hr/hr-analytics.html';
+});
+
+router.register('/hr/profile', () => {
+    // If we're already on hr-profile.html, just update active state
+    if (window.location.pathname.includes('hr-profile.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const profileItem = document.getElementById('profileItem');
+        if (profileItem) {
+            profileItem.classList.add('active');
+        }
+    } else {
+        window.location.href = '/pages/hr/hr-profile.html';
+    }
+});
+
+router.register('/hr/notifications', () => {
+    // If we're already on hr-notifications.html, just update active state
+    if (window.location.pathname.includes('hr-notifications.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const notificationsItem = document.getElementById('notificationsItem');
+        if (notificationsItem) {
+            notificationsItem.classList.add('active');
+        }
+    } else {
+        window.location.href = '/pages/hr/hr-notifications.html';
+    }
 });
 
 // Export for use in other files

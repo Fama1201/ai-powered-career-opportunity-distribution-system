@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Matches - Jobify CVUT</title>
+    <title>Profile - Jobify CVUT</title>
     
     <!-- Styles -->
     <link rel="stylesheet" href="../../css/style.css">
-    <link rel="stylesheet" href="../../css/student-dashboard.css">
+    <link rel="stylesheet" href="../../css/hr-dashboard.css">
     
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -68,25 +68,25 @@
             <div class="user-profile-dropdown">
                 <div class="user-profile" id="userProfileBtn">
                     <div class="profile-badge">
-                        <span class="profile-initials">ST</span>
+                        <span class="profile-initials">HR</span>
                     </div>
                     <div class="profile-info">
                         <span class="profile-name">Loading...</span>
-                        <span class="profile-role">Student</span>
+                        <span class="profile-role">HR Professional</span>
                     </div>
                     <svg class="chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
                 <div class="user-dropdown-menu" id="userDropdownMenu">
-                    <a href="#/student/profile" class="dropdown-item" id="profileItem">
+                    <a href="#/hr/profile" class="dropdown-item active" id="profileItem" data-route="#/hr/profile">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         <span data-i18n="profile">Profile</span>
                     </a>
-                    <a href="#/student/notifications" class="dropdown-item notification-item" id="notificationsItem">
+                    <a href="#/hr/notifications" class="dropdown-item notification-item" id="notificationsItem" data-route="#/hr/notifications">
                         <i class="fas fa-bell notification-icon"></i>
                         <span data-i18n="notifications">Notifications</span>
                         <span class="notification-count">0</span>
@@ -110,44 +110,36 @@
         <!-- Left Sidebar -->
         <aside class="dashboard-sidebar">
             <nav class="sidebar-nav">
-                <a href="#/student/dashboard" class="sidebar-item" data-route="#/student/dashboard">
+                <a href="#/hr/dashboard" class="sidebar-item" data-route="#/hr/dashboard">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <span>Dashboard</span>
                 </a>
-                <a href="#/student/job-matches" class="sidebar-item active" data-route="#/student/job-matches">
+                <a href="#/hr/job-openings" class="sidebar-item" data-route="#/hr/job-openings">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Job Matches</span>
+                    <span>Job Openings</span>
                 </a>
-                <a href="#/student/applications" class="sidebar-item" data-route="#/student/applications">
+                <a href="#/hr/candidates" class="sidebar-item" data-route="#/hr/candidates">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>My Applications</span>
+                    <span>Candidates</span>
                 </a>
-                <a href="#/student/cv" class="sidebar-item" data-route="#/student/cv">
+                <a href="#/hr/hires" class="sidebar-item" data-route="#/hr/hires">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>CV Management</span>
+                    <span>Hires</span>
                 </a>
-                <a href="#/student/advisor" class="sidebar-item" data-route="#/student/advisor">
+                <a href="#/hr/analytics" class="sidebar-item" data-route="#/hr/analytics">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Career Advisor</span>
+                    <span>Analytics</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -177,62 +169,64 @@
             <div class="dashboard-content">
                 <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Job Matches</h1>
-                    <p class="welcome-subtitle">İşlerinizle eşleşen fırsatları keşfedin</p>
+                    <h1 class="welcome-title">My Profile</h1>
+                    <p class="welcome-subtitle">Manage your HR profile information and company details</p>
                 </div>
 
-                <!-- Search and Filter Section -->
-                <section class="job-matches-filters">
-                    <div class="filters-card">
-                        <div class="search-box">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <input type="text" id="jobSearchInput" placeholder="Search jobs by title, company, or keywords..." aria-label="Search jobs">
-                            <button class="search-btn" id="searchBtn">
-                                <span>Search</span>
-                            </button>
+                <!-- Profile Form -->
+                <section class="profile-section">
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <h2 class="profile-card-title">HR Information</h2>
                         </div>
-                        <div class="filter-options">
-                            <select id="jobTypeFilter" class="filter-select">
-                                <option value="">All Job Types</option>
-                                <option value="Full-Time">Full-Time</option>
-                                <option value="Part-Time">Part-Time</option>
-                                <option value="Internship">Internship</option>
-                                <option value="Contract">Contract</option>
-                            </select>
-                            <select id="locationFilter" class="filter-select">
-                                <option value="">All Locations</option>
-                                <option value="Remote">Remote</option>
-                                <option value="On-site">On-site</option>
-                                <option value="Hybrid">Hybrid</option>
-                            </select>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Job Matches Grid -->
-                <section class="job-matches-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Your Job Matches</h2>
-                        <div class="matches-count" id="matchesCount">0 matches found</div>
-                    </div>
-                    <div class="job-cards-grid" id="jobMatchesGrid">
-                        <!-- Job cards will be dynamically loaded here -->
-                        <div class="loading-state" id="loadingState">
-                            <div class="loading-spinner"></div>
-                            <p>Loading job matches...</p>
-                        </div>
-                    </div>
-                    <div class="empty-state" id="emptyState" style="display: none;">
-                        <svg width="128" height="128" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <h3>No Job Matches Found</h3>
-                        <p>Update your CV and skills to get better matches!</p>
-                        <a href="#/student/cv" class="btn btn-primary">Update CV</a>
+                        <form id="profileForm" class="profile-form">
+                            <div class="form-group">
+                                <label for="profileName" class="form-label">Full Name</label>
+                                <input 
+                                    type="text" 
+                                    id="profileName" 
+                                    name="fullName" 
+                                    class="form-input" 
+                                    placeholder="Enter your full name"
+                                    required
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profileEmail" class="form-label">Email</label>
+                                <input 
+                                    type="email" 
+                                    id="profileEmail" 
+                                    name="email" 
+                                    class="form-input" 
+                                    placeholder="your.email@example.com"
+                                    disabled
+                                >
+                                <small class="form-hint">Email cannot be changed</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profileCompany" class="form-label">Company Name</label>
+                                <input 
+                                    type="text" 
+                                    id="profileCompany" 
+                                    name="companyName" 
+                                    class="form-input" 
+                                    placeholder="Enter your company name"
+                                >
+                                <small class="form-hint">The name of the company you work for</small>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="saveBtn">
+                                    <span id="saveBtnText">Save Changes</span>
+                                    <span id="saveBtnLoading" style="display: none;">
+                                        <i class="fas fa-spinner fa-spin"></i> Saving...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </section>
             </div>
@@ -245,7 +239,7 @@
     <script src="../../js/api.js"></script>
     <script src="../../js/ui.js"></script>
     <script src="../../js/i18n.js"></script>
-    <script src="../../js/job-matches.js"></script>
+    <script src="../../js/hr-profile.js"></script>
 </body>
 </html>
 

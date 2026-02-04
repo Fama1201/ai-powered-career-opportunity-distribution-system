@@ -556,18 +556,12 @@ function setupDashboardsButton() {
  * Setup assistant card - AI chat
  */
 function setupAssistantCard() {
-    const askButton = document.querySelector('.ask-button');
-    const assistantAskBtn = document.querySelector('.assistant-ask-btn');
-    
-    if (askButton) {
-        askButton.addEventListener('click', function() {
-            openAiChatDrawer();
-        });
-    }
+    const assistantAskBtn = document.getElementById('assistantAskBtn') || document.querySelector('.assistant-ask-btn');
     
     if (assistantAskBtn) {
         assistantAskBtn.addEventListener('click', function() {
-            openAiChatDrawer();
+            // Navigate to Career Advisor page
+            router.navigate('/student/advisor');
         });
     }
 }

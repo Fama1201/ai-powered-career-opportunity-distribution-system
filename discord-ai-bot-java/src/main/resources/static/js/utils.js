@@ -98,8 +98,8 @@ async function apiRequest(endpoint, options = {}) {
             // Try to refresh token
             const refreshed = await refreshAccessToken();
             if (!refreshed) {
-                // Refresh failed, redirect to login
-                redirectToLogin();
+                // Refresh failed - don't redirect, just throw error
+                // Let the calling code decide what to do
                 throw new Error(CONFIG.ERROR_MESSAGES.UNAUTHORIZED);
             }
             // Retry request with new token

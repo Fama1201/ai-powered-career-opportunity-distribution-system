@@ -32,10 +32,11 @@ const StudentAPI = {
         try {
             const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, mergedOptions);
             
+            // Don't auto-redirect on 401/403 - let the calling code handle it
+            // This prevents unwanted redirects when the page is loading
             if (response.status === 401 || response.status === 403) {
-                clearAuthData();
-                window.location.href = '/pages/auth/login.html';
-                throw new Error('Unauthorized');
+                const error = await response.json().catch(() => ({ message: 'Unauthorized' }));
+                throw new Error(error.message || 'Unauthorized');
             }
 
             if (!response.ok) {
