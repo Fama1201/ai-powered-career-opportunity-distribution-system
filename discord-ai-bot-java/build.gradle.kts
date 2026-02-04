@@ -23,6 +23,9 @@
         //spring boot
         implementation("org.springframework.boot:spring-boot-starter-web")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("org.springframework.security:spring-security-test")
+        testImplementation("org.mockito:mockito-inline:5.2.0")
+        testImplementation("com.h2database:h2:2.2.224")
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
         implementation("org.postgresql:postgresql:42.7.2")
 
