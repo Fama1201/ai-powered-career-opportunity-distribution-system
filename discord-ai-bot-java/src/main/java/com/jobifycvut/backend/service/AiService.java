@@ -1,6 +1,5 @@
 package com.jobifycvut.backend.service;
 
-import bot.api.OpportunityClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -24,12 +23,18 @@ import java.util.Set;
 public class AiService {
     private final InteractionRepository interactionRepository;
     private final StudentContextService studentContextService;
+    private final JobSearchClient jobSearchClient;
+    private final OpenAiClient openAiClient;
     private final Gson gson = new Gson();
 
     public AiService(InteractionRepository interactionRepository,
-                     StudentContextService studentContextService) {
+                     StudentContextService studentContextService,
+                     JobSearchClient jobSearchClient,
+                     OpenAiClient openAiClient) {
         this.interactionRepository = interactionRepository;
         this.studentContextService = studentContextService;
+        this.jobSearchClient = jobSearchClient;
+        this.openAiClient = openAiClient;
     }
 
     public ChatResponse chat(Long userId, String message) {
@@ -49,18 +54,18 @@ public class AiService {
         String keywords = String.join(" ",
                 List.of(skills, careerInterest, extra).stream().filter(s -> !s.isBlank()).toList());
 
-        Set<OpportunityClient.Opportunity> rawJobs = OpportunityClient.searchMultipleKeywords(
+        Set<bot.api.OpportunityClient.Opportunity> rawJobs = jobSearchClient.searchMultipleKeywords(
                 keywords.isBlank() ? "software" : keywords
         );
 
         if (rawJobs.size() < 10) {
-            Set<OpportunityClient.Opportunity> fallback = OpportunityClient.searchMultipleKeywords(
+            Set<bot.api.OpportunityClient.Opportunity> fallback = jobSearchClient.searchMultipleKeywords(
                     "software internship backend developer"
             );
             rawJobs.addAll(fallback);
         }
 
-        List<OpportunityClient.Opportunity> jobs = rawJobs.stream()
+        List<bot.api.OpportunityClient.Opportunity> jobs = rawJobs.stream()
                 .sorted(Comparator.comparing(o -> safeTrim(o.title)))
                 .limit(30)
                 .toList();
@@ -84,10 +89,11 @@ public class AiService {
             );
         }
 
-        OpenAiChatClient client = new OpenAiChatClient(apiKey, "gpt-4o-mini");
         String replyJson;
         try {
-            replyJson = client.chatJson(
+            replyJson = openAiClient.chatJson(
+                    apiKey,
+                    "gpt-4o-mini",
                     List.of(
                             Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", userPrompt)
@@ -179,10 +185,11 @@ public class AiService {
 
         String userPrompt = "Language: " + (language.isBlank() ? "unspecified" : language) + "\n\nCode:\n" + code;
 
-        OpenAiChatClient client = new OpenAiChatClient(apiKey, "gpt-4o-mini");
         String replyJson;
         try {
-            replyJson = client.chatJson(
+            replyJson = openAiClient.chatJson(
+                    apiKey,
+                    "gpt-4o-mini",
                     List.of(
                             Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", userPrompt)
@@ -209,7 +216,7 @@ public class AiService {
         return response;
     }
 
-    private String buildUserPrompt(StudentEntity student, String cvText, List<OpportunityClient.Opportunity> jobs) {
+    private String buildUserPrompt(StudentEntity student, String cvText, List<bot.api.OpportunityClient.Opportunity> jobs) {
         JsonObject root = new JsonObject();
         root.addProperty("studentName", safeTrim(student.getName()));
         root.addProperty("email", safeTrim(student.getEmail()));
@@ -218,7 +225,7 @@ public class AiService {
         root.addProperty("cvText", cvText);
 
         JsonArray jobsArr = new JsonArray();
-        for (OpportunityClient.Opportunity job : jobs) {
+        for (bot.api.OpportunityClient.Opportunity job : jobs) {
             JsonObject j = new JsonObject();
             j.addProperty("id", safeTrim(job.id));
             j.addProperty("title", safeTrim(job.title));
@@ -538,7 +545,7 @@ public class AiService {
     }
 
     private void ensureTopMatches(ChatResponse response,
-                                  List<OpportunityClient.Opportunity> jobs,
+                                  List<bot.api.OpportunityClient.Opportunity> jobs,
                                   String skills,
                                   String careerInterest,
                                   String message) {
@@ -560,14 +567,14 @@ public class AiService {
             response.setTopMatches(new java.util.ArrayList<>());
         }
 
-        List<OpportunityClient.Opportunity> sorted = jobs.stream()
+        List<bot.api.OpportunityClient.Opportunity> sorted = jobs.stream()
                 .sorted((a, b) -> Integer.compare(
                         scoreJob(b, tokens),
                         scoreJob(a, tokens)
                 ))
                 .toList();
 
-        for (OpportunityClient.Opportunity job : sorted) {
+        for (bot.api.OpportunityClient.Opportunity job : sorted) {
             if (response.getTopMatches().size() >= 10) break;
             if (job.id != null && seen.contains(job.id)) continue;
 
@@ -583,7 +590,7 @@ public class AiService {
         }
     }
 
-    private int scoreJob(OpportunityClient.Opportunity job, List<String> tokens) {
+    private int scoreJob(bot.api.OpportunityClient.Opportunity job, List<String> tokens) {
         String hay = (safeTrim(job.title) + " " + safeTrim(job.description)).toLowerCase();
         int score = 0;
         for (String t : tokens) {
