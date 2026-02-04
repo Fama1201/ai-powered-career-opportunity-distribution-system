@@ -31,8 +31,9 @@ public class OpportunityService {
     }
 
     // GET /api/jobs
-    public Page<OpportunityListResponse> getAllOpportunities(Pageable pageable) {
-        return opportunityRepository.findAll(pageable).map(this::mapToListResponse);
+    public Page<OpportunityListResponse> getAllOpportunities(Pageable pageable, String jobType, String workMode) {
+        return opportunityRepository.findAllWithFilters(jobType, workMode, pageable)
+                .map(this::mapToListResponse);
     }
 
     // GET /api/jobs/{jobId} details (without applied/saved flags)
@@ -61,9 +62,9 @@ public class OpportunityService {
     }
 
     // GET /api/jobs/search?keyword=...
-    public Page<OpportunityListResponse> searchOpportunities(String keyword, Pageable pageable) {
+    public Page<OpportunityListResponse> searchOpportunities(String keyword, Pageable pageable, String jobType, String workMode) {
         return opportunityRepository
-                .findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(keyword, keyword, pageable)
+                .searchWithFilters(keyword, jobType, workMode, pageable)
                 .map(this::mapToListResponse);
     }
 
