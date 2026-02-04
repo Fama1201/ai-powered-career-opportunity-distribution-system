@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Dashboard - Jobify CVUT</title>
+    <title>Job Openings - Jobify CVUT</title>
 
     <!-- Styles -->
     <link rel="stylesheet" href="../../css/style.css">
@@ -37,16 +37,6 @@
         </div>
         <div class="header-right">
             <div class="header-actions">
-                <button class="header-btn" id="dashboardsBtn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                    <span>Dashboards</span>
-                </button>
                 <div class="language-dropdown">
                     <button class="header-btn" id="languageBtn">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -88,11 +78,11 @@
             <div class="user-profile-dropdown">
                 <div class="user-profile" id="userProfileBtn">
                     <div class="profile-badge">
-                        <span class="profile-initials">EE</span>
+                        <span class="profile-initials">HR</span>
                     </div>
                     <div class="profile-info">
-                        <span class="profile-name">Emre Erdem</span>
-                        <span class="profile-role">Student</span>
+                        <span class="profile-name">Loading...</span>
+                        <span class="profile-role">HR Professional</span>
                     </div>
                     <svg class="chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +91,7 @@
                     </svg>
                 </div>
                 <div class="user-dropdown-menu" id="userDropdownMenu">
-                    <a href="#" class="dropdown-item" id="profileItem">
+                    <a href="#/hr/profile" class="dropdown-item" id="profileItem" data-route="#/hr/profile">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
@@ -111,13 +101,13 @@
                         </svg>
                         <span data-i18n="profile">Profile</span>
                     </a>
-                    <a href="#" class="dropdown-item notification-item" id="notificationsItem">
+                    <a href="#/hr/notifications" class="dropdown-item notification-item" id="notificationsItem" data-route="#/hr/notifications">
                         <i class="fas fa-bell notification-icon"></i>
                         <span data-i18n="notifications">Notifications</span>
-                        <span class="notification-count">3</span>
+                        <span class="notification-count">0</span>
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="login.html" class="dropdown-item logout-item" id="logoutItem">
+                    <a href="#" class="dropdown-item logout-item" id="logoutItem">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
@@ -139,7 +129,7 @@
         <!-- Left Sidebar -->
         <aside class="dashboard-sidebar">
             <nav class="sidebar-nav">
-                <a href="hr-dashboard.html" class="sidebar-item">
+                <a href="#/hr/dashboard" class="sidebar-item" data-route="#/hr/dashboard">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -150,7 +140,7 @@
                     </svg>
                     <span>Dashboard</span>
                 </a>
-                <a href="hr-job-openings.html" class="sidebar-item active">
+                <a href="#/hr/job-openings" class="sidebar-item active" data-route="#/hr/job-openings">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -159,7 +149,7 @@
                     </svg>
                     <span>Job Openings</span>
                 </a>
-                <a href="hr-candidates.html" class="sidebar-item">
+                <a href="#/hr/candidates" class="sidebar-item" data-route="#/hr/candidates">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -168,7 +158,7 @@
                     </svg>
                     <span>Candidates</span>
                 </a>
-                <a href="hr-hires.html" class="sidebar-item">
+                <a href="#/hr/hires" class="sidebar-item" data-route="#/hr/hires">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
@@ -176,7 +166,7 @@
                     </svg>
                     <span>Hires</span>
                 </a>
-                <a href="hr-analytics.html" class="sidebar-item">
+                <a href="#/hr/analytics" class="sidebar-item" data-route="#/hr/analytics">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -223,81 +213,196 @@
         <!-- Main Content Area -->
         <main class="dashboard-main">
             <div class="dashboard-content">
-                <!-- Welcome Section -->
+                <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Welcome HR Manager, <span class="user-name">Emre</span>!</h1>
+                    <h1 class="welcome-title">Job Openings</h1>
+                    <p class="welcome-subtitle">Manage your job postings and track applications</p>
                 </div>
 
-                <!-- Job Openings Section -->
-                <section class="job-list-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Job Openings</h2>
-                        <button class="header-btn"
-                            style="background: var(--primary-color); color: white; border: none;">
-                            <i class="fas fa-plus"></i> Post New Job
-                        </button>
+                <!-- Filters and Actions -->
+                <section class="job-openings-filters">
+                    <div class="filters-card">
+                        <div class="filter-group">
+                            <label for="statusFilter" class="filter-label">Status</label>
+                            <div class="custom-select-wrapper">
+                                <button type="button" class="custom-select-btn" id="statusFilterBtn">
+                                    <span class="custom-select-text" id="statusFilterText">All Status</span>
+                                    <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <div class="custom-select-dropdown" id="statusFilterDropdown">
+                                    <button type="button" class="custom-select-option" data-value="">All Status</button>
+                                    <button type="button" class="custom-select-option" data-value="OPEN">Open</button>
+                                    <button type="button" class="custom-select-option" data-value="CLOSED">Closed</button>
+                                    <button type="button" class="custom-select-option" data-value="ARCHIVED">Archived</button>
+                                </div>
+                                <input type="hidden" id="statusFilter" value="">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="searchInput" class="filter-label">Search</label>
+                            <div class="search-box">
+                                <input type="text" id="searchInput" class="search-input" placeholder="Search jobs...">
+                                <button class="search-btn" id="searchBtn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="filter-actions">
+                            <button class="btn btn-primary" id="postNewJobBtn">
+                                <i class="fas fa-plus"></i> Post New Job
+                            </button>
+                        </div>
                     </div>
+                </section>
 
-                    <div class="job-cards-grid">
-                        <!-- Job 1 -->
-                        <div class="job-card">
-                            <div class="job-icon purple">
-                                <i class="fas fa-code"></i>
-                            </div>
-                            <div class="job-content">
-                                <h3 class="job-title">Frontend Developer</h3>
-                                <p class="job-company">Software Department</p>
-                                <p class="job-location">Prague, Czechia</p>
-                            </div>
-                            <div class="job-footer">
-                                <span class="job-type">Full-Time</span>
-                                <div class="job-salary">25 Applicants</div>
-                                <button class="job-arrow">Manage</button>
-                            </div>
+                <!-- Job Cards Grid -->
+                <section class="job-openings-section">
+                    <div class="job-cards-grid" id="jobCardsGrid">
+                        <!-- Loading State -->
+                        <div class="loading-state" id="loadingState">
+                            <div class="loading-spinner"></div>
+                            <p>Loading job openings...</p>
                         </div>
-
-                        <!-- Job 2 -->
-                        <div class="job-card">
-                            <div class="job-icon green">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div class="job-content">
-                                <h3 class="job-title">Data Analyst</h3>
-                                <p class="job-company">Data Science Team</p>
-                                <p class="job-location">Prague, Czechia</p>
-                            </div>
-                            <div class="job-footer">
-                                <span class="job-type">Full-Time</span>
-                                <div class="job-salary">42 Applicants</div>
-                                <button class="job-arrow">Manage</button>
-                            </div>
-                        </div>
-
-                        <!-- Job 3 -->
-                        <div class="job-card">
-                            <div class="job-icon orange" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
-                                <i class="fas fa-paint-brush"></i>
-                            </div>
-                            <div class="job-content">
-                                <h3 class="job-title">UX Designer</h3>
-                                <p class="job-company">Design Team</p>
-                                <p class="job-location">Remote</p>
-                            </div>
-                            <div class="job-footer">
-                                <span class="job-type">Contract</span>
-                                <div class="job-salary">18 Applicants</div>
-                                <button class="job-arrow">Manage</button>
-                            </div>
-                        </div>
+                    </div>
+                    <!-- Empty State -->
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <svg width="128" height="128" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <h3>No Job Openings</h3>
+                        <p>You haven't posted any jobs yet. Click "Post New Job" to get started.</p>
                     </div>
                 </section>
             </div>
         </main>
     </div>
 
+    <!-- Job Create/Edit Modal -->
+    <div class="modal-overlay" id="jobModalOverlay" style="display: none;">
+        <div class="modal-content job-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Post New Job</h2>
+                <button class="modal-close" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="jobForm" class="job-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jobTitle" class="form-label">Job Title *</label>
+                        <input type="text" id="jobTitle" name="title" class="form-input" required
+                            placeholder="e.g., Frontend Developer">
+                    </div>
+                    <div class="form-group">
+                        <label for="jobCompany" class="form-label">Company *</label>
+                        <input type="text" id="jobCompany" name="company" class="form-input" required
+                            placeholder="e.g., Tech Corp">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jobType" class="form-label">Job Type *</label>
+                        <select id="jobType" name="jobType" class="form-input" required>
+                            <option value="">Select job type</option>
+                            <option value="Full-Time">Full-Time</option>
+                            <option value="Part-Time">Part-Time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobWage" class="form-label">Wage/Salary</label>
+                        <input type="text" id="jobWage" name="wage" class="form-input"
+                            placeholder="e.g., €50,000 - €70,000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jobHomeOffice" class="form-label">Work Location</label>
+                        <select id="jobHomeOffice" name="homeOffice" class="form-input">
+                            <option value="">Select location</option>
+                            <option value="Remote">Remote</option>
+                            <option value="On-site">On-site</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobDeadline" class="form-label">Application Deadline</label>
+                        <input type="datetime-local" id="jobDeadline" name="applicationDeadline" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="jobDescription" class="form-label">Job Description *</label>
+                    <textarea id="jobDescription" name="description" class="form-textarea" rows="5" required
+                        placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="jobTechnicalRequirements" class="form-label">Technical Requirements</label>
+                    <textarea id="jobTechnicalRequirements" name="technicalRequirements" class="form-textarea" rows="3"
+                        placeholder="e.g., JavaScript, React, Node.js, etc."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="jobFormalRequirements" class="form-label">Formal Requirements</label>
+                    <textarea id="jobFormalRequirements" name="formalRequirements" class="form-textarea" rows="3"
+                        placeholder="e.g., Bachelor's degree, 3+ years experience, etc."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="jobBenefits" class="form-label">Benefits</label>
+                    <textarea id="jobBenefits" name="benefits" class="form-textarea" rows="3"
+                        placeholder="e.g., Health insurance, flexible hours, etc."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jobContactPerson" class="form-label">Contact Person</label>
+                        <input type="text" id="jobContactPerson" name="contactPerson" class="form-input"
+                            placeholder="e.g., John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="jobUrl" class="form-label">Application URL</label>
+                        <input type="url" id="jobUrl" name="url" class="form-input"
+                            placeholder="https://example.com/apply">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelJobBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveJobBtn">
+                        <span id="saveJobBtnText">Post Job</span>
+                        <span id="saveJobBtnLoading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Saving...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Job Detail Modal -->
+    <div class="modal-overlay" id="jobDetailModalOverlay" style="display: none;">
+        <div class="modal-content job-detail-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="jobDetailTitle">Job Details</h2>
+                <button class="modal-close" id="jobDetailCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="job-detail-content" id="jobDetailContent">
+                <!-- Job details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script src="../../js/config.js"></script>
     <script src="../../js/utils.js"></script>
-    <script src="../../js/hr-dashboard.js"></script>
+    <script src="../../js/router.js"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/ui.js"></script>
+    <script src="../../js/i18n.js"></script>
+    <script src="../../js/hr-job-openings.js"></script>
 </body>
 
 </html>

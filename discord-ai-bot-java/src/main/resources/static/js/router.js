@@ -246,7 +246,17 @@ router.register('/hr/dashboard', () => {
 });
 
 router.register('/hr/job-openings', () => {
-    window.location.href = '/pages/hr/hr-job-openings.html';
+    // If we're already on hr-job-openings.html, just update active state
+    if (window.location.pathname.includes('hr-job-openings.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('job-openings') || item.getAttribute('data-route')?.includes('job-openings') || item.textContent.includes('Job Openings')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        window.location.href = '/pages/hr/hr-job-openings.html';
+    }
 });
 
 router.register('/hr/candidates', () => {
