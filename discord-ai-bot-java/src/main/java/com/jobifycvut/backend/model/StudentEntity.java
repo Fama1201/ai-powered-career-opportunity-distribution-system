@@ -31,6 +31,14 @@ public class StudentEntity {
     @Column(name = "cv_text", columnDefinition = "TEXT")
     private String cvText;
 
+    // Foreign key relationship to users table
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Long userId;
+
     // --- Getters and Setters (Required for Spring JPA to handle data) ---
 
     public Long getId() { return id; }
@@ -53,4 +61,10 @@ public class StudentEntity {
 
     public String getCvText() { return cvText; }
     public void setCvText(String cvText) { this.cvText = cvText; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 }

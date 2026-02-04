@@ -1,9 +1,10 @@
-// Student Dashboard JavaScript
+// HR Dashboard JavaScript
 
 document.addEventListener('DOMContentLoaded', function () {
     initializeDashboard();
     loadSavedTheme();
     loadSavedLanguage();
+    loadUserProfile();
 });
 
 function initializeDashboard() {
@@ -15,6 +16,66 @@ function initializeDashboard() {
     setupJobCards();
     setupAssistantCard();
     setupClickOutside();
+}
+
+// Load user profile information from backend or localStorage
+function loadUserProfile() {
+    // Try to get from localStorage first (from login)
+    const fullName = localStorage.getItem('hrFullName');
+    const email = localStorage.getItem('email');
+    const role = localStorage.getItem('role');
+    
+    // Ensure role is HR for HR dashboard
+    const hrRole = (role === 'HR' || role === 'hr') ? 'HR' : 'HR';
+    
+    console.log('Loading HR profile - fullName:', fullName, 'email:', email, 'role:', role);
+    
+    if (fullName) {
+        updateUserProfileDisplay(fullName, hrRole);
+    } else if (email) {
+        // If fullName not in localStorage, try to get from backend
+        // For now, use email as fallback
+        updateUserProfileDisplay(email, hrRole);
+    } else {
+        // Fallback if nothing is available
+        updateUserProfileDisplay('HR User', hrRole);
+    }
+}
+
+// Update user profile display in header
+function updateUserProfileDisplay(fullName, role) {
+    const profileNameElement = document.querySelector('.profile-name');
+    const profileRoleElement = document.querySelector('.profile-role');
+    const profileInitialsElement = document.querySelector('.profile-initials');
+    
+    if (profileNameElement) {
+        profileNameElement.textContent = fullName || 'HR User';
+    }
+    
+    if (profileRoleElement) {
+        // Always show HR Professional for HR dashboard
+        profileRoleElement.textContent = 'HR Professional';
+    }
+    
+    if (profileInitialsElement && fullName) {
+        // Extract initials from full name
+        const names = fullName.trim().split(' ');
+        let initials = '';
+        if (names.length >= 2) {
+            initials = (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+        } else if (names.length === 1) {
+            initials = names[0].substring(0, 2).toUpperCase();
+        }
+        profileInitialsElement.textContent = initials || 'HR';
+    }
+    
+    // Update welcome message with user's first name
+    const welcomeUserNameElement = document.querySelector('.user-name');
+    if (welcomeUserNameElement && fullName) {
+        // Extract first name from full name
+        const firstName = fullName.trim().split(' ')[0];
+        welcomeUserNameElement.textContent = firstName || 'HR Manager';
+    }
 }
 
 // Sidebar Navigation
@@ -74,11 +135,21 @@ function setupUserProfile() {
     if (logoutItem) {
         logoutItem.addEventListener('click', function (e) {
             e.preventDefault();
-            // Clear any stored data
-            localStorage.removeItem('userToken');
-            localStorage.removeItem('userData');
-            // Redirect to login
-            window.location.href = 'login.html';
+            // Clear all authentication data
+            if (typeof clearAuthData === 'function') {
+                clearAuthData();
+            } else {
+                // Fallback: clear all possible auth keys
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('email');
+                localStorage.removeItem('role');
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userData');
+            }
+            // Redirect to login page (absolute path)
+            window.location.href = '/pages/auth/login.html';
         });
     }
 }

@@ -125,12 +125,87 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 // Success
                 console.log("Registration successful:", data);
-                showNotification(data.message || 'Registration successful! Redirecting to login...', 'success');
+                showNotification('Registration successful! Logging you in...', 'success');
                 
-                // Redirect to login page after successful registration
-                setTimeout(() => {
-                    window.location.href = '/pages/auth/login.html';
-                }, 2000);
+                // Auto-login after successful registration
+                const loginData = {
+                    email: registrationData.email,
+                    password: registrationData.password
+                };
+                
+                const apiBaseUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE_URL) ? CONFIG.API_BASE_URL : '/api';
+                const studentLoginEndpoint = (typeof CONFIG !== 'undefined' && CONFIG.ENDPOINTS && CONFIG.ENDPOINTS.STUDENT_LOGIN) 
+                    ? CONFIG.ENDPOINTS.STUDENT_LOGIN 
+                    : '/auth/student/login';
+                
+                const loginUrl = `${apiBaseUrl}${studentLoginEndpoint}`;
+                
+                // Auto-login
+                fetch(loginUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                })
+                .then(loginResponse => {
+                    if (!loginResponse.ok) {
+                        throw new Error('Auto-login failed');
+                    }
+                    return loginResponse.json();
+                })
+                .then(loginData => {
+                    // Save auth data
+                    if (loginData.accessToken) {
+                        localStorage.setItem('accessToken', loginData.accessToken);
+                    }
+                    if (loginData.refreshToken) {
+                        localStorage.setItem('refreshToken', loginData.refreshToken);
+                    }
+                    if (loginData.userId) {
+                        localStorage.setItem('userId', loginData.userId);
+                    }
+                    if (loginData.email) {
+                        localStorage.setItem('email', loginData.email);
+                    }
+                    if (loginData.role) {
+                        localStorage.setItem('role', loginData.role);
+                    }
+                    // Save firstName and lastName for Student users
+                    if (loginData.firstName) {
+                        localStorage.setItem('firstName', loginData.firstName);
+                    }
+                    if (loginData.lastName) {
+                        localStorage.setItem('lastName', loginData.lastName);
+                    }
+                    
+                    // Use storeTokens if available
+                    if (typeof storeTokens === 'function') {
+                        storeTokens(
+                            loginData.accessToken,
+                            loginData.refreshToken,
+                            'student',
+                            loginData.email,
+                            loginData.userId
+                        );
+                    }
+                    
+                    console.log('Auto-login successful:', loginData);
+                    showNotification('Welcome! Redirecting to your dashboard...', 'success');
+                    
+                    // Redirect to student dashboard
+                    setTimeout(() => {
+                        window.location.href = '/pages/student/student-dashboard.html';
+                    }, 1500);
+                })
+                .catch(loginError => {
+                    console.error('Auto-login error:', loginError);
+                    // If auto-login fails, redirect to login page
+                    showNotification('Registration successful! Please log in.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/pages/auth/login.html';
+                    }, 2000);
+                });
             })
             .catch(error => {
                 console.error("Registration error:", error);

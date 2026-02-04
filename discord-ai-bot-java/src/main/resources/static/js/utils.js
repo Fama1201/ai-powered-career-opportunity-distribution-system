@@ -45,6 +45,13 @@ function clearAuthData() {
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USER_TYPE);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USER_EMAIL);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USER_ID);
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.FIRST_NAME);
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.LAST_NAME);
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.HR_FULL_NAME);
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.ROLE);
+    // Fallback for old keys
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userData');
 }
 
 /**

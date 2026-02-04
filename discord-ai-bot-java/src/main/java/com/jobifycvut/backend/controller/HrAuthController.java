@@ -69,7 +69,9 @@ public class HrAuthController {
                     "accessToken", accessToken,
                     "refreshToken", refreshToken,
                     "email", user.getEmail(),
-                    "company", user.getCompanyName() != null ? user.getCompanyName() : "N/A"
+                    "fullName", user.getFullName() != null ? user.getFullName() : user.getEmail(),
+                    "company", user.getCompanyName() != null ? user.getCompanyName() : "N/A",
+                    "role", "HR"
             ));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));

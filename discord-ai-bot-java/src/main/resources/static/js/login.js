@@ -67,9 +67,20 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.innerHTML = '<span>Signing in...</span>';
             
             // Determine API endpoint based on user type
+            // Fallback if CONFIG is not defined
+            const apiBaseUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE_URL) ? CONFIG.API_BASE_URL : '/api';
+            const studentEndpoint = (typeof CONFIG !== 'undefined' && CONFIG.ENDPOINTS && CONFIG.ENDPOINTS.STUDENT_LOGIN) 
+                ? CONFIG.ENDPOINTS.STUDENT_LOGIN 
+                : '/auth/student/login';
+            const hrEndpoint = (typeof CONFIG !== 'undefined' && CONFIG.ENDPOINTS && CONFIG.ENDPOINTS.HR_LOGIN) 
+                ? CONFIG.ENDPOINTS.HR_LOGIN 
+                : '/hr/auth/login';
+            
             const loginEndpoint = formData.userType === 'student' 
-                ? `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.STUDENT_LOGIN}`
-                : `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.HR_LOGIN}`;
+                ? `${apiBaseUrl}${studentEndpoint}`
+                : `${apiBaseUrl}${hrEndpoint}`;
+            
+            console.log('Login endpoint:', loginEndpoint);
             
             // Prepare login request
             const loginRequest = {
@@ -86,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(loginRequest)
             })
             .then(response => {
+                console.log('Login response status:', response.status);
                 if (!response.ok) {
                     return response.json().then(err => {
                         const errorMessage = err.message || err.error || `Login failed: ${response.status}`;
@@ -97,37 +109,82 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                // Success - save auth data
+                console.log('Login response data:', data);
+                
+                // Success - save auth data using CONFIG.STORAGE_KEYS
+                const STORAGE_KEYS = (typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS) ? CONFIG.STORAGE_KEYS : {
+                    ACCESS_TOKEN: 'accessToken',
+                    REFRESH_TOKEN: 'refreshToken',
+                    USER_TYPE: 'userType',
+                    USER_EMAIL: 'userEmail',
+                    USER_ID: 'userId',
+                    FIRST_NAME: 'firstName',
+                    LAST_NAME: 'lastName',
+                    HR_FULL_NAME: 'hrFullName',
+                    ROLE: 'role'
+                };
+                
                 if (data.accessToken) {
-                    localStorage.setItem('accessToken', data.accessToken);
-                    if (data.refreshToken) {
-                        localStorage.setItem('refreshToken', data.refreshToken);
-                    }
-                    if (data.userId) {
-                        localStorage.setItem('userId', data.userId);
-                    }
-                    if (data.email) {
-                        localStorage.setItem('email', data.email);
-                    }
-                    if (data.role) {
-                        localStorage.setItem('role', data.role);
-                    }
+                    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.accessToken);
+                }
+                if (data.refreshToken) {
+                    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
+                }
+                if (data.userId) {
+                    localStorage.setItem(STORAGE_KEYS.USER_ID, data.userId);
+                }
+                if (data.email) {
+                    localStorage.setItem(STORAGE_KEYS.USER_EMAIL, data.email);
+                }
+                if (data.role) {
+                    localStorage.setItem(STORAGE_KEYS.ROLE, data.role);
+                }
+                // Save fullName for HR users
+                if (data.fullName) {
+                    localStorage.setItem(STORAGE_KEYS.HR_FULL_NAME, data.fullName);
+                }
+                // Ensure role is set for HR users
+                if (data.fullName && !data.role) {
+                    localStorage.setItem(STORAGE_KEYS.ROLE, 'HR');
+                }
+                // Save firstName and lastName for Student users
+                if (data.firstName) {
+                    localStorage.setItem(STORAGE_KEYS.FIRST_NAME, data.firstName);
+                }
+                if (data.lastName) {
+                    localStorage.setItem(STORAGE_KEYS.LAST_NAME, data.lastName);
+                }
+                // Save user type
+                localStorage.setItem(STORAGE_KEYS.USER_TYPE, formData.userType);
+                
+                // Also use storeTokens if available
+                if (typeof storeTokens === 'function') {
+                    storeTokens(
+                        data.accessToken,
+                        data.refreshToken,
+                        formData.userType,
+                        data.email,
+                        data.userId
+                    );
                 }
                 
                 console.log('Login successful:', data);
                 showNotification(data.message || 'Login successful! Redirecting...', 'success');
                 
-                // Redirect based on user type
+                // Redirect based on user type (always redirect on successful login)
                 setTimeout(() => {
+                    let dashboardPath;
                     if (formData.userType === 'student') {
-                        const dashboardPath = '/pages/student/student-dashboard.html';
-                        console.log('Redirecting to:', dashboardPath);
-                        window.location.href = dashboardPath;
+                        dashboardPath = '/pages/student/student-dashboard.html';
                     } else if (formData.userType === 'hr') {
-                        const dashboardPath = '/pages/hr/hr-dashboard.html';
-                        console.log('Redirecting to:', dashboardPath);
-                        window.location.href = dashboardPath;
+                        dashboardPath = '/pages/hr/hr-dashboard.html';
+                    } else {
+                        // Fallback to login if user type is unknown
+                        dashboardPath = '/pages/auth/login.html';
                     }
+                    
+                    console.log('Redirecting to:', dashboardPath);
+                    window.location.href = dashboardPath;
                 }, 1500);
             })
             .catch(error => {

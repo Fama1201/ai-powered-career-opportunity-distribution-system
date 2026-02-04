@@ -13,6 +13,7 @@ public class OpportunityListResponse {
     private String homeOffice;
     private String wage;
     private LocalDate applicationDeadline;
+    private Integer matchScore; // Match score (0-100) calculated by MatchService
 
     public OpportunityListResponse(){};
 
@@ -75,5 +76,10 @@ public class OpportunityListResponse {
         this.applicationDeadline=applicationDeadline;
     }
 
-
+    public Integer getMatchScore() {
+        return matchScore;
+    }
+    public void setMatchScore(Integer matchScore) {
+        this.matchScore = matchScore;
+    }
 }

@@ -49,6 +49,25 @@ const CONFIG = {
         GET_PROFILE: '/profile',
         UPDATE_PROFILE: '/profile',
         
+        // CV Management
+        GET_CV: '/cv',
+        UPLOAD_CV: '/cv/upload',
+        UPDATE_CV: '/cv/update',
+        DELETE_CV: '/cv',
+        
+        // Notifications
+        GET_NOTIFICATIONS: '/notifications',
+        MARK_NOTIFICATION_READ: '/notifications',
+        MARK_ALL_NOTIFICATIONS_READ: '/notifications/mark-all-read',
+        
+        // Applications
+        GET_APPLICATIONS: '/applications',
+        GET_APPLICATION_BY_ID: '/applications',
+        WITHDRAW_APPLICATION: '/applications',
+        
+        // Dashboard
+        DASHBOARD_APPLICATIONS_STATS: '/dashboard/applications/stats',
+        
         // Health
         HEALTH_CHECK: '/status'
     },
@@ -59,7 +78,11 @@ const CONFIG = {
         REFRESH_TOKEN: 'refreshToken',
         USER_TYPE: 'userType',
         USER_EMAIL: 'userEmail',
-        USER_ID: 'userId'
+        USER_ID: 'userId',
+        FIRST_NAME: 'firstName',
+        LAST_NAME: 'lastName',
+        HR_FULL_NAME: 'hrFullName',
+        ROLE: 'role'
     },
     
     // Application Settings

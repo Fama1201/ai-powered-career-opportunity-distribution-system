@@ -7,7 +7,18 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
 
-    List<NotificationEntity> findByStudentIdOrderByCreatedAtDesc(Long studentId);
+    List<NotificationEntity> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    List<NotificationEntity> findByStudentIdAndReadFalseOrderByCreatedAtDesc(Long studentId);
+    List<NotificationEntity> findByUserIdAndReadFalseOrderByCreatedAtDesc(Long userId);
+    
+    // Backward compatibility - deprecated
+    @Deprecated
+    default List<NotificationEntity> findByStudentIdOrderByCreatedAtDesc(Long studentId) {
+        return findByUserIdOrderByCreatedAtDesc(studentId);
+    }
+    
+    @Deprecated
+    default List<NotificationEntity> findByStudentIdAndReadFalseOrderByCreatedAtDesc(Long studentId) {
+        return findByUserIdAndReadFalseOrderByCreatedAtDesc(studentId);
+    }
 }

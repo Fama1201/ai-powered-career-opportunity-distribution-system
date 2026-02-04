@@ -24,7 +24,9 @@
         implementation("org.springframework.boot:spring-boot-starter-web")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-        implementation("org.postgresql:postgresql:42.7.2")
+        
+        // PostgreSQL Driver - Latest version for Neon compatibility
+        implementation("org.postgresql:postgresql:42.7.3")
 
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
@@ -39,9 +41,6 @@
 
         // Logging
         //implementation("org.slf4j:slf4j-simple:2.0.9")
-
-        // PostgreSQL
-        implementation("org.postgresql:postgresql:42.5.4")
 
         // Connection Pool
         implementation("com.zaxxer:HikariCP:5.0.1")
