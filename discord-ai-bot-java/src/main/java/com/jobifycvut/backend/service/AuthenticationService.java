@@ -60,34 +60,73 @@ public class AuthenticationService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AuthException("Invalid email or password."));
+        try {
+            // Log for debugging
+            System.out.println("Login attempt for email: " + request.getEmail());
+            
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> {
+                        System.out.println("User not found for email: " + request.getEmail());
+                        return new AuthException("Invalid email or password.");
+                    });
 
-        if (!PasswordHasher.verifyPassword(request.getPassword(), user.getPassword())) {
-            throw new AuthException("Invalid password.");
+            System.out.println("User found: " + user.getEmail() + ", Role: " + user.getRole());
+            
+            if (!PasswordHasher.verifyPassword(request.getPassword(), user.getPassword())) {
+                System.out.println("Password verification failed for user: " + user.getEmail());
+                throw new AuthException("Invalid email or password.");
+            }
+            
+            System.out.println("Password verification successful for user: " + user.getEmail());
+
+            // Validate user role
+            if (user.getRole() == null) {
+                throw new AuthException("User role is not set. Please contact support.");
+            }
+
+            String accessToken = jwtUtil.generateAccessToken(user);
+            String refreshToken = jwtUtil.generateRefreshToken(user);
+
+            user.setLastLoginAt(Instant.now());
+            userRepository.save(user);
+
+            long expiresInSeconds = 15 * 60L;
+
+            AuthResponse response = new AuthResponse();
+            response.setAccessToken(accessToken);
+            response.setRefreshToken(refreshToken);
+            response.setTokenType("Bearer");
+            response.setExpiresIn(String.valueOf(expiresInSeconds));
+            response.setUserId(user.getId());
+            response.setEmail(user.getEmail());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
+            response.setRole(user.getRole().toString());
+            response.setMessage("Login Successful");
+
+            return response;
+        } catch (AuthException e) {
+            // Re-throw AuthException as-is
+            System.err.println("AuthException during login: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            // Log unexpected errors with full details
+            System.err.println("=== UNEXPECTED ERROR DURING LOGIN ===");
+            System.err.println("Exception Type: " + e.getClass().getName());
+            System.err.println("Exception Message: " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("Cause: " + e.getCause().getClass().getName() + " - " + e.getCause().getMessage());
+            }
+            e.printStackTrace();
+            System.err.println("=====================================");
+            
+            // Return more specific error message
+            String errorMsg = e.getMessage();
+            if (errorMsg == null || errorMsg.isEmpty()) {
+                errorMsg = "An error occurred during login. Please try again.";
+            }
+            throw new AuthException(errorMsg, e);
         }
-
-        String accessToken = jwtUtil.generateAccessToken(user);
-        String refreshToken = jwtUtil.generateRefreshToken(user);
-
-        user.setLastLoginAt(Instant.now());
-        userRepository.save(user);
-
-        long expiresInSeconds = 15 * 60L;
-
-        AuthResponse response = new AuthResponse();
-        response.setAccessToken(accessToken);
-        response.setRefreshToken(refreshToken);
-        response.setTokenType("Bearer");
-        response.setExpiresIn(String.valueOf(expiresInSeconds));
-        response.setUserId(user.getId());
-        response.setEmail(user.getEmail());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setRole(user.getRole().toString());
-        response.setMessage("Login Successful");
-
-        return response;
     }
 
     public AuthResponse refreshToken(RefreshTokenRequest request) {

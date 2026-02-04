@@ -32,10 +32,11 @@ const StudentAPI = {
         try {
             const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, mergedOptions);
             
+            // Don't auto-redirect on 401/403 - let the calling code handle it
+            // This prevents unwanted redirects when the page is loading
             if (response.status === 401 || response.status === 403) {
-                clearAuthData();
-                window.location.href = '/pages/auth/login.html';
-                throw new Error('Unauthorized');
+                const error = await response.json().catch(() => ({ message: 'Unauthorized' }));
+                throw new Error(error.message || 'Unauthorized');
             }
 
             if (!response.ok) {
@@ -350,8 +351,134 @@ const StudentAPI = {
     }
 };
 
+// ========== HR API ==========
+const HrAPI = {
+    /**
+     * Make authenticated API request for HR endpoints
+     */
+    async request(endpoint, options = {}) {
+        const token = getAccessToken();
+        if (!token) {
+            throw new Error('Not authenticated');
+        }
+
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const mergedOptions = {
+            ...defaultOptions,
+            ...options,
+            headers: {
+                ...defaultOptions.headers,
+                ...(options.headers || {})
+            }
+        };
+
+        try {
+            const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, mergedOptions);
+            
+            // Don't auto-redirect on 401/403 - let the calling code handle it
+            if (response.status === 401 || response.status === 403) {
+                const error = await response.json().catch(() => ({ message: 'Unauthorized' }));
+                throw new Error(error.message || 'Unauthorized');
+            }
+
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(error.message || `HTTP ${response.status}`);
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            }
+            return null;
+        } catch (error) {
+            console.error('HR API Request Error:', error);
+            throw error;
+        }
+    },
+
+    // ========== HR JOBS ==========
+
+    /**
+     * GET /api/hr/jobs?status=OPEN|CLOSED|ARCHIVED
+     * Returns: Opportunity[]
+     */
+    async getJobs(status = null) {
+        const query = status ? `?status=${status}` : '';
+        return this.request(`/hr/jobs${query}`);
+    },
+
+    /**
+     * GET /api/hr/jobs/{jobId}
+     * Returns: Opportunity
+     */
+    async getJob(jobId) {
+        return this.request(`/hr/jobs/${jobId}`);
+    },
+
+    /**
+     * POST /api/hr/jobs
+     * Body: HrJobCreateRequest
+     * Returns: Opportunity
+     */
+    async createJob(jobData) {
+        return this.request('/hr/jobs', {
+            method: 'POST',
+            body: JSON.stringify(jobData)
+        });
+    },
+
+    /**
+     * PUT /api/hr/jobs/{jobId}
+     * Body: HrJobCreateRequest
+     * Returns: Opportunity
+     */
+    async updateJob(jobId, jobData) {
+        return this.request(`/hr/jobs/${jobId}`, {
+            method: 'PUT',
+            body: JSON.stringify(jobData)
+        });
+    },
+
+    /**
+     * PATCH /api/hr/jobs/{jobId}/status
+     * Body: { status: "OPEN"|"CLOSED"|"ARCHIVED" }
+     * Returns: 204 No Content
+     */
+    async updateJobStatus(jobId, status) {
+        return this.request(`/hr/jobs/${jobId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+    },
+
+    /**
+     * DELETE /api/hr/jobs/{jobId}
+     * Returns: 204 No Content
+     */
+    async deleteJob(jobId) {
+        return this.request(`/hr/jobs/${jobId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    /**
+     * GET /api/hr/jobs/{jobId}/applications
+     * Returns: HrApplicationListItemResponse[]
+     */
+    async getJobApplications(jobId) {
+        return this.request(`/hr/jobs/${jobId}/applications`);
+    }
+};
+
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = StudentAPI;
+    module.exports = { StudentAPI, HrAPI };
 }
 

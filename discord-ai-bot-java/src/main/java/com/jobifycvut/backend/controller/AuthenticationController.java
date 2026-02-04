@@ -22,9 +22,17 @@ public class AuthenticationController {
     }
 
     @PostMapping("/student/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request){
-        AuthResponse authResponse = authenticationService.login(request);
-        return ResponseEntity.ok(authResponse);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request){
+        try {
+            AuthResponse authResponse = authenticationService.login(request);
+            return ResponseEntity.ok(authResponse);
+        } catch (Exception e) {
+            // Log the exception for debugging
+            System.err.println("Login error: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
+            // Let GlobalExceptionHandler handle it
+            throw e;
+        }
     }
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest request){

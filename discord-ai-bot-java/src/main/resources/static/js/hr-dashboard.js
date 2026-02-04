@@ -84,15 +84,28 @@ function setupSidebarNavigation() {
 
     sidebarItems.forEach(item => {
         item.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            // Get route from data-route attribute or href
+            const route = this.getAttribute('data-route') || this.getAttribute('href');
+            
+            if (route && route.startsWith('#/')) {
+                // Use router if available
+                if (typeof router !== 'undefined' && router.navigate) {
+                    router.navigate(route.substring(1)); // Remove # prefix
+                } else {
+                    // Fallback: use hash navigation
+                    window.location.hash = route;
+                }
+            } else if (route && !route.startsWith('#')) {
+                // Direct href navigation
+                window.location.href = route;
+            }
+            
             // Remove active class from all items
             sidebarItems.forEach(i => i.classList.remove('active'));
             // Add active class to clicked item
             this.classList.add('active');
-
-            // If it's not a link, prevent default
-            if (this.getAttribute('href') === '#') {
-                e.preventDefault();
-            }
         });
     });
 }
@@ -117,18 +130,28 @@ function setupUserProfile() {
     if (profileItem) {
         profileItem.addEventListener('click', function (e) {
             e.preventDefault();
-            // TODO: Navigate to profile page
-            console.log('Profile clicked');
             userDropdownMenu.classList.remove('active');
+            // Navigate to profile page using router
+            if (typeof router !== 'undefined' && router.navigate) {
+                router.navigate('/hr/profile');
+            } else {
+                // Fallback: use hash navigation
+                window.location.hash = '#/hr/profile';
+            }
         });
     }
 
     if (notificationsItem) {
         notificationsItem.addEventListener('click', function (e) {
             e.preventDefault();
-            // TODO: Open notifications panel
-            console.log('Notifications clicked');
             userDropdownMenu.classList.remove('active');
+            // Navigate to notifications page using router
+            if (typeof router !== 'undefined' && router.navigate) {
+                router.navigate('/hr/notifications');
+            } else {
+                // Fallback: use hash navigation
+                window.location.hash = '#/hr/notifications';
+            }
         });
     }
 

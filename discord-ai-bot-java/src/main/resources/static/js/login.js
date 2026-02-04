@@ -96,16 +96,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify(loginRequest)
             })
-            .then(response => {
+            .then(async response => {
                 console.log('Login response status:', response.status);
+                console.log('Login response headers:', response.headers);
+                
                 if (!response.ok) {
-                    return response.json().then(err => {
-                        const errorMessage = err.message || err.error || `Login failed: ${response.status}`;
-                        throw new Error(errorMessage);
-                    }).catch(parseError => {
-                        throw new Error(`Login failed: ${response.status} ${response.statusText}`);
-                    });
+                    // Try to get error message from response
+                    let errorMessage = `Login failed: ${response.status}`;
+                    
+                    try {
+                        const contentType = response.headers.get('content-type');
+                        console.log('Response content-type:', contentType);
+                        
+                        if (contentType && contentType.includes('application/json')) {
+                            const err = await response.json();
+                            console.log('Login error response (JSON):', JSON.stringify(err, null, 2));
+                            errorMessage = err.message || err.error || errorMessage;
+                        } else {
+                            const text = await response.text();
+                            console.log('Login error response (text):', text);
+                            // Try to parse as JSON if it looks like JSON
+                            try {
+                                const parsed = JSON.parse(text);
+                                errorMessage = parsed.message || parsed.error || errorMessage;
+                            } catch (e) {
+                                errorMessage = text || errorMessage;
+                            }
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing error response:', parseError);
+                        try {
+                            const text = await response.text();
+                            console.error('Raw response text:', text);
+                            errorMessage = text || errorMessage;
+                        } catch (textError) {
+                            console.error('Could not read response text:', textError);
+                        }
+                    }
+                    
+                    console.error('Final error message:', errorMessage);
+                    throw new Error(errorMessage);
                 }
+                
                 return response.json();
             })
             .then(data => {

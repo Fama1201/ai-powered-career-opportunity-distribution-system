@@ -367,15 +367,24 @@ function setupSidebarNavigation() {
     sidebarItems.forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
+            const route = this.getAttribute('data-route');
             const href = this.getAttribute('href');
             
             // Remove active class from all items
             sidebarItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
             
-            // Navigate
-            if (href && href !== '#' && href !== 'student-dashboard.html') {
-                if (href.includes('job-matches') || href.includes('job')) {
+            // Navigate using data-route if available, otherwise use href
+            if (route) {
+                // Remove # from route if present
+                const cleanRoute = route.startsWith('#') ? route.substring(1) : route;
+                router.navigate(cleanRoute);
+            } else if (href && href !== '#' && href !== 'student-dashboard.html') {
+                // Fallback to href parsing
+                if (href.startsWith('#')) {
+                    const cleanRoute = href.substring(1);
+                    router.navigate(cleanRoute);
+                } else if (href.includes('job-matches') || href.includes('job')) {
                     router.navigate('/student/job-matches');
                 } else if (href.includes('applications')) {
                     router.navigate('/student/applications');
@@ -547,18 +556,12 @@ function setupDashboardsButton() {
  * Setup assistant card - AI chat
  */
 function setupAssistantCard() {
-    const askButton = document.querySelector('.ask-button');
-    const assistantAskBtn = document.querySelector('.assistant-ask-btn');
-    
-    if (askButton) {
-        askButton.addEventListener('click', function() {
-            openAiChatDrawer();
-        });
-    }
+    const assistantAskBtn = document.getElementById('assistantAskBtn') || document.querySelector('.assistant-ask-btn');
     
     if (assistantAskBtn) {
         assistantAskBtn.addEventListener('click', function() {
-            openAiChatDrawer();
+            // Navigate to Career Advisor page
+            router.navigate('/student/advisor');
         });
     }
 }
