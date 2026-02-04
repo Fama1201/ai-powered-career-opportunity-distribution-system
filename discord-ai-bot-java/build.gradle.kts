@@ -65,7 +65,13 @@
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
-    // Run ONLY the Spring Boot backend
+    
+    // Configure bootRun to run Spring Boot backend
+    tasks.named<BootRun>("bootRun") {
+        mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")
+    }
+    
+    // Run ONLY the Spring Boot backend (alternative task name)
     tasks.register<BootRun>("bootRunBackend") {
         dependsOn("classes")
         mainClass.set("com.jobifycvut.backend.JobifyBackendApplication")

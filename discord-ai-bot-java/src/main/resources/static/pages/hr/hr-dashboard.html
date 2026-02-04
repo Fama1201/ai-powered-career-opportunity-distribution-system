@@ -7,8 +7,8 @@
     <title>HR Dashboard - Jobify CVUT</title>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/hr-dashboard.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/hr-dashboard.css">
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -139,7 +139,7 @@
         <!-- Left Sidebar -->
         <aside class="dashboard-sidebar">
             <nav class="sidebar-nav">
-                <a href="hr-dashboard.html" class="sidebar-item">
+                <a href="hr-dashboard.html" class="sidebar-item active">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -159,7 +159,7 @@
                     </svg>
                     <span>Job Openings</span>
                 </a>
-                <a href="hr-candidates.html" class="sidebar-item active">
+                <a href="hr-candidates.html" class="sidebar-item">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -228,153 +228,168 @@
                     <h1 class="welcome-title">Welcome HR Manager, <span class="user-name">Emre</span>!</h1>
                 </div>
 
-                <!-- Candidate CV View Section -->
-                <section class="candidate-view-section">
-                    <div class="section-header">
-                        <div class="header-left-content">
-                            <a href="hr-candidates.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to
-                                Candidates</a>
-                            <h2 class="section-title" style="margin-top: 0.5rem;">Candidate Profile</h2>
+                <!-- Application Status Section -->
+                <section class="status-section">
+                    <div class="status-grid">
+                        <!-- Applied Card -->
+                        <div class="status-card">
+                            <div class="status-icon yellow">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-number">25</div>
+                                <div class="status-label">Job Openings</div>
+                            </div>
                         </div>
-                        <div class="header-actions">
-                            <button class="action-btn secondary"><i class="fas fa-download"></i> Download PDF</button>
-                            <button class="action-btn primary"><i class="fas fa-calendar-alt"></i> Schedule
-                                Interview</button>
+
+                        <!-- Interview Card -->
+                        <div class="status-card">
+                            <div class="status-icon green">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-number">134</div>
+                                <div class="status-label">New Candidates</div>
+                            </div>
+                        </div>
+
+                        <!-- Applied with Details Card -->
+                        <div class="status-card detailed">
+                            <div class="status-header">
+                                <div class="status-title">Hires</div>
+                                <div class="status-number-large">57</div>
+                            </div>
+                            <div class="status-details">
+                                <div class="status-detail-item">
+                                    <span class="status-dot green"></span>
+                                    <span>Hired this month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rejected Card -->
+                        <div class="status-header">
+                            <div class="status-title">Interviews</div>
+                            <div class="status-number-large">12</div>
+                        </div>
+                        <div class="status-details">
+                            <div class="status-detail-item">
+                                <span class="status-dot orange"></span>
+                                <span>Scheduled</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="cv-container">
-                        <!-- Sidebar / Header Info -->
-                        <div class="cv-sidebar">
-                            <div class="cv-profile-header">
-                                <div class="cv-avatar">JW</div>
-                                <h2 class="cv-name">Jane Williams</h2>
-                                <p class="cv-role">Frontend Developer</p>
-                                <div class="cv-match-badge high">95% Match</div>
-                            </div>
-
-                            <div class="cv-contact-info">
-                                <h3>Contact Info</h3>
-                                <div class="contact-item">
-                                    <i class="fas fa-envelope"></i>
-                                    <span>jane.williams@example.com</span>
-                                </div>
-                                <div class="contact-item">
-                                    <i class="fas fa-phone"></i>
-                                    <span>+420 123 456 789</span>
-                                </div>
-                                <div class="contact-item">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Prague, Czechia</span>
-                                </div>
-                                <div class="contact-item">
-                                    <i class="fab fa-linkedin"></i>
-                                    <span>linkedin.com/in/janewilliams</span>
-                                </div>
-                            </div>
-
-                            <div class="cv-skills-section">
-                                <h3>Skills</h3>
-                                <div class="cv-tags">
-                                    <span>React</span>
-                                    <span>TypeScript</span>
-                                    <span>JavaScript (ES6+)</span>
-                                    <span>HTML5 & CSS3</span>
-                                    <span>Redux</span>
-                                    <span>Tailwind CSS</span>
-                                    <span>Git</span>
-                                    <span>Jest</span>
-                                </div>
-                            </div>
-
-                            <div class="cv-languages-section">
-                                <h3>Languages</h3>
-                                <div class="language-item">
-                                    <span>English</span>
-                                    <span class="level">Native</span>
-                                </div>
-                                <div class="language-item">
-                                    <span>Czech</span>
-                                    <span class="level">B1</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Main CV Content -->
-                        <div class="cv-main-content">
-                            <section class="cv-section">
-                                <h3 class="cv-section-title">Professional Summary</h3>
-                                <p>Passionate and experienced Frontend Developer with over 3 years of expertise in
-                                    building responsive and user-friendly web applications. Proficient in the React
-                                    ecosystem, TypeScript, and modern CSS frameworks. Strong problem-solving skills and
-                                    a proven track record of delivering high-quality code in agile environments. Eager
-                                    to contribute to innovative projects and enhance user experiences.</p>
-                            </section>
-
-                            <section class="cv-section">
-                                <h3 class="cv-section-title">Experience</h3>
-
-                                <div class="experience-item">
-                                    <div class="exp-header">
-                                        <h4>Frontend Developer</h4>
-                                        <span class="exp-date">Jan 2022 - Present</span>
-                                    </div>
-                                    <p class="exp-company">TechSolutions Inc., Prague</p>
-                                    <ul class="exp-list">
-                                        <li>Developed and maintained key features for the company's flagship SaaS
-                                            product using React and TypeScript.</li>
-                                        <li>Improved application performance by 40% through code splitting and
-                                            optimizing rendering cycles.</li>
-                                        <li>Collaborated closely with UX/UI designers to implement pixel-perfect
-                                            responsive designs.</li>
-                                        <li>Mentored junior developers and conducted code reviews to ensure code quality
-                                            and best practices.</li>
-                                    </ul>
-                                </div>
-
-                                <div class="experience-item">
-                                    <div class="exp-header">
-                                        <h4>Junior Web Developer</h4>
-                                        <span class="exp-date">Jun 2020 - Dec 2021</span>
-                                    </div>
-                                    <p class="exp-company">CreativeWeb Agency, Brno</p>
-                                    <ul class="exp-list">
-                                        <li>Built custom websites for diverse clients using HTML, CSS, JavaScript, and
-                                            WordPress.</li>
-                                        <li>Implemented animations and interactive elements to enhance user engagement.
-                                        </li>
-                                        <li>Ensured cross-browser compatibility and optimized websites for SEO and
-                                            accessibility.</li>
-                                    </ul>
-                                </div>
-                            </section>
-
-                            <section class="cv-section">
-                                <h3 class="cv-section-title">Education</h3>
-                                <div class="education-item">
-                                    <div class="edu-header">
-                                        <h4>Bachelor's in Computer Science</h4>
-                                        <span class="edu-date">2017 - 2020</span>
-                                    </div>
-                                    <p class="edu-school">Czech Technical University (CVUT), Prague</p>
-                                </div>
-                            </section>
-
-                            <section class="cv-section">
-                                <h3 class="cv-section-title">Certifications</h3>
-                                <ul class="cert-list">
-                                    <li>Meta Front-End Developer Professional Certificate (2021)</li>
-                                    <li>AWS Certified Cloud Practitioner (2022)</li>
-                                </ul>
-                            </section>
-                        </div>
-                    </div>
-                </section>
             </div>
-        </main>
+            </section>
+
+            <!-- New Job Matches Section -->
+            <section class="job-matches-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Job Postings</h2>
+                    <a href="#" class="see-all-link">See all ></a>
+                </div>
+                <div class="job-cards-grid">
+                    <!-- Frontend Developer Job -->
+                    <div class="job-card">
+                        <div class="job-icon purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="job-content">
+                            <h3 class="job-title">Frontend Developer</h3>
+                            <p class="job-company">Tech-Solutions</p>
+                            <p class="job-location">Prague</p>
+                        </div>
+                        <div class="job-footer">
+                            <span class="job-type">Full-Time</span>
+                            <div class="job-salary">€ 4.50 €</div>
+                            <button class="job-arrow">></button>
+                        </div>
+                    </div>
+
+                    <!-- Data Analyst Job -->
+                    <div class="job-card">
+                        <div class="job-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="job-content">
+                            <h3 class="job-title">Data Analyst</h3>
+                            <p class="job-company">InnoBeta</p>
+                            <p class="job-location">Prague</p>
+                        </div>
+                        <div class="job-footer">
+                            <span class="job-type">Full-Time</span>
+                            <div class="job-salary">€ 5.50 €</div>
+                            <button class="job-arrow">></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Career Assistant Section -->
+            <section class="career-assistant-section">
+                <div class="section-header">
+                    <h2 class="section-title">HR Assistant</h2>
+                    <button class="ask-button">Ask...</button>
+                </div>
+                <div class="assistant-card">
+                    <div class="assistant-avatar">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9 9H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M9 15H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="1" fill="currentColor" />
+                        </svg>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="assistant-content">
+                        <p class="assistant-message">Reviewing candidate pools... 3 new strong matches found for
+                            Frontend Developer.</p>
+                    </div>
+                    <button class="assistant-ask-btn">Ask ></button>
+                </div>
+            </section>
+    </div>
+    </main>
     </div>
 
-    <script src="js/hr-dashboard.js"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="../../js/hr-dashboard.js"></script>
 </body>
 
 </html>

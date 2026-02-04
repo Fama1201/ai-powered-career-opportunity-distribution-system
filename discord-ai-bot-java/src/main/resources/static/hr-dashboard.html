@@ -139,7 +139,7 @@
         <!-- Left Sidebar -->
         <aside class="dashboard-sidebar">
             <nav class="sidebar-nav">
-                <a href="hr-dashboard.html" class="sidebar-item">
+                <a href="hr-dashboard.html" class="sidebar-item active">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -159,7 +159,7 @@
                     </svg>
                     <span>Job Openings</span>
                 </a>
-                <a href="hr-candidates.html" class="sidebar-item active">
+                <a href="hr-candidates.html" class="sidebar-item">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -228,163 +228,167 @@
                     <h1 class="welcome-title">Welcome HR Manager, <span class="user-name">Emre</span>!</h1>
                 </div>
 
-                <!-- Candidates Pool Section -->
-                <section class="candidates-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Candidates Pool</h2>
-                        <div class="filter-actions">
-                            <button class="filter-btn active">All</button>
-                            <button class="filter-btn">New</button>
-                            <button class="filter-btn">Interview</button>
-                            <button class="filter-btn">Shortlisted</button>
-                        </div>
-                    </div>
-
-                    <div class="candidates-grid">
-                        <!-- Candidate 1 -->
-                        <div class="candidate-card">
-                            <div class="candidate-header">
-                                <div class="candidate-avatar">JW</div>
-                                <div class="candidate-info">
-                                    <h3 class="candidate-name">Jane Williams</h3>
-                                    <p class="candidate-role">Frontend Developer</p>
-                                </div>
-                                <span class="match-score high">95% Match</span>
+                <!-- Application Status Section -->
+                <section class="status-section">
+                    <div class="status-grid">
+                        <!-- Applied Card -->
+                        <div class="status-card">
+                            <div class="status-icon yellow">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
                             </div>
-                            <div class="candidate-body">
-                                <div class="info-row">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Prague, Czechia</span>
-                                </div>
-                                <div class="info-row">
-                                    <i class="fas fa-briefcase"></i>
-                                    <span>3 Years Experience</span>
-                                </div>
-                                <div class="skills-tags">
-                                    <span>React</span>
-                                    <span>TypeScript</span>
-                                    <span>CSS</span>
-                                </div>
-                            </div>
-                            <div class="candidate-footer">
-                                <span class="status-badge new">New</span>
-                                <div class="action-buttons">
-                                    <button class="icon-btn" onclick="window.location.href='hr-candidate-view.html'"
-                                        title="View Profile"><i class="fas fa-eye"></i></button>
-                                    <button class="icon-btn" title="Contact"><i class="fas fa-envelope"></i></button>
-                                </div>
+                            <div class="status-content">
+                                <div class="status-number">25</div>
+                                <div class="status-label">Job Openings</div>
                             </div>
                         </div>
 
-                        <!-- Candidate 2 -->
-                        <div class="candidate-card">
-                            <div class="candidate-header">
-                                <div class="candidate-avatar">MB</div>
-                                <div class="candidate-info">
-                                    <h3 class="candidate-name">Michael Brown</h3>
-                                    <p class="candidate-role">Data Analyst</p>
-                                </div>
-                                <span class="match-score medium">78% Match</span>
+                        <!-- Interview Card -->
+                        <div class="status-card">
+                            <div class="status-icon green">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
                             </div>
-                            <div class="candidate-body">
-                                <div class="info-row">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Brno, Czechia</span>
-                                </div>
-                                <div class="info-row">
-                                    <i class="fas fa-briefcase"></i>
-                                    <span>1 Year Experience</span>
-                                </div>
-                                <div class="skills-tags">
-                                    <span>Python</span>
-                                    <span>SQL</span>
-                                    <span>Tableau</span>
-                                </div>
+                            <div class="status-content">
+                                <div class="status-number">134</div>
+                                <div class="status-label">New Candidates</div>
                             </div>
-                            <div class="candidate-footer">
-                                <span class="status-badge interview">Interview</span>
-                                <div class="action-buttons">
-                                    <button class="icon-btn" onclick="window.location.href='hr-candidate-view.html'"
-                                        title="View Profile"><i class="fas fa-eye"></i></button>
-                                    <button class="icon-btn" title="Contact"><i class="fas fa-envelope"></i></button>
+                        </div>
+
+                        <!-- Applied with Details Card -->
+                        <div class="status-card detailed">
+                            <div class="status-header">
+                                <div class="status-title">Hires</div>
+                                <div class="status-number-large">57</div>
+                            </div>
+                            <div class="status-details">
+                                <div class="status-detail-item">
+                                    <span class="status-dot green"></span>
+                                    <span>Hired this month</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Candidate 3 -->
-                        <div class="candidate-card">
-                            <div class="candidate-header">
-                                <div class="candidate-avatar">EJ</div>
-                                <div class="candidate-info">
-                                    <h3 class="candidate-name">Emma Johnson</h3>
-                                    <p class="candidate-role">UX Designer</p>
-                                </div>
-                                <span class="match-score high">92% Match</span>
-                            </div>
-                            <div class="candidate-body">
-                                <div class="info-row">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Remote</span>
-                                </div>
-                                <div class="info-row">
-                                    <i class="fas fa-briefcase"></i>
-                                    <span>Senior</span>
-                                </div>
-                                <div class="skills-tags">
-                                    <span>Figma</span>
-                                    <span>User Research</span>
-                                </div>
-                            </div>
-                            <div class="candidate-footer">
-                                <span class="status-badge shortlisted">Shortlisted</span>
-                                <div class="action-buttons">
-                                    <button class="icon-btn" onclick="window.location.href='hr-candidate-view.html'"
-                                        title="View Profile"><i class="fas fa-eye"></i></button>
-                                    <button class="icon-btn" title="Contact"><i class="fas fa-envelope"></i></button>
-                                </div>
-                            </div>
+                        <!-- Rejected Card -->
+                        <div class="status-header">
+                            <div class="status-title">Interviews</div>
+                            <div class="status-number-large">12</div>
                         </div>
-
-                        <!-- Candidate 4 -->
-                        <div class="candidate-card">
-                            <div class="candidate-header">
-                                <div class="candidate-avatar">DK</div>
-                                <div class="candidate-info">
-                                    <h3 class="candidate-name">David Kolar</h3>
-                                    <p class="candidate-role">Backend Developer</p>
-                                </div>
-                                <span class="match-score medium">85% Match</span>
-                            </div>
-                            <div class="candidate-body">
-                                <div class="info-row">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Prague, Czechia</span>
-                                </div>
-                                <div class="info-row">
-                                    <i class="fas fa-briefcase"></i>
-                                    <span>5 Years Experience</span>
-                                </div>
-                                <div class="skills-tags">
-                                    <span>Java</span>
-                                    <span>Spring Boot</span>
-                                    <span>Docker</span>
-                                </div>
-                            </div>
-                            <div class="candidate-footer">
-                                <span class="status-badge new">New</span>
-                                <div class="action-buttons">
-                                    <button class="icon-btn" onclick="window.location.href='hr-candidate-view.html'"
-                                        title="View Profile"><i class="fas fa-eye"></i></button>
-                                    <button class="icon-btn" title="Contact"><i class="fas fa-envelope"></i></button>
-                                </div>
+                        <div class="status-details">
+                            <div class="status-detail-item">
+                                <span class="status-dot orange"></span>
+                                <span>Scheduled</span>
                             </div>
                         </div>
                     </div>
-                </section>
             </div>
-        </main>
+            </section>
+
+            <!-- New Job Matches Section -->
+            <section class="job-matches-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Job Postings</h2>
+                    <a href="#" class="see-all-link">See all ></a>
+                </div>
+                <div class="job-cards-grid">
+                    <!-- Frontend Developer Job -->
+                    <div class="job-card">
+                        <div class="job-icon purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="job-content">
+                            <h3 class="job-title">Frontend Developer</h3>
+                            <p class="job-company">Tech-Solutions</p>
+                            <p class="job-location">Prague</p>
+                        </div>
+                        <div class="job-footer">
+                            <span class="job-type">Full-Time</span>
+                            <div class="job-salary">€ 4.50 €</div>
+                            <button class="job-arrow">></button>
+                        </div>
+                    </div>
+
+                    <!-- Data Analyst Job -->
+                    <div class="job-card">
+                        <div class="job-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="job-content">
+                            <h3 class="job-title">Data Analyst</h3>
+                            <p class="job-company">InnoBeta</p>
+                            <p class="job-location">Prague</p>
+                        </div>
+                        <div class="job-footer">
+                            <span class="job-type">Full-Time</span>
+                            <div class="job-salary">€ 5.50 €</div>
+                            <button class="job-arrow">></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Career Assistant Section -->
+            <section class="career-assistant-section">
+                <div class="section-header">
+                    <h2 class="section-title">HR Assistant</h2>
+                    <button class="ask-button">Ask...</button>
+                </div>
+                <div class="assistant-card">
+                    <div class="assistant-avatar">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9 9H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M9 15H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="1" fill="currentColor" />
+                        </svg>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="assistant-content">
+                        <p class="assistant-message">Reviewing candidate pools... 3 new strong matches found for
+                            Frontend Developer.</p>
+                    </div>
+                    <button class="assistant-ask-btn">Ask ></button>
+                </div>
+            </section>
+    </div>
+    </main>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
     <script src="js/hr-dashboard.js"></script>
 </body>
 

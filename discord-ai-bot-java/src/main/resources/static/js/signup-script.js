@@ -83,19 +83,69 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // 5. Success
-            console.log("--- New User Signup ---");
-            console.log("Name:", fullName);
-            console.log("Full Phone:", fullPhone); // This will now print e.g., "+420123456789"
-            console.log("Gender:", genderValue);
+            // 5. Get email from form
+            const email = document.getElementById('email').value;
             
-            // Show success message
-            showNotification('Registration successful! Redirecting to dashboard...', 'success');
+            // 6. Send registration request to backend
+            const registrationData = {
+                email: email,
+                password: password,
+                firstName: firstName,
+                lastName: lastName
+            };
             
-            // Redirect to student dashboard after successful registration
-            setTimeout(() => {
-                window.location.href = 'student-dashboard.html';
-            }, 1500);
+            // Show loading state
+            const submitButton = signupForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Registering...';
+            
+            // Make API call
+            fetch(`${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.STUDENT_REGISTER}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registrationData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Try to parse JSON error response
+                    return response.json().then(err => {
+                        // Extract error message from response
+                        const errorMessage = err.message || err.error || `Registration failed: ${response.status}`;
+                        throw new Error(errorMessage);
+                    }).catch(parseError => {
+                        // If response is not JSON, use status text
+                        throw new Error(`Registration failed: ${response.status} ${response.statusText}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Success
+                console.log("Registration successful:", data);
+                showNotification(data.message || 'Registration successful! Redirecting to login...', 'success');
+                
+                // Redirect to login page after successful registration
+                setTimeout(() => {
+                    window.location.href = '/pages/auth/login.html';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error("Registration error:", error);
+                // Show detailed error message
+                let errorMessage = error.message || 'Registration failed. Please try again.';
+                
+                // Check if it's a database/connection error
+                if (errorMessage.includes('500') || errorMessage.includes('Internal Server Error')) {
+                    errorMessage = 'Database connection error. Please ensure database tables are created. See SETUP_DATABASE.md for instructions.';
+                }
+                
+                showNotification(errorMessage, 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            });
         });
     }
 });

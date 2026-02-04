@@ -66,29 +66,76 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.innerHTML = '<span>Signing in...</span>';
             
-            // Simulate login (in production, this would send to a backend API)
-            setTimeout(() => {
-                // In a real application, you would send this data to your backend API
-                console.log('Login attempt:', {
-                    userType: formData.userType,
-                    email: formData.email,
-                    rememberMe: formData.rememberMe
-                });
+            // Determine API endpoint based on user type
+            const loginEndpoint = formData.userType === 'student' 
+                ? `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.STUDENT_LOGIN}`
+                : `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.HR_LOGIN}`;
+            
+            // Prepare login request
+            const loginRequest = {
+                email: formData.email,
+                password: formData.password
+            };
+            
+            // Send login request to backend
+            fetch(loginEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginRequest)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        const errorMessage = err.message || err.error || `Login failed: ${response.status}`;
+                        throw new Error(errorMessage);
+                    }).catch(parseError => {
+                        throw new Error(`Login failed: ${response.status} ${response.statusText}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Success - save auth data
+                if (data.accessToken) {
+                    localStorage.setItem('accessToken', data.accessToken);
+                    if (data.refreshToken) {
+                        localStorage.setItem('refreshToken', data.refreshToken);
+                    }
+                    if (data.userId) {
+                        localStorage.setItem('userId', data.userId);
+                    }
+                    if (data.email) {
+                        localStorage.setItem('email', data.email);
+                    }
+                    if (data.role) {
+                        localStorage.setItem('role', data.role);
+                    }
+                }
                 
-                // Show success message
-                showNotification('Login successful! Redirecting...', 'success');
+                console.log('Login successful:', data);
+                showNotification(data.message || 'Login successful! Redirecting...', 'success');
                 
-                // In production, redirect based on user type
+                // Redirect based on user type
                 setTimeout(() => {
                     if (formData.userType === 'student') {
-                        // Redirect to student dashboard
-                        window.location.href = 'student-dashboard.html'; // This page doesn't exist yet
+                        const dashboardPath = '/pages/student/student-dashboard.html';
+                        console.log('Redirecting to:', dashboardPath);
+                        window.location.href = dashboardPath;
                     } else if (formData.userType === 'hr') {
-                        // Redirect to HR dashboard
-                        window.location.href = 'hr-dashboard.html'; // This page doesn't exist yet
+                        const dashboardPath = '/pages/hr/hr-dashboard.html';
+                        console.log('Redirecting to:', dashboardPath);
+                        window.location.href = dashboardPath;
                     }
                 }, 1500);
-            }, 1500);
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                showNotification(error.message || 'Login failed. Please try again.', 'error');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            });
         });
     }
 });

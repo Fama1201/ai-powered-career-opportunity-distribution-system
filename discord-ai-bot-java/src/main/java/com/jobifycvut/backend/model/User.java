@@ -19,17 +19,17 @@ public class User {
     @Column(nullable=false)
     private String password;
 
-    @Column(name="first_name", nullable=false)
+    @Column(name="first_name")
     private String firstName;
 
-    @Column(name="last_name", nullable=false)
+    @Column(name="last_name")
     private String lastName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserRole role;
 
-    @Column(nullable=false)
+    @Column(name="is_active", nullable=false)
     private boolean isActive;
 
     @Column(name="created_at")

@@ -35,9 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Always allow CORS preflight without JWT
         if (HttpMethod.OPTIONS.matches(request.getMethod())) return true;
 
-        // Public endpoints
+        // Skip JWT filter for static resources
+        if (!path.startsWith("/api/")) return true;
+
+        // Public API endpoints
         if (path.startsWith("/api/auth/")) return true;
         if (path.startsWith("/api/hr/auth/")) return true;
+        if (path.equals("/api/status")) return true;
         if (path.equals("/error")) return true;
 
         return false;
