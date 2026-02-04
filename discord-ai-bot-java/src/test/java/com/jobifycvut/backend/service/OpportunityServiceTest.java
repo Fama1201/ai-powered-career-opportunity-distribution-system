@@ -72,7 +72,7 @@ class OpportunityServiceTest {
                 "java", "java", PageRequest.of(0, 10)
         )).thenReturn(new PageImpl<>(List.of(opportunity)));
 
-        var page = service.searchOpportunities("java", PageRequest.of(0, 10));
+        var page = service.searchOpportunities("java", PageRequest.of(0, 10), null, null);
         assertEquals(1, page.getTotalElements());
         assertEquals("Java Intern", page.getContent().get(0).getTitle());
     }

@@ -22,8 +22,12 @@ public class OpportunityController {
 
     // GET /api/jobs
     @GetMapping
-    public Page<OpportunityListResponse> getOpportunities(Pageable pageable) {
-        return opportunityService.getAllOpportunities(pageable);
+    public Page<OpportunityListResponse> getOpportunities(
+            @RequestParam(required = false) String jobType,
+            @RequestParam(required = false) String workMode,
+            Pageable pageable
+    ) {
+        return opportunityService.getAllOpportunities(pageable, jobType, workMode);
     }
 
     // GET /api/jobs/{jobId}
@@ -36,8 +40,13 @@ public class OpportunityController {
 
     // GET /api/jobs/search?keyword=backend
     @GetMapping("/search")
-    public Page<OpportunityListResponse> searchOpportunities(@RequestParam String keyword, Pageable pageable) {
-        return opportunityService.searchOpportunities(keyword, pageable);
+    public Page<OpportunityListResponse> searchOpportunities(
+            @RequestParam String keyword,
+            @RequestParam(required = false) String jobType,
+            @RequestParam(required = false) String workMode,
+            Pageable pageable
+    ) {
+        return opportunityService.searchOpportunities(keyword, pageable, jobType, workMode);
     }
 
     // POST /api/jobs/{id}/save

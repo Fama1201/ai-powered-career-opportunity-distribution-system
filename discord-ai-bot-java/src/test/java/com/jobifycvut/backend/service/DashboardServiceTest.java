@@ -14,8 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import com.jobifycvut.backend.dto.OpportunityListResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +33,8 @@ class DashboardServiceTest {
     private JobApplicationRepository applicationRepository;
     @Mock
     private SavedJobRepository savedJobRepository;
+    @Mock
+    private MatchService matchService;
 
     @InjectMocks
     private DashboardService service;
@@ -47,6 +48,10 @@ class DashboardServiceTest {
         student.setEmail("student@example.com");
         student.setName("Student One");
         student.setCareerInterest("Java");
+
+        // Default stub for match service to avoid nulls
+        lenient().when(matchService.findMatches(any(StudentEntity.class), eq(10)))
+                .thenReturn(List.of());
     }
 
     @Test
@@ -59,9 +64,18 @@ class DashboardServiceTest {
         opp.setId(100L);
         opp.setTitle("Java Intern");
         opp.setCompany("TestCo");
-        when(opportunityRepository.findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
-                "Java", "Java", PageRequest.of(0, 10)
-        )).thenReturn(new PageImpl<>(List.of(opp)));
+        when(matchService.findMatches(any(StudentEntity.class), eq(10)))
+                .thenReturn(List.of(
+                        new com.jobifycvut.backend.dto.OpportunityListResponse(
+                                opp.getId(),
+                                opp.getTitle(),
+                                opp.getCompany(),
+                                null,
+                                null,
+                                null,
+                                null
+                        )
+                ));
 
         DashboardOverviewResponse response = service.getOverview(1L, "student@example.com");
 
