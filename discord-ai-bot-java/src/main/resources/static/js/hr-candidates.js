@@ -159,7 +159,7 @@ function populateJobFilter() {
         allOption.type = 'button';
         allOption.className = 'custom-select-option';
         allOption.setAttribute('data-value', '');
-        allOption.textContent = 'All Jobs';
+        allOption.textContent = I18n.t('allJobs');
         dropdown.appendChild(allOption);
     }
 
@@ -438,7 +438,7 @@ function renderCandidates(candidates) {
         }
         if (emptyStateMessage) {
             if (!currentJobId) {
-                emptyStateMessage.textContent = 'Select a job to view candidates.';
+                emptyStateMessage.textContent = I18n.t('selectJobToView');
             } else if (currentStatusFilter || currentSearchQuery) {
                 emptyStateMessage.textContent = 'No candidates match your filters. Try adjusting your search criteria.';
             } else {
@@ -482,8 +482,8 @@ function createCandidateCard(candidate) {
         <div class="candidate-header">
             <div class="candidate-avatar">${initials}</div>
             <div class="candidate-info">
-                <h3 class="candidate-name">${escapeHtml(candidate.studentName || 'Unknown')}</h3>
-                <p class="candidate-email">${escapeHtml(candidate.studentEmail || 'No email')}</p>
+                <h3 class="candidate-name">${escapeHtml(candidate.studentName || I18n.t('unknown'))}</h3>
+                <p class="candidate-email">${escapeHtml(candidate.studentEmail || I18n.t('noEmail'))}</p>
             </div>
         </div>
         <div class="candidate-body">
@@ -534,13 +534,13 @@ function getStatusClass(status) {
 function getStatusLabel(status) {
     const statusUpper = (status || '').toUpperCase();
     switch (statusUpper) {
-        case 'APPLIED': return 'Applied';
-        case 'SHORTLISTED': return 'Shortlisted';
-        case 'INTERVIEW': return 'Interview';
-        case 'REJECTED': return 'Rejected';
-        case 'HIRED': return 'Hired';
-        case 'WITHDRAWN': return 'Withdrawn';
-        default: return 'Applied';
+        case 'APPLIED': return I18n.t('applied');
+        case 'SHORTLISTED': return I18n.t('shortlisted');
+        case 'INTERVIEW': return I18n.t('interview');
+        case 'REJECTED': return I18n.t('rejected');
+        case 'HIRED': return I18n.t('hired');
+        case 'WITHDRAWN': return I18n.t('withdrawn');
+        default: return I18n.t('applied');
     }
 }
 
@@ -562,7 +562,7 @@ function showCandidateDetailModal(detail) {
     const title = document.getElementById('candidateDetailTitle');
 
     if (title) {
-        title.textContent = `${detail.studentName || 'Candidate'} - Application Details`;
+        title.textContent = `${detail.studentName || I18n.t('candidateDetails')} - ${I18n.t('applicationDetails')}`;
     }
 
     const actionsContainer = document.getElementById('candidateDetailActions');
@@ -577,21 +577,21 @@ function showCandidateDetailModal(detail) {
             <div class="candidate-detail-header">
                 <div class="candidate-detail-avatar">${initials}</div>
                 <div class="candidate-detail-info">
-                    <h3>${escapeHtml(detail.studentName || 'Unknown')}</h3>
-                    <p class="candidate-detail-email">${escapeHtml(detail.studentEmail || 'No email')}</p>
+                    <h3>${escapeHtml(detail.studentName || I18n.t('unknown'))}</h3>
+                    <p class="candidate-detail-email">${escapeHtml(detail.studentEmail || I18n.t('noEmail'))}</p>
                     <div class="status-badge ${statusClass}">${statusLabel}</div>
                 </div>
             </div>
 
             <div class="candidate-detail-section">
-                <h4>Application Information</h4>
+                <h4>${I18n.t('applicationInformation')}</h4>
                 <div class="detail-grid">
                     <div class="detail-row">
-                        <span class="detail-label">Applied Date:</span>
+                        <span class="detail-label">${I18n.t('appliedDate')}:</span>
                         <span class="detail-value">${appliedDate}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Status:</span>
+                        <span class="detail-label">${I18n.t('status')}:</span>
                         <span class="detail-value status-badge ${statusClass}">${statusLabel}</span>
                     </div>
                 </div>
@@ -599,21 +599,21 @@ function showCandidateDetailModal(detail) {
 
             ${detail.studentSkills ? `
             <div class="candidate-detail-section">
-                <h4>Skills</h4>
+                <h4>${I18n.t('skills')}</h4>
                 <p class="candidate-skills">${escapeHtml(detail.studentSkills)}</p>
             </div>
             ` : ''}
 
             ${detail.studentCareerInterest ? `
             <div class="candidate-detail-section">
-                <h4>Career Interest</h4>
+                <h4>${I18n.t('careerInterest')}</h4>
                 <p class="candidate-career-interest">${escapeHtml(detail.studentCareerInterest)}</p>
             </div>
             ` : ''}
 
             ${detail.studentCvText ? `
             <div class="candidate-detail-section">
-                <h4>CV Preview</h4>
+                <h4>${I18n.t('cvPreview')}</h4>
                 <div class="cv-preview">
                     <pre class="cv-text">${escapeHtml(detail.studentCvText)}</pre>
                 </div>
@@ -622,7 +622,7 @@ function showCandidateDetailModal(detail) {
 
             ${detail.notes ? `
             <div class="candidate-detail-section">
-                <h4>Notes</h4>
+                <h4>${I18n.t('notes')}</h4>
                 <div class="notes-preview">
                     <pre class="notes-text">${escapeHtml(detail.notes)}</pre>
                 </div>
@@ -634,13 +634,13 @@ function showCandidateDetailModal(detail) {
     if (actionsContainer) {
         actionsContainer.innerHTML = `
             <button class="btn btn-secondary" id="addNoteBtn" data-application-id="${detail.applicationId}">
-                <i class="fas fa-sticky-note"></i> Add Note
+                <i class="fas fa-sticky-note"></i> ${I18n.t('addNote')}
             </button>
             <button class="btn btn-secondary" id="updateStatusBtn" data-application-id="${detail.applicationId}">
-                <i class="fas fa-edit"></i> Update Status
+                <i class="fas fa-edit"></i> ${I18n.t('updateStatus')}
             </button>
             <button class="btn btn-primary" id="viewCvBtn" data-student-id="${detail.studentUserId}">
-                <i class="fas fa-file-pdf"></i> View Full CV
+                <i class="fas fa-file-pdf"></i> ${I18n.t('viewFullCv')}
             </button>
         `;
 
@@ -669,11 +669,11 @@ async function viewFullCv(studentUserId) {
             downloadCv(cv.cvText, studentUserId);
             
             if (typeof UI !== 'undefined' && UI.toast) {
-                UI.toast('CV downloaded successfully!', 'success');
+                UI.toast(I18n.t('cvDownloaded'), 'success');
             }
         } else {
             if (typeof UI !== 'undefined' && UI.toast) {
-                UI.toast('CV not available for this candidate.', 'info');
+                UI.toast(I18n.t('cvNotAvailable'), 'info');
             }
         }
     } catch (error) {
@@ -880,17 +880,17 @@ function openStatusUpdateModal(applicationId, currentStatus) {
     // Update button text and active state
     if (statusSelectText && statusSelectOptions) {
         const statusLabels = {
-            '': 'Select status',
-            'APPLIED': 'Applied',
-            'SHORTLISTED': 'Shortlisted',
-            'INTERVIEW': 'Interview',
-            'REJECTED': 'Rejected',
-            'HIRED': 'Hired',
-            'WITHDRAWN': 'Withdrawn'
+            '': I18n.t('selectStatus'),
+            'APPLIED': I18n.t('applied'),
+            'SHORTLISTED': I18n.t('shortlisted'),
+            'INTERVIEW': I18n.t('interview'),
+            'REJECTED': I18n.t('rejected'),
+            'HIRED': I18n.t('hired'),
+            'WITHDRAWN': I18n.t('withdrawn')
         };
 
         const selectedValue = currentStatus || '';
-        statusSelectText.textContent = statusLabels[selectedValue] || 'Select status';
+        statusSelectText.textContent = statusLabels[selectedValue] || I18n.t('selectStatus');
 
         // Update active state
         statusSelectOptions.forEach(option => {
@@ -947,7 +947,7 @@ async function handleStatusUpdate(e) {
         await HrAPI.updateApplicationStatus(currentEditingApplicationId, newStatus);
         
         if (typeof UI !== 'undefined' && UI.toast) {
-            UI.toast('Status updated successfully!', 'success');
+            UI.toast(I18n.t('statusUpdated'), 'success');
         }
         
         closeStatusUpdateModal();
@@ -1018,7 +1018,7 @@ async function handleAddNote(e) {
         await HrAPI.addApplicationNote(currentEditingApplicationId, note);
         
         if (typeof UI !== 'undefined' && UI.toast) {
-            UI.toast('Note added successfully!', 'success');
+            UI.toast(I18n.t('noteAdded'), 'success');
         }
         
         closeAddNoteModal();
@@ -1128,7 +1128,13 @@ function loadSavedLanguage() {
             btn.classList.add('active');
             const currentLangEl = document.getElementById('currentLanguage');
             if (currentLangEl) {
-                currentLangEl.textContent = langName || 'English';
+                const langMap = {
+                    'en': I18n.t('english'),
+                    'cs': I18n.t('czech'),
+                    'tr': I18n.t('turkish'),
+                    'es': I18n.t('spanish')
+                };
+                currentLangEl.textContent = langMap[lang] || langName || I18n.t('english');
             }
         } else {
             btn.classList.remove('active');
@@ -1155,7 +1161,13 @@ function toggleLanguageMenu() {
 function handleLanguageChange(button) {
     const lang = button.getAttribute('data-lang');
     const langName = button.getAttribute('data-lang-name');
-    document.getElementById('currentLanguage').textContent = langName;
+    const langMap = {
+        'en': I18n.t('english'),
+        'cs': I18n.t('czech'),
+        'tr': I18n.t('turkish'),
+        'es': I18n.t('spanish')
+    };
+    document.getElementById('currentLanguage').textContent = langMap[lang] || langName;
     document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('active'));
     button.classList.add('active');
     localStorage.setItem('language', lang);

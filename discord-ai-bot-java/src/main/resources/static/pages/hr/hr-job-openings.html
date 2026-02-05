@@ -138,7 +138,7 @@
                         <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    <span>Dashboard</span>
+                    <span data-i18n="dashboard">Dashboard</span>
                 </a>
                 <a href="#/hr/job-openings" class="sidebar-item active" data-route="#/hr/job-openings">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -147,7 +147,7 @@
                             d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Job Openings</span>
+                    <span data-i18n="jobOpenings">Job Openings</span>
                 </a>
                 <a href="#/hr/candidates" class="sidebar-item" data-route="#/hr/candidates">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -156,7 +156,7 @@
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Candidates</span>
+                    <span data-i18n="candidates">Candidates</span>
                 </a>
                 <a href="#/hr/hires" class="sidebar-item" data-route="#/hr/hires">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -164,7 +164,7 @@
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Hires</span>
+                    <span data-i18n="hires">Hires</span>
                 </a>
                 <a href="#/hr/analytics" class="sidebar-item" data-route="#/hr/analytics">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -173,7 +173,7 @@
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Analytics</span>
+                    <span data-i18n="analytics">Analytics</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -215,26 +215,26 @@
             <div class="dashboard-content">
                 <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Job Openings</h1>
-                    <p class="welcome-subtitle">Manage your job postings and track applications</p>
+                    <h1 class="welcome-title" data-i18n="jobOpenings">Job Openings</h1>
+                    <p class="welcome-subtitle" data-i18n="manageJobPostings">Manage your job postings and track applications</p>
                 </div>
 
                 <!-- Filters and Actions -->
                 <section class="job-openings-filters">
                     <div class="filters-card">
                         <div class="filter-group">
-                            <label for="statusFilter" class="filter-label">Status</label>
+                            <label for="statusFilter" class="filter-label" data-i18n="status">Status</label>
                             <div class="custom-select-wrapper">
                                 <button type="button" class="custom-select-btn" id="statusFilterBtn">
-                                    <span class="custom-select-text" id="statusFilterText">All Status</span>
+                                    <span class="custom-select-text" id="statusFilterText" data-i18n="allStatus">All Status</span>
                                     <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
                                 <div class="custom-select-dropdown" id="statusFilterDropdown">
-                                    <button type="button" class="custom-select-option" data-value="">All Status</button>
-                                    <button type="button" class="custom-select-option" data-value="OPEN">Open</button>
-                                    <button type="button" class="custom-select-option" data-value="CLOSED">Closed</button>
+                                    <button type="button" class="custom-select-option" data-value="" data-i18n="allStatus">All Status</button>
+                                    <button type="button" class="custom-select-option" data-value="OPEN" data-i18n="open">Open</button>
+                                    <button type="button" class="custom-select-option" data-value="CLOSED" data-i18n="closed">Closed</button>
                                     <button type="button" class="custom-select-option" data-value="ARCHIVED">Archived</button>
                                 </div>
                                 <input type="hidden" id="statusFilter" value="">
@@ -251,7 +251,7 @@
                         </div>
                         <div class="filter-actions">
                             <button class="btn btn-primary" id="postNewJobBtn">
-                                <i class="fas fa-plus"></i> Post New Job
+                                <i class="fas fa-plus"></i> <span data-i18n="postNewJob">Post New Job</span>
                             </button>
                         </div>
                     </div>
@@ -273,8 +273,8 @@
                                 d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <h3>No Job Openings</h3>
-                        <p>You haven't posted any jobs yet. Click "Post New Job" to get started.</p>
+                        <h3 data-i18n="noData">No Job Openings</h3>
+                        <p data-i18n="noData">You haven't posted any jobs yet. Click "Post New Job" to get started.</p>
                     </div>
                 </section>
             </div>
@@ -285,7 +285,7 @@
     <div class="modal-overlay" id="jobModalOverlay" style="display: none;">
         <div class="modal-content job-modal">
             <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Post New Job</h2>
+                <h2 class="modal-title" id="modalTitle" data-i18n="postNewJob">Post New Job</h2>
                 <button class="modal-close" id="modalCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
