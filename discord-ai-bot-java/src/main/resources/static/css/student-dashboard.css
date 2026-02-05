@@ -2111,11 +2111,31 @@ body.light-theme .btn-refresh-matches:hover:not(:disabled) {
 .job-detail-content {
     max-height: 70vh;
     overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for job detail content */
+.job-detail-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.job-detail-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.job-detail-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.job-detail-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .job-detail-header {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -2131,20 +2151,34 @@ body.light-theme .btn-refresh-matches:hover:not(:disabled) {
 .job-detail-company {
     color: var(--text-secondary);
     font-size: 1.15rem;
-    font-weight: 500;
+    font-weight: 600;
     margin: 0;
     line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.job-detail-company::before {
+    content: '🏢';
+    font-size: 1.1rem;
 }
 
 .job-detail-info {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-color);
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
-    padding: 0.75rem 0;
+    align-items: center;
+    padding: 0.875rem 0;
     border-bottom: 1px solid var(--border-color);
+    gap: 1rem;
 }
 
 .info-row:last-child {
@@ -2155,32 +2189,54 @@ body.light-theme .btn-refresh-matches:hover:not(:disabled) {
     font-weight: 600;
     color: var(--text-primary);
     font-size: 0.95rem;
+    flex-shrink: 0;
+    min-width: 120px;
 }
 
 .info-row span:not(.info-label) {
     color: var(--text-secondary);
     font-size: 0.95rem;
     font-weight: 400;
+    text-align: right;
+    flex: 1;
 }
 
 .job-detail-section {
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.job-detail-section:first-of-type {
+    margin-top: 0;
 }
 
 .job-detail-section h4 {
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     font-weight: 700;
     margin: 0 0 1rem 0;
     letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.job-detail-section h4::before {
+    content: '📋';
+    font-size: 1.2rem;
 }
 
 .job-detail-section p {
     color: var(--text-secondary);
     font-size: 1rem;
     font-weight: 400;
-    line-height: 1.7;
+    line-height: 1.8;
     margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 @media (max-width: 768px) {
@@ -2381,6 +2437,27 @@ body.light-theme .empty-state svg {
     opacity: 0.6;
 }
 
+/* Light Theme - Job Detail Modal */
+body.light-theme .job-detail-content {
+    color: #0f172a;
+}
+
+body.light-theme .job-detail-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+body.light-theme .job-detail-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+}
+
+body.light-theme .job-detail-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+body.light-theme .job-detail-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
 body.light-theme .job-detail-header h2 {
     color: #0f172a;
 }
@@ -2389,16 +2466,30 @@ body.light-theme .job-detail-company {
     color: #475569;
 }
 
+body.light-theme .job-detail-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
 body.light-theme .info-label {
     color: #0f172a;
+}
+
+body.light-theme .info-row {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-theme .info-row:last-child {
+    border-bottom: none;
 }
 
 body.light-theme .info-row span:not(.info-label) {
     color: #64748b;
 }
 
-body.light-theme .info-row {
-    border-bottom: 1px solid #e2e8f0;
+body.light-theme .job-detail-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
 }
 
 body.light-theme .job-detail-section h4 {
@@ -2407,10 +2498,6 @@ body.light-theme .job-detail-section h4 {
 
 body.light-theme .job-detail-section p {
     color: #475569;
-}
-
-body.light-theme .job-detail-header {
-    border-bottom: 1px solid #e2e8f0;
 }
 
 body.light-theme .job-card-footer {
