@@ -49,4 +49,6 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
     List<Opportunity> findByDiscordIdAndApplicationDeadlineLessThanOrderByIdDesc(String discordId, LocalDate date);
 
     List<Opportunity> findByDiscordIdAndApplicationDeadlineIsNullOrderByIdDesc(String discordId);
+
+    java.util.Optional<Opportunity> findByOpportunityIdAndDiscordId(String opportunityId, String discordId);
 }

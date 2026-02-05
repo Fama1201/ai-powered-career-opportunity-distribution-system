@@ -5,6 +5,7 @@ import com.jobifycvut.backend.dto.OpportunityDetailResponse;
 import com.jobifycvut.backend.dto.OpportunityListResponse;
 import com.jobifycvut.backend.security.SecurityUtil;
 import com.jobifycvut.backend.service.OpportunityService;
+import com.jobifycvut.backend.service.OpportunitySyncService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class OpportunityController {
 
     private final OpportunityService opportunityService;
+    private final OpportunitySyncService opportunitySyncService;
 
-    public OpportunityController(OpportunityService opportunityService) {
+    public OpportunityController(OpportunityService opportunityService,
+                                 OpportunitySyncService opportunitySyncService) {
         this.opportunityService = opportunityService;
+        this.opportunitySyncService = opportunitySyncService;
     }
 
     // GET /api/jobs
@@ -63,5 +67,12 @@ public class OpportunityController {
         Long userId = SecurityUtil.requireUserId();
         opportunityService.applyToOpportunity(id, userId);
         return ResponseEntity.ok(new ApiResponse("Job applied successfully"));
+    }
+
+    // POST /api/jobs/sync
+    @PostMapping("/sync")
+    public ResponseEntity<ApiResponse> syncJobs() {
+        int count = opportunitySyncService.syncFromEdumatch();
+        return ResponseEntity.ok(new ApiResponse("Synced " + count + " opportunities."));
     }
 }
