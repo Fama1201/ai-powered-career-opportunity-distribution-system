@@ -99,17 +99,11 @@ function updateWelcomeMessage(overview) {
  * Update status cards with real data
  */
 function updateStatusCards(stats) {
-    // Always calculate from applications to ensure accuracy
-    // API stats might be incorrect, so we recalculate from the actual applications list
-    // This ensures the count is always correct based on actual application statuses
-    calculateStatsFromApplications();
-}
-
-/**
- * Update status cards directly with calculated stats (internal use)
- */
-function updateStatusCardsWithStats(stats) {
-    if (!stats) return;
+    if (!stats) {
+        // Calculate from applications if stats not available
+        calculateStatsFromApplications();
+        return;
+    }
 
     // Update Applied card
     const appliedNumber = document.querySelector('.status-card:first-child .status-number');
@@ -123,10 +117,12 @@ function updateStatusCardsWithStats(stats) {
         interviewNumber.textContent = stats.interviews || 0;
     }
 
-    // Update detailed Applied card (the large one)
+    // Update detailed Applied card (the large one with "Applied • Interview")
+    // This should show only "Applied" status count, not including Interview or Rejected
     const detailedApplied = document.querySelector('.status-card.detailed:first-of-type .status-number-large');
     if (detailedApplied) {
-        detailedApplied.textContent = stats.totalApplied || 0;
+        // Calculate correct Applied count from applications (async, will update when ready)
+        calculateAppliedCountForDetailedCard();
     }
 
     // Update Rejected card
@@ -137,9 +133,10 @@ function updateStatusCardsWithStats(stats) {
 }
 
 /**
- * Calculate stats from applications list
+ * Calculate and update the detailed Applied card count
+ * This ensures only "Applied" status applications are counted (excluding Interview/Rejected)
  */
-async function calculateStatsFromApplications() {
+async function calculateAppliedCountForDetailedCard() {
     try {
         const applications = await StudentAPI.getApplications();
         // Filter only "Applied" status (case-insensitive, excluding Interview and Rejected)
@@ -148,18 +145,27 @@ async function calculateStatsFromApplications() {
             return status.includes('applied') && !status.includes('interview') && !status.includes('reject');
         }).length;
         
+        const detailedApplied = document.querySelector('.status-card.detailed:first-of-type .status-number-large');
+        if (detailedApplied) {
+            detailedApplied.textContent = appliedCount;
+        }
+    } catch (error) {
+        console.error('Error calculating applied count for detailed card:', error);
+    }
+}
+
+/**
+ * Calculate stats from applications list
+ */
+async function calculateStatsFromApplications() {
+    try {
+        const applications = await StudentAPI.getApplications();
         const stats = {
-            totalApplied: appliedCount,
-            interviews: applications.filter(a => {
-                const status = (a.status || '').toLowerCase();
-                return status.includes('interview');
-            }).length,
-            rejected: applications.filter(a => {
-                const status = (a.status || '').toLowerCase();
-                return status.includes('reject');
-            }).length
+            totalApplied: applications.length,
+            interviews: applications.filter(a => a.status === 'Interview').length,
+            rejected: applications.filter(a => a.status === 'Rejected').length
         };
-        updateStatusCardsWithStats(stats);
+        updateStatusCards(stats);
     } catch (error) {
         console.error('Error calculating stats:', error);
     }
