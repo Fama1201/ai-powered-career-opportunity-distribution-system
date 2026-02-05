@@ -282,6 +282,20 @@ public class AiService {
         return learningAssignmentRepository.findByStudentIdAndCategoryOrderByCreatedAtDesc(student.getId(), cat);
     }
 
+    public AssignmentSubmission getSubmission(Long userId, Long assignmentId) {
+        StudentEntity student = studentContextService.getOrCreateCurrentStudent();
+        List<AssignmentSubmission> submissions = assignmentSubmissionRepository.findByAssignmentIdOrderByCreatedAtDesc(assignmentId);
+        if (submissions.isEmpty()) {
+            return null;
+        }
+        // Return the most recent submission for this student
+        Long studentId = student.getId();
+        return submissions.stream()
+                .filter(s -> s.getStudentId() != null && s.getStudentId().equals(studentId))
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<LearningAssignment> generateAssignments(Long userId, AssignmentRequest req) {
         StudentEntity student = studentContextService.getOrCreateCurrentStudent();
 

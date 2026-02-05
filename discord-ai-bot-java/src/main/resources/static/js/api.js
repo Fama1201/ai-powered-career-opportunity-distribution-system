@@ -274,6 +274,58 @@ const StudentAPI = {
         });
     },
 
+    /**
+     * POST /api/ai/assignments
+     * Body: { language: string, level: string, category?: string }
+     * Returns: LearningAssignment[]
+     */
+    async createAssignments(language, level, category = null) {
+        const body = { language, level };
+        if (category) {
+            body.category = category;
+        }
+        return this.request('/ai/assignments', {
+            method: 'POST',
+            body: JSON.stringify(body)
+        });
+    },
+
+    /**
+     * GET /api/ai/assignments?category=...
+     * Returns: LearningAssignment[]
+     */
+    async getAssignments(category = null) {
+        const query = category ? `?category=${encodeURIComponent(category)}` : '';
+        return this.request(`/ai/assignments${query}`);
+    },
+
+    /**
+     * GET /api/ai/assignments/{assignmentId}/submission
+     * Returns: AssignmentSubmission { id, assignmentId, code, feedback, createdAt }
+     */
+    async getSubmission(assignmentId) {
+        return this.request(`/ai/assignments/${assignmentId}/submission`);
+    },
+
+    /**
+     * POST /api/ai/code-review
+     * Body: { language?: string, code: string, assignmentId?: number }
+     * Returns: CodeReviewResponse { summary, issues[], suggestions[] }
+     */
+    async submitCodeReview(code, language = null, assignmentId = null) {
+        const body = { code };
+        if (language) {
+            body.language = language;
+        }
+        if (assignmentId) {
+            body.assignmentId = assignmentId;
+        }
+        return this.request('/ai/code-review', {
+            method: 'POST',
+            body: JSON.stringify(body)
+        });
+    },
+
     // ========== CV ==========
 
     /**

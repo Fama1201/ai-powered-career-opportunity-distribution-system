@@ -192,6 +192,20 @@ router.register('/student/cv', () => {
     }
 });
 
+router.register('/student/code-practice', () => {
+    // If we're already on code-practice.html, just update active state
+    if (window.location.pathname.includes('code-practice.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('code-practice') || item.textContent.includes('Code Practice')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        window.location.href = '/pages/student/code-practice.html';
+    }
+});
+
 router.register('/student/advisor', () => {
     window.location.href = '/pages/student/advisor.html';
 });

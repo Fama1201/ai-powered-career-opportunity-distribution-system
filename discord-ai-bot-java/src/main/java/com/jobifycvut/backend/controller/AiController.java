@@ -73,4 +73,10 @@ public class AiController {
         Long userId = SecurityUtil.requireUserId();
         return ResponseEntity.ok(aiService.getAssignments(userId, category));
     }
+
+    @GetMapping("/assignments/{assignmentId}/submission")
+    public ResponseEntity<?> getSubmission(@PathVariable Long assignmentId) {
+        Long userId = SecurityUtil.requireUserId();
+        return ResponseEntity.ok(aiService.getSubmission(userId, assignmentId));
+    }
 }
