@@ -62,6 +62,9 @@ function setupEventListeners() {
             closeStatusUpdateModal();
         }
     });
+    
+    // Setup status select dropdown
+    setupStatusSelect();
 
     // Add note modal
     document.getElementById('addNoteCloseBtn')?.addEventListener('click', closeAddNoteModal);
@@ -562,6 +565,8 @@ function showCandidateDetailModal(detail) {
         title.textContent = `${detail.studentName || 'Candidate'} - Application Details`;
     }
 
+    const actionsContainer = document.getElementById('candidateDetailActions');
+    
     if (content) {
         const statusClass = getStatusClass(detail.status);
         const statusLabel = getStatusLabel(detail.status);
@@ -580,13 +585,15 @@ function showCandidateDetailModal(detail) {
 
             <div class="candidate-detail-section">
                 <h4>Application Information</h4>
-                <div class="detail-row">
-                    <span class="detail-label">Applied Date:</span>
-                    <span class="detail-value">${appliedDate}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Status:</span>
-                    <span class="detail-value status-badge ${statusClass}">${statusLabel}</span>
+                <div class="detail-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Applied Date:</span>
+                        <span class="detail-value">${appliedDate}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value status-badge ${statusClass}">${statusLabel}</span>
+                    </div>
                 </div>
             </div>
 
@@ -621,18 +628,20 @@ function showCandidateDetailModal(detail) {
                 </div>
             </div>
             ` : ''}
+        `;
+    }
 
-            <div class="candidate-detail-actions">
-                <button class="btn btn-secondary" id="addNoteBtn" data-application-id="${detail.applicationId}">
-                    <i class="fas fa-sticky-note"></i> Add Note
-                </button>
-                <button class="btn btn-secondary" id="updateStatusBtn" data-application-id="${detail.applicationId}">
-                    <i class="fas fa-edit"></i> Update Status
-                </button>
-                <button class="btn btn-primary" id="viewCvBtn" data-student-id="${detail.studentUserId}">
-                    <i class="fas fa-file-pdf"></i> View Full CV
-                </button>
-            </div>
+    if (actionsContainer) {
+        actionsContainer.innerHTML = `
+            <button class="btn btn-secondary" id="addNoteBtn" data-application-id="${detail.applicationId}">
+                <i class="fas fa-sticky-note"></i> Add Note
+            </button>
+            <button class="btn btn-secondary" id="updateStatusBtn" data-application-id="${detail.applicationId}">
+                <i class="fas fa-edit"></i> Update Status
+            </button>
+            <button class="btn btn-primary" id="viewCvBtn" data-student-id="${detail.studentUserId}">
+                <i class="fas fa-file-pdf"></i> View Full CV
+            </button>
         `;
 
         // Add event listeners
@@ -656,23 +665,12 @@ async function viewFullCv(studentUserId) {
     try {
         const cv = await HrAPI.getStudentCv(studentUserId);
         if (cv && cv.cvText) {
-            // Open CV in a new window or modal
-            const cvWindow = window.open('', '_blank');
-            cvWindow.document.write(`
-                <html>
-                    <head>
-                        <title>CV - ${studentUserId}</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; padding: 2rem; line-height: 1.6; }
-                            pre { white-space: pre-wrap; word-wrap: break-word; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>Curriculum Vitae</h1>
-                        <pre>${escapeHtml(cv.cvText)}</pre>
-                    </body>
-                </html>
-            `);
+            // Download CV as a text file
+            downloadCv(cv.cvText, studentUserId);
+            
+            if (typeof UI !== 'undefined' && UI.toast) {
+                UI.toast('CV downloaded successfully!', 'success');
+            }
         } else {
             if (typeof UI !== 'undefined' && UI.toast) {
                 UI.toast('CV not available for this candidate.', 'info');
@@ -686,6 +684,28 @@ async function viewFullCv(studentUserId) {
     }
 }
 
+function downloadCv(cvText, studentUserId) {
+    // Create a blob with the CV text
+    const blob = new Blob([cvText], { type: 'text/plain;charset=utf-8' });
+    
+    // Create a download link
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.download = `CV_${studentUserId}_${timestamp}.txt`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 function closeCandidateDetailModal() {
     const modal = document.getElementById('candidateDetailModalOverlay');
     if (modal) {
@@ -693,13 +713,194 @@ function closeCandidateDetailModal() {
     }
 }
 
+function adjustDropdownPosition(dropdown, button) {
+    if (!dropdown || !button) return;
+    
+    // Dropdown'u geçici olarak görünür yap (ölçüm için)
+    dropdown.style.visibility = 'hidden';
+    dropdown.style.display = 'block';
+    dropdown.style.opacity = '0';
+    dropdown.style.position = 'absolute';
+    dropdown.style.top = 'calc(100% + 0.5rem)';
+    dropdown.style.bottom = 'auto';
+    dropdown.style.maxHeight = 'none';
+    
+    // requestAnimationFrame ile ölçümü yap
+    requestAnimationFrame(() => {
+        const buttonRect = button.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const modalBody = button.closest('.modal-body');
+        const modalContent = button.closest('.modal-content');
+        const modalOverlay = button.closest('.modal-overlay');
+        
+        // Dropdown'un gerçek içerik yüksekliğini ölç (tüm seçenekler dahil)
+        const options = dropdown.querySelectorAll('.custom-select-option');
+        const optionCount = options.length;
+        const estimatedHeight = optionCount * 48; // Her seçenek yaklaşık 48px (padding dahil)
+        
+        // Modal body ve modal content'in sınırlarını bul
+        let availableSpaceBelow = viewportHeight - buttonRect.bottom - 30; // 30px padding
+        let availableSpaceAbove = buttonRect.top - 120; // 120px üstten boşluk (header + padding)
+        
+        if (modalBody) {
+            const modalBodyRect = modalBody.getBoundingClientRect();
+            availableSpaceBelow = modalBodyRect.bottom - buttonRect.bottom - 30;
+            availableSpaceAbove = buttonRect.top - modalBodyRect.top - 30;
+        }
+        
+        if (modalContent) {
+            const modalContentRect = modalContent.getBoundingClientRect();
+            // Modal content'in alt sınırını da kontrol et
+            const spaceToModalBottom = modalContentRect.bottom - buttonRect.bottom - 30;
+            if (spaceToModalBottom < availableSpaceBelow) {
+                availableSpaceBelow = spaceToModalBottom;
+            }
+        }
+        
+        // Dropdown'un tüm seçeneklerini göstermek için yeterli alan var mı?
+        // 7 seçenek için: Select status, Applied, Shortlisted, Interview, Rejected, Hired, Withdrawn
+        const neededHeight = Math.min(estimatedHeight, 336); // 7 seçenek * 48px = 336px
+        
+        // Aşağı doğru açılabilir mi? (tercih edilen)
+        if (availableSpaceBelow >= neededHeight) {
+            // Aşağı doğru aç (varsayılan)
+            dropdown.classList.remove('dropdown-up');
+            dropdown.style.top = 'calc(100% + 0.5rem)';
+            dropdown.style.bottom = 'auto';
+            dropdown.style.maxHeight = `${neededHeight}px`;
+        } 
+        // Yukarı doğru açılabilir mi?
+        else if (availableSpaceAbove >= neededHeight) {
+            // Yukarı doğru aç
+            dropdown.classList.add('dropdown-up');
+            dropdown.style.top = 'auto';
+            dropdown.style.bottom = 'calc(100% + 0.5rem)';
+            dropdown.style.maxHeight = `${neededHeight}px`;
+        }
+        // Her iki tarafta da yeterli alan yoksa, daha büyük olanı seç
+        else {
+            if (availableSpaceBelow >= availableSpaceAbove && availableSpaceBelow >= 200) {
+                // Aşağı doğru aç, scroll ile
+                dropdown.classList.remove('dropdown-up');
+                dropdown.style.top = 'calc(100% + 0.5rem)';
+                dropdown.style.bottom = 'auto';
+                dropdown.style.maxHeight = `${availableSpaceBelow}px`;
+            } else if (availableSpaceAbove >= 200) {
+                // Yukarı doğru aç, scroll ile
+                dropdown.classList.add('dropdown-up');
+                dropdown.style.top = 'auto';
+                dropdown.style.bottom = 'calc(100% + 0.5rem)';
+                dropdown.style.maxHeight = `${availableSpaceAbove}px`;
+            } else {
+                // Minimum alan varsa, aşağı doğru aç
+                dropdown.classList.remove('dropdown-up');
+                dropdown.style.top = 'calc(100% + 0.5rem)';
+                dropdown.style.bottom = 'auto';
+                dropdown.style.maxHeight = `${Math.max(200, Math.min(availableSpaceBelow, availableSpaceAbove))}px`;
+            }
+        }
+        
+        // Dropdown'u tekrar görünür yap
+        dropdown.style.visibility = 'visible';
+        dropdown.style.opacity = '1';
+    });
+}
+
+function setupStatusSelect() {
+    const statusSelectBtn = document.getElementById('statusSelectBtn');
+    const statusSelectDropdown = document.getElementById('statusSelectDropdown');
+    const statusSelectText = document.getElementById('statusSelectText');
+    const statusSelectHidden = document.getElementById('newStatus');
+    const statusSelectWrapper = document.getElementById('statusSelectWrapper');
+    const statusSelectOptions = statusSelectDropdown?.querySelectorAll('.custom-select-option');
+
+    if (!statusSelectBtn || !statusSelectDropdown || !statusSelectText || !statusSelectHidden) return;
+
+    // Toggle dropdown
+    statusSelectBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = statusSelectDropdown.classList.toggle('active');
+        if (statusSelectWrapper) {
+            if (isActive) {
+                statusSelectWrapper.classList.add('active');
+                // Dropdown pozisyonunu ayarla
+                adjustDropdownPosition(statusSelectDropdown, statusSelectBtn);
+            } else {
+                statusSelectWrapper.classList.remove('active');
+            }
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (statusSelectWrapper && !statusSelectWrapper.contains(e.target)) {
+            statusSelectDropdown.classList.remove('active');
+            if (statusSelectWrapper) {
+                statusSelectWrapper.classList.remove('active');
+            }
+        }
+    });
+
+    // Handle option selection
+    statusSelectOptions?.forEach(option => {
+        option.addEventListener('click', () => {
+            const value = option.getAttribute('data-value');
+            const text = option.textContent;
+
+            // Update hidden input
+            statusSelectHidden.value = value;
+
+            // Update button text
+            statusSelectText.textContent = text;
+
+            // Update active state
+            statusSelectOptions.forEach(opt => opt.classList.remove('active'));
+            option.classList.add('active');
+
+            // Close dropdown
+            statusSelectDropdown.classList.remove('active');
+            if (statusSelectWrapper) {
+                statusSelectWrapper.classList.remove('active');
+            }
+        });
+    });
+}
+
 function openStatusUpdateModal(applicationId, currentStatus) {
     currentEditingApplicationId = applicationId;
     const modal = document.getElementById('statusUpdateModalOverlay');
-    const statusSelect = document.getElementById('newStatus');
+    const statusSelectHidden = document.getElementById('newStatus');
+    const statusSelectText = document.getElementById('statusSelectText');
+    const statusSelectOptions = document.querySelectorAll('#statusSelectDropdown .custom-select-option');
 
-    if (statusSelect) {
-        statusSelect.value = currentStatus || '';
+    if (statusSelectHidden) {
+        statusSelectHidden.value = currentStatus || '';
+    }
+
+    // Update button text and active state
+    if (statusSelectText && statusSelectOptions) {
+        const statusLabels = {
+            '': 'Select status',
+            'APPLIED': 'Applied',
+            'SHORTLISTED': 'Shortlisted',
+            'INTERVIEW': 'Interview',
+            'REJECTED': 'Rejected',
+            'HIRED': 'Hired',
+            'WITHDRAWN': 'Withdrawn'
+        };
+
+        const selectedValue = currentStatus || '';
+        statusSelectText.textContent = statusLabels[selectedValue] || 'Select status';
+
+        // Update active state
+        statusSelectOptions.forEach(option => {
+            const optionValue = option.getAttribute('data-value');
+            if (optionValue === selectedValue) {
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
     }
 
     if (modal) {

@@ -290,7 +290,8 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="jobForm" class="job-form">
+            <div class="modal-body">
+                <form id="jobForm" class="job-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="jobTitle" class="form-label">Job Title *</label>
@@ -368,16 +369,19 @@
                             placeholder="https://example.com/apply">
                     </div>
                 </div>
+                </form>
+            </div>
+            <div class="modal-footer">
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelJobBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveJobBtn">
+                    <button type="submit" class="btn btn-primary" id="saveJobBtn" form="jobForm">
                         <span id="saveJobBtnText">Post Job</span>
                         <span id="saveJobBtnLoading" style="display: none;">
                             <i class="fas fa-spinner fa-spin"></i> Saving...
                         </span>
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
