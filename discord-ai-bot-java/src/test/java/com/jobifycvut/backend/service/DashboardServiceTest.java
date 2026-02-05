@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,8 +52,7 @@ class DashboardServiceTest {
         student.setName("Student One");
         student.setCareerInterest("Java");
 
-        // Default stub for match service to avoid nulls
-        lenient().when(matchService.findMatches(any(StudentEntity.class), eq(10)))
+        lenient().when(matchService.findMatches(any(StudentEntity.class), anyInt()))
                 .thenReturn(List.of());
     }
 
@@ -64,7 +66,8 @@ class DashboardServiceTest {
         opp.setId(100L);
         opp.setTitle("Java Intern");
         opp.setCompany("TestCo");
-        when(matchService.findMatches(any(StudentEntity.class), eq(10)))
+        
+        when(matchService.findMatches(any(StudentEntity.class), anyInt()))
                 .thenReturn(List.of(
                         new com.jobifycvut.backend.dto.OpportunityListResponse(
                                 opp.getId(),
