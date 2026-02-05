@@ -40,31 +40,50 @@ public class MatchService {
         String careerInterest = safeTrim(student.getCareerInterest());
         String cvText = safeTrim(student.getCvText());
 
-        // Build search keywords from student profile
-        Set<String> keywords = extractKeywords(skills, careerInterest, cvText);
-
-        if (keywords.isEmpty()) {
-            // Fallback: return recent opportunities
-            return opportunityRepository.findAll(PageRequest.of(0, limit))
-                    .stream()
-                    .map(this::mapToResponse)
-                    .collect(Collectors.toList());
-        }
+        Set<String> interestKeywords = extractKeywords(careerInterest);
+        Set<String> skillKeywords = extractKeywords(skills, cvText);
 
         // Pull a reasonable batch and score locally.
         // This avoids "full string contains" issues when keywords are many.
-        Pageable pageable = PageRequest.of(0, 200);
-        List<Opportunity> candidates = opportunityRepository.findAll(pageable).getContent();
+        // Pull multiple pages so we have enough candidates to score.
+        List<Opportunity> candidates = new java.util.ArrayList<>();
+        int page = 0;
+        int pageSize = 200;
+        while (candidates.size() < 800) {
+            Pageable pageable = PageRequest.of(page, pageSize);
+            var result = opportunityRepository.findAll(pageable);
+            if (result.isEmpty()) break;
+            candidates.addAll(
+                    result.getContent().stream()
+                            .filter(o -> o.getApplicationDeadline() == null || !o.getApplicationDeadline().isBefore(java.time.LocalDate.now()))
+                            .toList()
+            );
+            if (!result.hasNext()) break;
+            page++;
+        }
 
-        // Score and sort by match quality
-        List<ScoredOpportunity> scored = candidates.stream()
+        List<Opportunity> filtered = candidates;
+        if (!interestKeywords.isEmpty()) {
+            filtered = candidates.stream()
+                    .filter(o -> containsAnyKeyword(o, interestKeywords))
+                    .toList();
+        }
+        if (filtered.isEmpty()) {
+            filtered = candidates;
+        }
+
+        // Score and sort by match quality (skills only)
+        List<ScoredOpportunity> scored = filtered.stream()
                 .map(opp -> new ScoredOpportunity(
                         opp,
-                        calculateMatchScore(opp, student, keywords)
+                        calculateMatchScore(opp, skillKeywords)
                 ))
                 .sorted((a, b) -> Integer.compare(b.score, a.score))
-                .limit(limit)
                 .collect(Collectors.toList());
+
+        if (limit > 0 && scored.size() > limit) {
+            scored = scored.subList(0, limit);
+        }
 
         return scored.stream()
                 .map(so -> {
@@ -78,50 +97,25 @@ public class MatchService {
     /**
      * Calculate match score (0-100) for an opportunity
      */
-    private int calculateMatchScore(Opportunity opp, StudentEntity student, Set<String> studentKeywords) {
+    private int calculateMatchScore(Opportunity opp, Set<String> skillKeywords) {
         String oppRequirements = safeTrim(opp.getTechnicalRequirements()) + " " + safeTrim(opp.getFormalRequirements());
         Set<String> oppKeywords = extractKeywords(oppRequirements, opp.getTitle(), opp.getDescription());
 
-        int skillsMatchPct = calculateOverlap(studentKeywords, oppKeywords); // 0-100
+        // Skill match based on explicit skill tokens
+        Set<String> normalizedSkills = normalizeSkills(skillKeywords);
+        Set<String> normalizedOpp = normalizeSkills(oppKeywords);
 
-        String interest = safeTrim(student.getCareerInterest());
-        int interestMatchPct = 0;
-        if (!interest.isEmpty()) {
-            String oppText = (safeTrim(opp.getTitle()) + " " + safeTrim(opp.getDescription())).toLowerCase();
-            if (oppText.contains(interest.toLowerCase())) {
-                interestMatchPct = 100;
-            } else {
-                String[] interestWords = interest.toLowerCase().split("\\s+");
-                int matches = 0;
-                for (String word : interestWords) {
-                    if (oppText.contains(word)) matches++;
-                }
-                interestMatchPct = (int) ((matches / (double) interestWords.length) * 100);
-            }
+        int skillsMatchPct = calculateOverlap(normalizedSkills, normalizedOpp); // 0-100
+
+        // Boost if key skills appear in technical requirements/title
+        int boost = 0;
+        for (String sk : normalizedSkills) {
+            if (normalizedOpp.contains(sk)) boost += 5;
         }
 
-        String titleDesc = (safeTrim(opp.getTitle()) + " " + safeTrim(opp.getDescription())).toLowerCase();
-        int keywordMatches = 0;
-        for (String keyword : studentKeywords) {
-            if (titleDesc.contains(keyword.toLowerCase())) {
-                keywordMatches++;
-            }
-        }
-        int keywordMatchPct = studentKeywords.isEmpty()
-                ? 0
-                : (int) ((keywordMatches / (double) studentKeywords.size()) * 100);
-
-        // Weighted score: skills 50%, interest 30%, keywords 20%
-        double weighted = (skillsMatchPct * 0.5) + (interestMatchPct * 0.3) + (keywordMatchPct * 0.2);
-
-        // Small bump if job type is present (signal of higher quality)
-        if (opp.getJobType() != null && !opp.getJobType().isEmpty()) {
-            weighted += 5;
-        }
-
-        int score = (int) Math.round(weighted);
-        if (score > 0 && score < 30) score = 30; // avoid tiny-looking matches
-        return Math.min(100, score);
+        int score = Math.min(100, skillsMatchPct + boost);
+        if (score > 0 && score < 40) score = 40; // ensure visible minimum for matching roles
+        return score;
     }
 
     /**
@@ -184,6 +178,34 @@ public class MatchService {
                 opp.getWage(),
                 opp.getApplicationDeadline()
         );
+    }
+
+    private boolean containsAnyKeyword(Opportunity opp, Set<String> interestKeywords) {
+        String text = (safeTrim(opp.getTitle()) + " " +
+                safeTrim(opp.getDescription()) + " " +
+                safeTrim(opp.getTechnicalRequirements()) + " " +
+                safeTrim(opp.getFormalRequirements())).toLowerCase();
+        for (String kw : interestKeywords) {
+            if (text.contains(kw.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<String> normalizeSkills(Set<String> raw) {
+        Set<String> out = new HashSet<>();
+        for (String t : raw) {
+            String s = t.toLowerCase();
+            if (s.equals("javascript") || s.equals("js")) out.add("javascript");
+            else if (s.equals("typescript") || s.equals("ts")) out.add("typescript");
+            else if (s.equals("c++") || s.equals("cpp")) out.add("c++");
+            else if (s.equals("c#") || s.equals("csharp")) out.add("c#");
+            else if (s.equals("springboot") || s.equals("spring")) out.add("spring");
+            else if (s.equals("nodejs") || s.equals("node")) out.add("node");
+            else out.add(s);
+        }
+        return out;
     }
 
     /**
