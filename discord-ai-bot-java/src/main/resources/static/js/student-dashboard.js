@@ -279,17 +279,32 @@ function setupStatusCards() {
  */
 function setupJobCards() {
     const jobCards = document.querySelectorAll('.job-card');
-    const arrowButtons = document.querySelectorAll('.job-arrow');
+    const arrowButtons = document.querySelectorAll('.job-arrow, .job-arrow-dashboard');
     const seeAllLink = document.querySelector('.see-all-link');
 
-    // Arrow buttons
+    // Arrow buttons - both old and new dashboard style
     arrowButtons.forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.stopPropagation();
             const jobId = this.getAttribute('data-job-id') || 
                          this.closest('.job-card')?.getAttribute('data-job-id');
             if (jobId) {
-                await showJobDetailModal(jobId);
+                await viewJobDetailsFromDashboard(jobId);
+            }
+        });
+    });
+
+    // Make entire card clickable for dashboard cards
+    const dashboardCards = document.querySelectorAll('.dashboard-job-card');
+    dashboardCards.forEach(card => {
+        card.addEventListener('click', async function(e) {
+            // Don't trigger if clicking on the arrow button
+            if (e.target.closest('.job-arrow-dashboard')) {
+                return;
+            }
+            const jobId = this.getAttribute('data-job-id');
+            if (jobId) {
+                await viewJobDetailsFromDashboard(jobId);
             }
         });
     });
@@ -298,91 +313,252 @@ function setupJobCards() {
     if (seeAllLink) {
         seeAllLink.addEventListener('click', function(e) {
             e.preventDefault();
-            router.navigate('/student/job-matches');
+            if (typeof router !== 'undefined' && router.navigate) {
+                router.navigate('/student/job-matches');
+            } else {
+                window.location.href = '/pages/student/job-matches.html';
+            }
         });
     }
 }
 
 /**
- * Show job detail modal
+ * View job details from Dashboard - same as My Applications page
  */
-async function showJobDetailModal(jobId) {
-    try {
+async function viewJobDetailsFromDashboard(jobId) {
+    if (!jobId) {
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Job details not available', 'error');
+        }
+        return;
+    }
+
+    if (typeof UI !== 'undefined' && UI.loading) {
         UI.loading(document.body, true);
+    }
+
+    try {
         const job = await StudentAPI.getJobById(jobId);
         
-        const content = `
-            <div class="job-detail-modal">
+        // Helper function to escape HTML
+        const escapeHtml = (text) => {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+
+        // Helper function to format date
+        const formatDate = (dateString) => {
+            if (!dateString) return 'N/A';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch (e) {
+                return dateString;
+            }
+        };
+        
+        const modalContent = `
+            <div class="job-detail-content">
                 <div class="job-detail-header">
-                    <h3>${job.title || 'N/A'}</h3>
-                    <p class="job-detail-company">${job.company || 'N/A'}</p>
+                    <h2>${escapeHtml(job.title || 'N/A')}</h2>
+                    <p class="job-detail-company">${escapeHtml(job.company || 'N/A')}</p>
                 </div>
                 <div class="job-detail-info">
                     <div class="info-row">
-                        <span class="info-label">${I18n.t('location')}:</span>
-                        <span>${job.homeOffice || 'N/A'}</span>
+                        <span class="info-label">Location:</span>
+                        <span>${escapeHtml(job.homeOffice || job.location || 'Remote')}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">${I18n.t('jobType')}:</span>
-                        <span>${job.jobType || 'N/A'}</span>
+                        <span class="info-label">Job Type:</span>
+                        <span>${escapeHtml(job.jobType || 'N/A')}</span>
                     </div>
+                    ${job.wage ? `
                     <div class="info-row">
-                        <span class="info-label">${I18n.t('salary')}:</span>
-                        <span>${job.wage || 'N/A'}</span>
-                    </div>
+                        <span class="info-label">Salary:</span>
+                        <span>${escapeHtml(job.wage)}</span>
+                    </div>` : ''}
                     ${job.applicationDeadline ? `
                     <div class="info-row">
-                        <span class="info-label">${I18n.t('deadline')}:</span>
-                        <span>${new Date(job.applicationDeadline).toLocaleDateString()}</span>
+                        <span class="info-label">Deadline:</span>
+                        <span>${formatDate(job.applicationDeadline)}</span>
                     </div>` : ''}
                 </div>
                 ${job.description ? `
                 <div class="job-detail-section">
-                    <h4>${I18n.t('description')}</h4>
-                    <p>${job.description}</p>
+                    <h4>Description</h4>
+                    <p>${escapeHtml(job.description)}</p>
                 </div>` : ''}
-                ${job.requirements ? `
+                ${job.formalRequirements ? `
                 <div class="job-detail-section">
-                    <h4>${I18n.t('requirements')}</h4>
-                    <p>${job.requirements}</p>
+                    <h4>Formal Requirements</h4>
+                    <p>${escapeHtml(job.formalRequirements)}</p>
+                </div>` : ''}
+                ${job.technicalRequirements ? `
+                <div class="job-detail-section">
+                    <h4>Technical Requirements</h4>
+                    <p>${escapeHtml(job.technicalRequirements)}</p>
                 </div>` : ''}
                 ${job.benefits ? `
                 <div class="job-detail-section">
-                    <h4>${I18n.t('benefits')}</h4>
-                    <p>${job.benefits}</p>
+                    <h4>Benefits</h4>
+                    <p>${escapeHtml(job.benefits)}</p>
+                </div>` : ''}
+                ${job.contactPerson ? `
+                <div class="job-detail-section">
+                    <h4>Contact Person</h4>
+                    <p>${escapeHtml(job.contactPerson)}</p>
+                </div>` : ''}
+                ${job.url ? `
+                <div class="job-detail-section">
+                    <h4>Application URL</h4>
+                    <p><a href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(job.url)}</a></p>
                 </div>` : ''}
             </div>
         `;
 
-        const footer = `
-            <button class="btn btn-secondary" id="saveJobBtn" data-job-id="${jobId}">${I18n.t('save')}</button>
-            <button class="btn btn-primary" id="applyJobBtn" data-job-id="${jobId}" ${job.applied ? 'disabled' : ''}>
-                ${job.applied ? I18n.t('applied') : I18n.t('apply')}
+        const modalFooter = `
+            <button class="btn btn-secondary" data-action="save-job" data-job-id="${jobId}" ${job.saved ? 'disabled' : ''}>
+                ${job.saved ? 'Saved' : 'Save Job'}
+            </button>
+            <button class="btn btn-primary" data-action="apply-job-modal" data-job-id="${jobId}" ${job.applied ? 'disabled' : ''}>
+                ${job.applied ? 'Applied' : 'Apply Now'}
             </button>
         `;
 
-        const modal = UI.modal({
-            title: I18n.t('jobDetails'),
-            content: content,
-            footer: footer,
-            size: 'large'
-        });
+        if (typeof UI !== 'undefined' && UI.modal) {
+            const modal = UI.modal({
+                title: 'Job Details',
+                content: modalContent,
+                footer: modalFooter,
+                size: 'large',
+                onClose: () => {
+                    // Cleanup if needed
+                }
+            });
 
-        // Attach event listeners
-        document.getElementById('saveJobBtn')?.addEventListener('click', async () => {
-            await handleSaveJob(jobId, modal);
-        });
+            // Add event listeners to modal buttons after modal is created
+            setTimeout(() => {
+                document.querySelector('[data-action="save-job"]')?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await handleSaveJobFromDashboard(jobId, modal);
+                });
 
-        document.getElementById('applyJobBtn')?.addEventListener('click', async () => {
-            await handleApplyJob(jobId, modal);
-        });
+                document.querySelector('[data-action="apply-job-modal"]')?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await handleApplyJobFromDashboard(jobId, modal);
+                });
+            }, 100);
+        } else {
+            // Fallback: use alert
+            alert(`Job: ${job.title}\nCompany: ${job.company}\nLocation: ${job.homeOffice || job.location || 'Remote'}`);
+        }
 
     } catch (error) {
-        console.error('Error loading job details:', error);
-        UI.toast(I18n.t('error') + ': ' + error.message, 'error');
+        console.error('Failed to load job details:', error);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to load job details. Please try again.', 'error');
+        } else {
+            alert(error.message || 'Failed to load job details. Please try again.');
+        }
     } finally {
-        UI.loading(document.body, false);
+        if (typeof UI !== 'undefined' && UI.loading) {
+            UI.loading(document.body, false);
+        }
     }
+}
+
+/**
+ * Handle save job from dashboard modal
+ */
+async function handleSaveJobFromDashboard(jobId, modal) {
+    const button = document.querySelector(`[data-action="save-job"][data-job-id="${jobId}"]`);
+    if (!button || button.disabled) return;
+
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+        await StudentAPI.saveJob(jobId);
+        
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Job saved successfully!', 'success');
+        }
+        button.textContent = 'Saved';
+        button.disabled = true;
+        button.style.opacity = '1';
+    } catch (error) {
+        console.error('Failed to save job:', error);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to save job. Please try again.', 'error');
+        }
+        button.disabled = false;
+        button.innerHTML = originalText;
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
+    }
+}
+
+/**
+ * Handle apply job from dashboard modal
+ */
+async function handleApplyJobFromDashboard(jobId, modal) {
+    const button = document.querySelector(`[data-action="apply-job-modal"][data-job-id="${jobId}"]`);
+    if (!button || button.disabled) return;
+
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
+
+    try {
+        await StudentAPI.applyToJob(jobId);
+        
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Application submitted successfully!', 'success');
+        }
+        
+        // Update button state
+        button.textContent = 'Applied';
+        button.disabled = true;
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-secondary');
+        button.style.opacity = '1';
+
+        // Close modal after successful application
+        if (modal && modal.close) {
+            setTimeout(() => {
+                modal.close();
+            }, 1500);
+        }
+
+        // Refresh dashboard data
+        if (typeof loadDashboardData === 'function') {
+            loadDashboardData();
+        }
+    } catch (error) {
+        console.error('Failed to apply for job:', error);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to apply for job. Please try again.', 'error');
+        }
+        button.disabled = false;
+        button.innerHTML = originalText;
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
+    }
+}
+
+/**
+ * Show job detail modal (legacy - kept for backward compatibility)
+ */
+async function showJobDetailModal(jobId) {
+    // Use the new detailed view
+    await viewJobDetailsFromDashboard(jobId);
 }
 
 /**
