@@ -51,15 +51,10 @@ public class MatchService {
                     .collect(Collectors.toList());
         }
 
-        // Search opportunities by keywords
-        String searchQuery = String.join(" ", keywords);
-        Pageable pageable = PageRequest.of(0, 100); // Get more to score and filter
-
-        List<Opportunity> candidates = opportunityRepository
-                .findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
-                        searchQuery, searchQuery, pageable
-                )
-                .getContent();
+        // Pull a reasonable batch and score locally.
+        // This avoids "full string contains" issues when keywords are many.
+        Pageable pageable = PageRequest.of(0, 200);
+        List<Opportunity> candidates = opportunityRepository.findAll(pageable).getContent();
 
         // Score and sort by match quality
         List<ScoredOpportunity> scored = candidates.stream()
@@ -84,49 +79,48 @@ public class MatchService {
      * Calculate match score (0-100) for an opportunity
      */
     private int calculateMatchScore(Opportunity opp, StudentEntity student, Set<String> studentKeywords) {
-        int score = 0;
-
-        // 1. Skills match (40 points)
-        String oppRequirements = safeTrim(opp.getTechnicalRequirements()) + " " + safeTrim(opp.getRequirements());
+        String oppRequirements = safeTrim(opp.getTechnicalRequirements()) + " " + safeTrim(opp.getFormalRequirements());
         Set<String> oppKeywords = extractKeywords(oppRequirements, opp.getTitle(), opp.getDescription());
-        int skillsMatch = calculateOverlap(studentKeywords, oppKeywords);
-        score += (int) (skillsMatch * 0.4);
 
-        // 2. Career interest match (30 points)
+        int skillsMatchPct = calculateOverlap(studentKeywords, oppKeywords); // 0-100
+
         String interest = safeTrim(student.getCareerInterest());
+        int interestMatchPct = 0;
         if (!interest.isEmpty()) {
-            String oppText = (opp.getTitle() + " " + opp.getDescription()).toLowerCase();
+            String oppText = (safeTrim(opp.getTitle()) + " " + safeTrim(opp.getDescription())).toLowerCase();
             if (oppText.contains(interest.toLowerCase())) {
-                score += 30;
+                interestMatchPct = 100;
             } else {
-                // Partial match
                 String[] interestWords = interest.toLowerCase().split("\\s+");
                 int matches = 0;
                 for (String word : interestWords) {
                     if (oppText.contains(word)) matches++;
                 }
-                score += (int) ((matches / (double) interestWords.length) * 30);
+                interestMatchPct = (int) ((matches / (double) interestWords.length) * 100);
             }
         }
 
-        // 3. Title/Description keyword match (20 points)
-        String titleDesc = (opp.getTitle() + " " + opp.getDescription()).toLowerCase();
+        String titleDesc = (safeTrim(opp.getTitle()) + " " + safeTrim(opp.getDescription())).toLowerCase();
         int keywordMatches = 0;
         for (String keyword : studentKeywords) {
             if (titleDesc.contains(keyword.toLowerCase())) {
                 keywordMatches++;
             }
         }
-        if (!studentKeywords.isEmpty()) {
-            score += (int) ((keywordMatches / (double) studentKeywords.size()) * 20);
-        }
+        int keywordMatchPct = studentKeywords.isEmpty()
+                ? 0
+                : (int) ((keywordMatches / (double) studentKeywords.size()) * 100);
 
-        // 4. Job type preference (10 points) - can be enhanced
-        // For now, give bonus if job type matches common preferences
+        // Weighted score: skills 50%, interest 30%, keywords 20%
+        double weighted = (skillsMatchPct * 0.5) + (interestMatchPct * 0.3) + (keywordMatchPct * 0.2);
+
+        // Small bump if job type is present (signal of higher quality)
         if (opp.getJobType() != null && !opp.getJobType().isEmpty()) {
-            score += 10; // Basic bonus
+            weighted += 5;
         }
 
+        int score = (int) Math.round(weighted);
+        if (score > 0 && score < 30) score = 30; // avoid tiny-looking matches
         return Math.min(100, score);
     }
 
@@ -205,4 +199,3 @@ public class MatchService {
         }
     }
 }
-

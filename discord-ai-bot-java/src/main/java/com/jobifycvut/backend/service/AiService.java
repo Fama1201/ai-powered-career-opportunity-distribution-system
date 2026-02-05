@@ -6,9 +6,14 @@ import com.google.gson.JsonObject;
 import com.jobifycvut.backend.dto.ChatResponse;
 import com.jobifycvut.backend.dto.CodeReviewRequest;
 import com.jobifycvut.backend.dto.CodeReviewResponse;
+import com.jobifycvut.backend.dto.AssignmentRequest;
 import com.jobifycvut.backend.model.InteractionEntity;
+import com.jobifycvut.backend.model.LearningAssignment;
+import com.jobifycvut.backend.model.AssignmentSubmission;
 import com.jobifycvut.backend.model.StudentEntity;
+import com.jobifycvut.backend.repository.AssignmentSubmissionRepository;
 import com.jobifycvut.backend.repository.InteractionRepository;
+import com.jobifycvut.backend.repository.LearningAssignmentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,16 +30,27 @@ public class AiService {
     private final StudentContextService studentContextService;
     private final JobSearchClient jobSearchClient;
     private final OpenAiClient openAiClient;
+    private final LearningAssignmentRepository learningAssignmentRepository;
+    private final AssignmentSubmissionRepository assignmentSubmissionRepository;
     private final Gson gson = new Gson();
+    private static final List<String> ALLOWED_LANGUAGES = List.of(
+            "c", "c++", "c#", "java", "python", "javascript", "typescript",
+            "go", "rust", "kotlin", "swift", "php", "ruby", "scala",
+            "sql", "bash", "html", "css", "r", "matlab"
+    );
 
     public AiService(InteractionRepository interactionRepository,
                      StudentContextService studentContextService,
                      JobSearchClient jobSearchClient,
-                     OpenAiClient openAiClient) {
+                     OpenAiClient openAiClient,
+                     LearningAssignmentRepository learningAssignmentRepository,
+                     AssignmentSubmissionRepository assignmentSubmissionRepository) {
         this.interactionRepository = interactionRepository;
         this.studentContextService = studentContextService;
         this.jobSearchClient = jobSearchClient;
         this.openAiClient = openAiClient;
+        this.learningAssignmentRepository = learningAssignmentRepository;
+        this.assignmentSubmissionRepository = assignmentSubmissionRepository;
     }
 
     public ChatResponse chat(Long userId, String message) {
@@ -50,25 +66,32 @@ public class AiService {
         String skills = safeTrim(student.getSkills());
         String careerInterest = safeTrim(student.getCareerInterest());
         String extra = safeTrim(message);
+        boolean cvReviewOnly = containsCvReviewIntent(extra);
+        boolean skillGapsOnly = containsSkillGapIntent(extra);
         boolean assignmentsRequested = containsAssignmentIntent(extra);
         String keywords = String.join(" ",
                 List.of(skills, careerInterest, extra).stream().filter(s -> !s.isBlank()).toList());
 
-        Set<bot.api.OpportunityClient.Opportunity> rawJobs = jobSearchClient.searchMultipleKeywords(
-                keywords.isBlank() ? "software" : keywords
-        );
-
-        if (rawJobs.size() < 10) {
-            Set<bot.api.OpportunityClient.Opportunity> fallback = jobSearchClient.searchMultipleKeywords(
-                    "software internship backend developer"
+        List<bot.api.OpportunityClient.Opportunity> jobs;
+        if (cvReviewOnly || skillGapsOnly) {
+            jobs = List.of();
+        } else {
+            Set<bot.api.OpportunityClient.Opportunity> rawJobs = jobSearchClient.searchMultipleKeywords(
+                    keywords.isBlank() ? "software" : keywords
             );
-            rawJobs.addAll(fallback);
-        }
 
-        List<bot.api.OpportunityClient.Opportunity> jobs = rawJobs.stream()
-                .sorted(Comparator.comparing(o -> safeTrim(o.title)))
-                .limit(30)
-                .toList();
+            if (rawJobs.size() < 10) {
+                Set<bot.api.OpportunityClient.Opportunity> fallback = jobSearchClient.searchMultipleKeywords(
+                        "software internship backend developer"
+                );
+                rawJobs.addAll(fallback);
+            }
+
+            jobs = rawJobs.stream()
+                    .sorted(Comparator.comparing(o -> safeTrim(o.title)))
+                    .limit(20)
+                    .toList();
+        }
 
         String systemPrompt = """
                 You are a CV reviewer and job matcher for student internships.
@@ -77,9 +100,10 @@ public class AiService {
                 If the user asks for assignments/tasks/homework, include exactly 3 assignments.
                 If the user message mentions assignments/tasks/homework in any way, include them.
                 Otherwise return an empty assignments array.
+                If the user only asks for CV feedback or skill gaps, return an empty topMatches array.
                 """;
 
-        String userPrompt = buildUserPrompt(student, cvText, jobs);
+        String userPrompt = buildUserPrompt(student, trimForAi(cvText, 3000), jobs);
 
         String apiKey = System.getenv("OPENAI_API_KEY");
         if (apiKey == null || apiKey.isBlank()) {
@@ -116,7 +140,9 @@ public class AiService {
             ensureAssignments(response, skills, careerInterest);
         }
 
-        ensureTopMatches(response, jobs, skills, careerInterest, extra);
+        if (!jobs.isEmpty()) {
+            ensureTopMatches(response, jobs, skills, careerInterest, extra);
+        }
 
         InteractionEntity row = new InteractionEntity();
         row.setStudentId(student.getId());
@@ -183,7 +209,26 @@ public class AiService {
                 Be constructive and concise. Focus on correctness, security, performance, and readability.
                 """;
 
+        LearningAssignment assignment = null;
+        if (req.getAssignmentId() != null) {
+            assignment = learningAssignmentRepository.findById(req.getAssignmentId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment not found"));
+            language = safeTrim(assignment.getLanguage());
+        } else {
+            language = normalizeLanguage(language);
+            if (!isAllowedLanguage(language)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Unsupported language. Allowed: " + String.join(", ", ALLOWED_LANGUAGES)
+                );
+            }
+        }
+
         String userPrompt = "Language: " + (language.isBlank() ? "unspecified" : language) + "\n\nCode:\n" + code;
+        if (assignment != null) {
+            userPrompt = userPrompt + "\n\nAssignment:\n" + safeTrim(assignment.getTitle()) +
+                    "\n" + safeTrim(assignment.getDescription());
+        }
 
         String replyJson;
         try {
@@ -213,7 +258,89 @@ public class AiService {
         row.setResponse(replyJson);
         interactionRepository.save(row);
 
+        if (assignment != null) {
+            AssignmentSubmission submission = new AssignmentSubmission();
+            submission.setAssignmentId(assignment.getId());
+            submission.setStudentId(student.getId());
+            submission.setCode(code);
+            submission.setFeedback(replyJson);
+            assignmentSubmissionRepository.save(submission);
+
+            assignment.setStatus("REVIEWED");
+            learningAssignmentRepository.save(assignment);
+        }
+
         return response;
+    }
+
+    public List<LearningAssignment> getAssignments(Long userId, String category) {
+        StudentEntity student = studentContextService.getOrCreateCurrentStudent();
+        String cat = safeTrim(category);
+        if (cat.isEmpty()) {
+            return learningAssignmentRepository.findByStudentIdOrderByCreatedAtDesc(student.getId());
+        }
+        return learningAssignmentRepository.findByStudentIdAndCategoryOrderByCreatedAtDesc(student.getId(), cat);
+    }
+
+    public List<LearningAssignment> generateAssignments(Long userId, AssignmentRequest req) {
+        StudentEntity student = studentContextService.getOrCreateCurrentStudent();
+
+        String language = normalizeLanguage(req.getLanguage());
+        String level = safeTrim(req.getLevel()).toLowerCase();
+        String category = safeTrim(req.getCategory());
+        if (language.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "language is required");
+        }
+        if (!isAllowedLanguage(language)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Unsupported language. Allowed: " + String.join(", ", ALLOWED_LANGUAGES)
+            );
+        }
+        if (!List.of("beginner", "moderate", "advanced", "expert").contains(level)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "level must be beginner, moderate, advanced, or expert");
+        }
+
+        String apiKey = System.getenv("OPENAI_API_KEY");
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "OPENAI_API_KEY is not configured"
+            );
+        }
+
+        String systemPrompt = """
+                You are a programming instructor. Create exactly 3 assignments.
+                Each assignment must be small, practical, and aligned to the student's level.
+                If a category is provided, keep all assignments within that category.
+                Return JSON that matches the provided schema. Do not include extra keys.
+                """;
+
+        String userPrompt = "Language: " + language + "\nLevel: " + level;
+        if (!category.isEmpty()) {
+            userPrompt = userPrompt + "\nCategory: " + category;
+        }
+
+        String replyJson;
+        try {
+            replyJson = openAiClient.chatJson(
+                    apiKey,
+                    "gpt-4o-mini",
+                    List.of(
+                            Map.of("role", "system", "content", systemPrompt),
+                            Map.of("role", "user", "content", userPrompt)
+                    ),
+                    buildAssignmentSchema()
+            );
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "AI provider error: " + e.getMessage()
+            );
+        }
+
+        List<LearningAssignment> assignments = parseAssignments(replyJson, student.getId(), language, level, category);
+        return learningAssignmentRepository.saveAll(assignments);
     }
 
     private String buildUserPrompt(StudentEntity student, String cvText, List<bot.api.OpportunityClient.Opportunity> jobs) {
@@ -506,6 +633,74 @@ public class AiService {
         return response;
     }
 
+    private JsonObject buildAssignmentSchema() {
+        JsonObject schema = new JsonObject();
+        schema.addProperty("type", "object");
+        schema.addProperty("additionalProperties", false);
+
+        JsonObject properties = new JsonObject();
+        JsonObject assignments = new JsonObject();
+        assignments.addProperty("type", "array");
+        assignments.addProperty("maxItems", 3);
+
+        JsonObject item = new JsonObject();
+        item.addProperty("type", "object");
+        item.addProperty("additionalProperties", false);
+        JsonObject itemProps = new JsonObject();
+
+        JsonObject title = new JsonObject();
+        title.addProperty("type", "string");
+        itemProps.add("title", title);
+
+        JsonObject description = new JsonObject();
+        description.addProperty("type", "string");
+        itemProps.add("description", description);
+
+        JsonObject time = new JsonObject();
+        time.addProperty("type", "string");
+        itemProps.add("estimatedTime", time);
+
+        item.add("properties", itemProps);
+        JsonArray required = new JsonArray();
+        required.add("title");
+        required.add("description");
+        required.add("estimatedTime");
+        item.add("required", required);
+
+        assignments.add("items", item);
+        properties.add("assignments", assignments);
+
+        JsonArray rootRequired = new JsonArray();
+        rootRequired.add("assignments");
+        schema.add("properties", properties);
+        schema.add("required", rootRequired);
+        return schema;
+    }
+
+    private List<LearningAssignment> parseAssignments(String json, Long studentId, String language, String level, String category) {
+        JsonObject obj = gson.fromJson(json, JsonObject.class);
+        if (!obj.has("assignments") || !obj.get("assignments").isJsonArray()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "AI response missing assignments");
+        }
+
+        var list = new java.util.ArrayList<LearningAssignment>();
+        obj.getAsJsonArray("assignments").forEach(e -> {
+            JsonObject a = e.getAsJsonObject();
+            LearningAssignment la = new LearningAssignment();
+            la.setStudentId(studentId);
+            la.setLanguage(language);
+            la.setLevel(level);
+            la.setCategory(category.isEmpty() ? null : category);
+            la.setTitle(a.has("title") ? a.get("title").getAsString() : "Assignment");
+            la.setDescription(a.has("description") ? a.get("description").getAsString() : "");
+            la.setEstimatedTime(a.has("estimatedTime") ? a.get("estimatedTime").getAsString() : "");
+            la.setStatus("ASSIGNED");
+            list.add(la);
+        });
+
+        return list;
+    }
+
     private boolean containsAssignmentIntent(String message) {
         String m = safeTrim(message).toLowerCase();
         if (m.isEmpty()) return false;
@@ -516,6 +711,29 @@ public class AiService {
                 m.contains("homework") ||
                 m.contains("practice") ||
                 m.contains("study plan");
+    }
+
+    private boolean containsCvReviewIntent(String message) {
+        String m = safeTrim(message).toLowerCase();
+        if (m.isEmpty()) return false;
+        return m.contains("review my cv") ||
+                m.contains("review my resume") ||
+                m.contains("cv review") ||
+                m.contains("resume review") ||
+                (m.contains("review") && m.contains("cv")) ||
+                (m.contains("review") && m.contains("resume"));
+    }
+
+    private boolean containsSkillGapIntent(String message) {
+        String m = safeTrim(message).toLowerCase();
+        if (m.isEmpty()) return false;
+        return m.contains("missing skills") ||
+                m.contains("skill gaps") ||
+                m.contains("skills am i missing") ||
+                m.contains("what should i learn") ||
+                m.contains("improve my job prospects") ||
+                m.contains("improve my prospects") ||
+                m.contains("skill gap");
     }
 
     private void ensureAssignments(ChatResponse response, String skills, String careerInterest) {
@@ -602,5 +820,26 @@ public class AiService {
 
     private String safeTrim(String s) {
         return s == null ? "" : s.trim();
+    }
+
+    private String normalizeLanguage(String language) {
+        String l = safeTrim(language).toLowerCase();
+        if (l.equals("py") || l.equals("python3") || l.equals("python-3")) return "python";
+        if (l.equals("js") || l.equals("node")) return "javascript";
+        if (l.equals("ts")) return "typescript";
+        if (l.equals("csharp") || l.equals("c#")) return "c#";
+        if (l.equals("cpp") || l.equals("c++")) return "c++";
+        if (l.equals("golang")) return "go";
+        return l;
+    }
+
+    private boolean isAllowedLanguage(String language) {
+        return ALLOWED_LANGUAGES.contains(language);
+    }
+
+    private String trimForAi(String s, int maxChars) {
+        if (s == null) return "";
+        if (s.length() <= maxChars) return s;
+        return s.substring(0, maxChars);
     }
 }

@@ -3,6 +3,7 @@ package com.jobifycvut.backend.dto;
 public class CodeReviewRequest {
     private String language;
     private String code;
+    private Long assignmentId;
 
     public CodeReviewRequest() {
     }
@@ -26,5 +27,13 @@ public class CodeReviewRequest {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Long getAssignmentId() {
+        return assignmentId;
+    }
+
+    public void setAssignmentId(Long assignmentId) {
+        this.assignmentId = assignmentId;
     }
 }

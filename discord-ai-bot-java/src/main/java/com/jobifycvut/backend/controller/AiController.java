@@ -4,6 +4,7 @@ import com.jobifycvut.backend.dto.ChatRequest;
 import com.jobifycvut.backend.dto.ChatResponse;
 import com.jobifycvut.backend.dto.CodeReviewRequest;
 import com.jobifycvut.backend.dto.CodeReviewResponse;
+import com.jobifycvut.backend.dto.AssignmentRequest;
 import com.jobifycvut.backend.dto.HistoryItemResponse;
 import com.jobifycvut.backend.security.SecurityUtil;
 import com.jobifycvut.backend.service.AiService;
@@ -59,5 +60,17 @@ public class AiController {
     public ResponseEntity<CodeReviewResponse> codeReview(@RequestBody CodeReviewRequest req) {
         Long userId = SecurityUtil.requireUserId();
         return ResponseEntity.ok(aiService.codeReview(userId, req));
+    }
+
+    @PostMapping("/assignments")
+    public ResponseEntity<?> createAssignments(@RequestBody AssignmentRequest req) {
+        Long userId = SecurityUtil.requireUserId();
+        return ResponseEntity.ok(aiService.generateAssignments(userId, req));
+    }
+
+    @GetMapping("/assignments")
+    public ResponseEntity<?> listAssignments(@RequestParam(required = false) String category) {
+        Long userId = SecurityUtil.requireUserId();
+        return ResponseEntity.ok(aiService.getAssignments(userId, category));
     }
 }

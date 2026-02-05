@@ -1,0 +1,31 @@
+Alex Novak
+Prague, CZ • +420 777 000 000 • alex.novak@email.com
+LinkedIn: linkedin.com/in/alexnovak • GitHub: github.com/alexnovak
+Profile
+Motivated university student with strong analytical skills and hands-on experience in data analysis and basic software development. Interested in statistics, machine learning, and problem-solving projects.
+Education
+Bachelor’s Degree in Computer Science — Charles University, Prague
+2023 – Present
+Relevant coursework: Probability & Statistics, Linear Algebra, Programming, Data Structures
+Skills
+Programming: Python, C++, Java (basic), SQL
+Tools: Git, Excel, Jupyter Notebook
+Data/Math: Descriptive statistics, probability distributions, hypothesis testing (basic)
+Languages: Czech (native), English (B2–C1)
+Projects
+Probability & Statistics Homework Project (Team of 2)
+Solved and explained problems involving discrete/continuous distributions, conditional probability, and expected value
+Prepared clean solutions and summary notes for presentation
+Simple Data Analysis (Python)
+Cleaned a dataset, calculated summary statistics, visualized trends using matplotlib
+Wrote reusable functions for basic reporting
+Work Experience
+Part-time Cashier / Store Assistant — Random Market, Prague
+2022 – 2023
+Communicated with customers and handled daily transactions
+Managed restocking and basic inventory tasks
+Activities
+Member of university programming club
+Occasional volunteering at local events (registration/help desk)
+References
+Available upon request.
