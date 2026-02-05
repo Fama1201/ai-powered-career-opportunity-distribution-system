@@ -3,22 +3,22 @@ name: Jobify CI/CD Pipeline
 on:
   push:
     branches: [ "main", "master", "develop" ]
-    tags: [ "v*" ] # Triggers release only if a tag like v1.0 is pushed
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main", "master" ]
 
 jobs:
-  # ------------------------------------------------------------------
-  # JOB 1: BUILD, TEST, QUALITY & DOCS
-  # Unified for efficiency. If this fails, nothing else runs.
-  # ------------------------------------------------------------------
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       checks: write
 
-    # Database service so Spring Boot doesn't fail during test startup
+    # 👇 ESTA ES LA CLAVE: Definimos dónde ejecutar los comandos
+    defaults:
+      run:
+        working-directory: ./discord-ai-bot-java
+
     services:
       postgres:
         image: postgres:14
@@ -48,11 +48,8 @@ jobs:
     - name: 🔧 Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # COMPILATION and TESTS (Unit) step
-    # Gradle 'build' runs 'assemble' and 'check' (tests)
     - name: 🔨 Build with Gradle
       env:
-        # Passing dummy environment variables so tests load the context correctly
         DB_URL: jdbc:postgresql://localhost:5432/jobify_db
         DB_USER: postgres
         DB_PASSWORD: password123
@@ -60,51 +57,41 @@ jobs:
         OPENAI_API_KEY: "DUMMY_KEY_FOR_CI"
       run: ./gradlew build --no-daemon
 
-    # DOCUMENTATION step (JavaDoc)
     - name: 📚 Generate JavaDoc
       run: ./gradlew javadoc --no-daemon
 
-    # BASIC SECURITY step (Dependencies)
-    # Generates a dependency report to verify there are no conflicts
     - name: 🛡️ Check Dependencies
       run: ./gradlew dependencies --no-daemon
 
-    # 📤 UPLOAD ARTIFACTS (Evidence for the instructor)
-    
-    # 1. Executable JAR (App)
+    # 📤 ARTIFACTS (Paths ajustados a la subcarpeta)
     - name: 📦 Upload JAR Artifact
       uses: actions/upload-artifact@v4
       with:
         name: jobify-backend-jar
-        path: build/libs/*.jar
+        # Busca el jar dentro de la subcarpeta build/libs
+        path: discord-ai-bot-java/build/libs/*.jar
         retention-days: 5
 
-    # 2. Documentation (Docs)
     - name: 📄 Upload JavaDoc
       uses: actions/upload-artifact@v4
       with:
         name: jobify-javadoc
-        path: build/docs/javadoc
+        path: discord-ai-bot-java/build/docs/javadoc
         retention-days: 5
 
-    # 3. Test Report (Quality)
     - name: 🧪 Upload Test Report
-      if: always() # Upload report even if tests fail
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: test-results
-        path: build/test-results/test
+        path: discord-ai-bot-java/build/test-results/test
 
-  # ------------------------------------------------------------------
-  # JOB 2: RELEASE
-  # Only runs if build passed AND it is a Tag (v1.0, v2.0, etc.)
-  # ------------------------------------------------------------------
   release:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
-      contents: write # Permission to create releases
+      contents: write
 
     steps:
       - name: 📥 Download JAR Artifact
