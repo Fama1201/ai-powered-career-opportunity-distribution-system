@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,12 @@ public class OpenAiChatClient {
     private final String model;
 
     public OpenAiChatClient(String apiKey, String model) {
-        this.http = new OkHttpClient();
+        this.http = new OkHttpClient.Builder()
+                .callTimeout(Duration.ofSeconds(45))
+                .connectTimeout(Duration.ofSeconds(15))
+                .readTimeout(Duration.ofSeconds(45))
+                .writeTimeout(Duration.ofSeconds(30))
+                .build();
         this.gson = new GsonBuilder().create();
         this.apiKey = apiKey;
         this.model = model;
