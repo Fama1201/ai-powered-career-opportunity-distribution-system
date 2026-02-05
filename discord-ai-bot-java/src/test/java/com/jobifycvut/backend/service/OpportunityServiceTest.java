@@ -17,11 +17,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,7 +72,7 @@ class OpportunityServiceTest {
     @Test
     void searchOpportunities_mapsResults() {
         when(opportunityRepository.findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
-                "java", "java", PageRequest.of(0, 10)
+                eq("java"), eq("java"), any(Pageable.class)
         )).thenReturn(new PageImpl<>(List.of(opportunity)));
 
         var page = service.searchOpportunities("java", PageRequest.of(0, 10), null, null);
