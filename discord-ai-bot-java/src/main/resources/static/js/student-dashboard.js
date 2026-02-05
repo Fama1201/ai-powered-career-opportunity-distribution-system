@@ -136,10 +136,22 @@ function updateStatusCards(stats) {
 async function calculateStatsFromApplications() {
     try {
         const applications = await StudentAPI.getApplications();
+        // Filter only "Applied" status (case-insensitive, excluding Interview and Rejected)
+        const appliedCount = applications.filter(app => {
+            const status = (app.status || '').toLowerCase();
+            return status.includes('applied') && !status.includes('interview') && !status.includes('reject');
+        }).length;
+        
         const stats = {
-            totalApplied: applications.length,
-            interviews: applications.filter(a => a.status === 'Interview').length,
-            rejected: applications.filter(a => a.status === 'Rejected').length
+            totalApplied: appliedCount,
+            interviews: applications.filter(a => {
+                const status = (a.status || '').toLowerCase();
+                return status.includes('interview');
+            }).length,
+            rejected: applications.filter(a => {
+                const status = (a.status || '').toLowerCase();
+                return status.includes('reject');
+            }).length
         };
         updateStatusCards(stats);
     } catch (error) {

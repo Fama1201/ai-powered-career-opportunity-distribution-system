@@ -3086,7 +3086,7 @@ body.light-theme .filter-btn.active .filter-count {
 }
 
 body.light-theme .application-card {
-    background: rgba(255, 255, 255, 0.98);
+    background: #ffffff;
     border: 1px solid #e2e8f0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -3097,15 +3097,51 @@ body.light-theme .application-card:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+body.light-theme .application-icon {
+    color: white;
+}
+
+body.light-theme .application-icon.applied {
+    background: #f59e0b;
+}
+
+body.light-theme .application-icon.interview {
+    background: #10b981;
+}
+
+body.light-theme .application-icon.rejected {
+    background: #ef4444;
+}
+
+body.light-theme .application-status-badge.applied {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+}
+
+body.light-theme .application-status-badge.interview {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+}
+
+body.light-theme .application-status-badge.rejected {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
 body.light-theme .application-job-title {
     color: #0f172a;
 }
 
 body.light-theme .application-company {
     color: #475569;
+    font-weight: 600;
 }
 
 body.light-theme .application-meta-item {
+    color: #64748b;
+}
+
+body.light-theme .application-meta-item svg {
     color: #64748b;
 }
 
@@ -3120,6 +3156,37 @@ body.light-theme .application-notes p {
 
 body.light-theme .application-card-footer {
     border-top: 1px solid #e2e8f0;
+}
+
+body.light-theme .filter-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+body.light-theme .filter-btn:hover {
+    background: #f8fafc;
+    border-color: var(--primary-blue);
+}
+
+body.light-theme .filter-btn.active {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+body.light-theme .filter-count {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+body.light-theme .filter-btn.active .filter-count {
+    background: rgba(37, 99, 235, 0.2);
+    color: var(--primary-blue);
+}
+
+body.light-theme .applications-count {
+    color: #64748b;
 }
 
 /* Light Theme - Career Advisor */
