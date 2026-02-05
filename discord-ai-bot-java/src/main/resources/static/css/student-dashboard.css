@@ -3158,6 +3158,105 @@ body.light-theme .user-message-bubble {
     color: white;
 }
 
+/* Light Theme - CV Management */
+body.light-theme .cv-upload-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .cv-upload-header h2 {
+    color: #0f172a;
+}
+
+body.light-theme .cv-upload-header p {
+    color: #64748b;
+}
+
+body.light-theme .cv-upload-area {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+}
+
+body.light-theme .cv-upload-area:hover {
+    background: #f1f5f9;
+    border-color: var(--primary-blue);
+}
+
+body.light-theme .cv-upload-area.drag-over {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: var(--primary-blue);
+}
+
+body.light-theme .upload-placeholder svg {
+    color: #64748b;
+}
+
+body.light-theme .upload-placeholder p {
+    color: #0f172a;
+}
+
+body.light-theme .upload-placeholder span {
+    color: #64748b;
+}
+
+body.light-theme .upload-file-info {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-theme .file-name {
+    color: #0f172a;
+}
+
+body.light-theme .file-size {
+    color: #64748b;
+}
+
+body.light-theme .cv-preview-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .cv-preview-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-theme .cv-preview-header h2 {
+    color: #0f172a;
+}
+
+body.light-theme .cv-text-preview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-theme .cv-text-preview pre {
+    color: #0f172a;
+}
+
+body.light-theme .cv-truncated-note {
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+}
+
+body.light-theme .empty-state-content svg {
+    color: #cbd5e1;
+}
+
+body.light-theme .empty-state-content h3 {
+    color: #0f172a;
+}
+
+body.light-theme .empty-state-content p {
+    color: #64748b;
+}
+
+body.light-theme .welcome-subtitle {
+    color: #64748b;
+}
+
 body.light-theme .cv-score-card,
 body.light-theme .ai-suggestion-card {
     background: #f8fafc;
