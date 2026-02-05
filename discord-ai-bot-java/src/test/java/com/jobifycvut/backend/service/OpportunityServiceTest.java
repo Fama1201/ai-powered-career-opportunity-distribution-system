@@ -71,8 +71,12 @@ class OpportunityServiceTest {
 
     @Test
     void searchOpportunities_mapsResults() {
-        when(opportunityRepository.findByTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(
-                eq("java"), eq("java"), any(Pageable.class)
+        // Corrección: Usamos searchWithFilters que es lo que llama el servicio real
+        when(opportunityRepository.searchWithFilters(
+                eq("java"), 
+                any(), 
+                any(), 
+                any(Pageable.class)
         )).thenReturn(new PageImpl<>(List.of(opportunity)));
 
         var page = service.searchOpportunities("java", PageRequest.of(0, 10), null, null);
