@@ -10,7 +10,7 @@ import java.io.IOException;
  * Utility class for handling PDF-related operations using Apache PDFBox.
  * Provides functionality to extract plain text from PDF documents.
  */
-public class PdfUtils {
+public class PdfUtils  {
 
     /**
      * Extracts plain text content from a given PDF file using Apache PDFBox.
