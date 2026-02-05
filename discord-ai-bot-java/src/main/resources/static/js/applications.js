@@ -228,11 +228,11 @@ function createApplicationCard(application) {
         </div>
         <div class="application-card-footer">
             <button class="btn btn-secondary btn-sm" data-action="view-job-details" data-application-id="${application.id}" data-job-id="${application.opportunityId}">
-                View Job Details
+                ${I18n.t('viewDetails')}
             </button>
             ${status.toLowerCase() !== 'rejected' ? `
             <button class="btn btn-danger btn-sm" data-action="withdraw-application" data-application-id="${application.id}">
-                Withdraw
+                ${I18n.t('withdrawn')}
             </button>` : ''}
         </div>
     `;

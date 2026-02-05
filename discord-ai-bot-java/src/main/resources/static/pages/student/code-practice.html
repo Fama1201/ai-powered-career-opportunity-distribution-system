@@ -189,18 +189,18 @@
             <div class="dashboard-content">
                 <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Code Practice</h1>
+                    <h1 class="welcome-title" data-i18n="codePractice">Code Practice</h1>
                     <p class="welcome-subtitle">Improve your coding skills with AI-powered assignments and feedback</p>
                 </div>
 
                 <!-- Create Assignment Section -->
                 <section class="code-practice-section">
                     <div class="practice-card">
-                        <h2 class="section-title">Create New Assignment</h2>
+                        <h2 class="section-title" data-i18n="createNewAssignment">Create New Assignment</h2>
                         <div class="assignment-form">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="languageSelect">Programming Language</label>
+                                    <label for="languageSelect" data-i18n="programmingLanguage">Programming Language</label>
                                     <select id="languageSelect" class="form-select">
                                         <option value="">Select Language</option>
                                         <option value="c">C</option>
@@ -214,7 +214,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="levelSelect">Difficulty Level</label>
+                                    <label for="levelSelect" data-i18n="difficultyLevel">Difficulty Level</label>
                                     <select id="levelSelect" class="form-select">
                                         <option value="">Select Level</option>
                                         <option value="beginner">Beginner</option>
@@ -224,7 +224,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="categorySelect">Category (Optional)</label>
+                                    <label for="categorySelect" data-i18n="category">Category (Optional)</label>
                                     <select id="categorySelect" class="form-select">
                                         <option value="">All Categories</option>
                                         <option value="algorithms">Algorithms</option>
@@ -240,7 +240,7 @@
                                     <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                                <span>Generate Assignments</span>
+                                <span data-i18n="generateAssignments">Generate Assignments</span>
                             </button>
                         </div>
                     </div>
@@ -249,7 +249,7 @@
                 <!-- Active Assignments List -->
                 <section class="assignments-section">
                     <div class="section-header">
-                        <h2 class="section-title">Your Assignments</h2>
+                        <h2 class="section-title" data-i18n="yourAssignments">Your Assignments</h2>
                         <button class="btn-refresh-matches" id="refreshAssignmentsBtn" title="Refresh assignments">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M1 4V10H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -278,7 +278,7 @@
                 <!-- Completed Assignments List -->
                 <section class="assignments-section" id="completedSection" style="display: none;">
                     <div class="section-header">
-                        <h2 class="section-title">Completed Assignments</h2>
+                        <h2 class="section-title" data-i18n="completedAssignments">Completed Assignments</h2>
                     </div>
                     <div class="assignments-grid" id="completedAssignmentsGrid">
                     </div>
@@ -286,7 +286,7 @@
                         <svg width="128" height="128" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <h3>No Completed Assignments</h3>
+                        <h3 data-i18n="noAssignments">No Completed Assignments</h3>
                         <p>Complete your assignments to see them here!</p>
                     </div>
                 </section>

@@ -48,7 +48,7 @@
                                 d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <span id="currentLanguage">English</span>
+                        <span id="currentLanguage" data-i18n="english">English</span>
                         <svg class="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -81,8 +81,8 @@
                         <span class="profile-initials">HR</span>
                     </div>
                     <div class="profile-info">
-                        <span class="profile-name">Loading...</span>
-                        <span class="profile-role">HR Professional</span>
+                        <span class="profile-name" data-i18n="loading">Loading...</span>
+                        <span class="profile-role" data-i18n="hrProfessional">HR Professional</span>
                     </div>
                     <svg class="chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
@@ -138,7 +138,7 @@
                         <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    <span>Dashboard</span>
+                    <span data-i18n="dashboard">Dashboard</span>
                 </a>
                 <a href="#/hr/job-openings" class="sidebar-item" data-route="#/hr/job-openings">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -147,7 +147,7 @@
                             d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Job Openings</span>
+                    <span data-i18n="jobOpenings">Job Openings</span>
                 </a>
                 <a href="#/hr/candidates" class="sidebar-item active" data-route="#/hr/candidates">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -156,7 +156,7 @@
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Candidates</span>
+                    <span data-i18n="candidates">Candidates</span>
                 </a>
                 <a href="#/hr/hires" class="sidebar-item" data-route="#/hr/hires">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -164,7 +164,7 @@
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Hires</span>
+                    <span data-i18n="hires">Hires</span>
                 </a>
                 <a href="#/hr/analytics" class="sidebar-item" data-route="#/hr/analytics">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -173,7 +173,7 @@
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>Analytics</span>
+                    <span data-i18n="analytics">Analytics</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -215,54 +215,54 @@
             <div class="dashboard-content">
                 <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Candidates</h1>
-                    <p class="welcome-subtitle">Review and manage job applications</p>
+                    <h1 class="welcome-title" data-i18n="candidates">Candidates</h1>
+                    <p class="welcome-subtitle" data-i18n="reviewAndManage">Review and manage job applications</p>
                 </div>
 
                 <!-- Filters Section -->
                 <section class="candidates-filters">
                     <div class="filters-card">
                         <div class="filter-group">
-                            <label for="jobFilter" class="filter-label">Select Job</label>
+                            <label for="jobFilter" class="filter-label" data-i18n="selectJob">Select Job</label>
                             <div class="custom-select-wrapper">
                                 <button type="button" class="custom-select-btn" id="jobFilterBtn">
-                                    <span class="custom-select-text" id="jobFilterText">All Jobs</span>
+                                    <span class="custom-select-text" id="jobFilterText" data-i18n="allJobs">All Jobs</span>
                                     <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
                                 <div class="custom-select-dropdown" id="jobFilterDropdown">
-                                    <button type="button" class="custom-select-option" data-value="">All Jobs</button>
+                                    <button type="button" class="custom-select-option" data-value="" data-i18n="allJobs">All Jobs</button>
                                     <!-- Job options will be loaded dynamically -->
                                 </div>
                                 <input type="hidden" id="jobFilter" value="">
                             </div>
                         </div>
                         <div class="filter-group">
-                            <label for="statusFilter" class="filter-label">Status</label>
+                            <label for="statusFilter" class="filter-label" data-i18n="status">Status</label>
                             <div class="custom-select-wrapper">
                                 <button type="button" class="custom-select-btn" id="statusFilterBtn">
-                                    <span class="custom-select-text" id="statusFilterText">All Status</span>
+                                    <span class="custom-select-text" id="statusFilterText" data-i18n="allStatus">All Status</span>
                                     <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
                                 <div class="custom-select-dropdown" id="statusFilterDropdown">
-                                    <button type="button" class="custom-select-option" data-value="">All Status</button>
-                                    <button type="button" class="custom-select-option" data-value="APPLIED">Applied</button>
-                                    <button type="button" class="custom-select-option" data-value="SHORTLISTED">Shortlisted</button>
-                                    <button type="button" class="custom-select-option" data-value="INTERVIEW">Interview</button>
-                                    <button type="button" class="custom-select-option" data-value="REJECTED">Rejected</button>
-                                    <button type="button" class="custom-select-option" data-value="HIRED">Hired</button>
-                                    <button type="button" class="custom-select-option" data-value="WITHDRAWN">Withdrawn</button>
+                                    <button type="button" class="custom-select-option" data-value="" data-i18n="allStatus">All Status</button>
+                                    <button type="button" class="custom-select-option" data-value="APPLIED" data-i18n="applied">Applied</button>
+                                    <button type="button" class="custom-select-option" data-value="SHORTLISTED" data-i18n="shortlisted">Shortlisted</button>
+                                    <button type="button" class="custom-select-option" data-value="INTERVIEW" data-i18n="interview">Interview</button>
+                                    <button type="button" class="custom-select-option" data-value="REJECTED" data-i18n="rejected">Rejected</button>
+                                    <button type="button" class="custom-select-option" data-value="HIRED" data-i18n="hired">Hired</button>
+                                    <button type="button" class="custom-select-option" data-value="WITHDRAWN" data-i18n="withdrawn">Withdrawn</button>
                                 </div>
                                 <input type="hidden" id="statusFilter" value="">
                             </div>
                         </div>
                         <div class="filter-group">
-                            <label for="searchInput" class="filter-label">Search</label>
+                            <label for="searchInput" class="filter-label" data-i18n="search">Search</label>
                             <div class="search-box">
-                                <input type="text" id="searchInput" class="search-input" placeholder="Search by name or email...">
+                                <input type="text" id="searchInput" class="search-input" data-i18n-placeholder="searchByNameOrEmail" placeholder="Search by name or email...">
                                 <button class="search-btn" id="searchBtn">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -277,7 +277,7 @@
                         <!-- Loading State -->
                         <div class="loading-state" id="loadingState">
                             <div class="loading-spinner"></div>
-                            <p>Loading candidates...</p>
+                            <p data-i18n="loadingCandidates">Loading candidates...</p>
                         </div>
                     </div>
                     <!-- Empty State -->
@@ -287,8 +287,8 @@
                                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <h3>No Candidates Found</h3>
-                        <p id="emptyStateMessage">Select a job to view candidates or adjust your filters.</p>
+                        <h3 data-i18n="noCandidatesFound">No Candidates Found</h3>
+                        <p id="emptyStateMessage" data-i18n="selectJobToView">Select a job to view candidates or adjust your filters.</p>
                     </div>
                 </section>
             </div>
@@ -299,13 +299,20 @@
     <div class="modal-overlay" id="candidateDetailModalOverlay" style="display: none;">
         <div class="modal-content candidate-detail-modal">
             <div class="modal-header">
-                <h2 class="modal-title" id="candidateDetailTitle">Candidate Details</h2>
+                <h2 class="modal-title" id="candidateDetailTitle" data-i18n="candidateDetails">Candidate Details</h2>
                 <button class="modal-close" id="candidateDetailCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="candidate-detail-content" id="candidateDetailContent">
-                <!-- Candidate details will be loaded here -->
+            <div class="modal-body">
+                <div class="candidate-detail-content" id="candidateDetailContent">
+                    <!-- Candidate details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="candidate-detail-actions" id="candidateDetailActions">
+                    <!-- Buttons will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
@@ -314,34 +321,47 @@
     <div class="modal-overlay" id="statusUpdateModalOverlay" style="display: none;">
         <div class="modal-content status-update-modal">
             <div class="modal-header">
-                <h2 class="modal-title">Update Application Status</h2>
+                <h2 class="modal-title" data-i18n="updateApplicationStatus">Update Application Status</h2>
                 <button class="modal-close" id="statusUpdateCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="statusUpdateForm" class="status-update-form">
-                <div class="form-group">
-                    <label for="newStatus" class="form-label">New Status</label>
-                    <select id="newStatus" class="form-input" required>
-                        <option value="">Select status</option>
-                        <option value="APPLIED">Applied</option>
-                        <option value="SHORTLISTED">Shortlisted</option>
-                        <option value="INTERVIEW">Interview</option>
-                        <option value="REJECTED">Rejected</option>
-                        <option value="HIRED">Hired</option>
-                        <option value="WITHDRAWN">Withdrawn</option>
-                    </select>
-                </div>
+            <div class="modal-body">
+                <form id="statusUpdateForm" class="status-update-form">
+                    <div class="form-group">
+                        <label for="newStatus" class="form-label" data-i18n="newStatus">New Status</label>
+                        <div class="custom-select-wrapper" id="statusSelectWrapper">
+                            <button type="button" class="custom-select-btn" id="statusSelectBtn">
+                                <span class="custom-select-text" id="statusSelectText" data-i18n="selectStatus">Select status</span>
+                                <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div class="custom-select-dropdown" id="statusSelectDropdown">
+                                <button type="button" class="custom-select-option" data-value="" data-i18n="selectStatus">Select status</button>
+                                <button type="button" class="custom-select-option" data-value="APPLIED" data-i18n="applied">Applied</button>
+                                <button type="button" class="custom-select-option" data-value="SHORTLISTED" data-i18n="shortlisted">Shortlisted</button>
+                                <button type="button" class="custom-select-option" data-value="INTERVIEW" data-i18n="interview">Interview</button>
+                                <button type="button" class="custom-select-option" data-value="REJECTED" data-i18n="rejected">Rejected</button>
+                                <button type="button" class="custom-select-option" data-value="HIRED" data-i18n="hired">Hired</button>
+                                <button type="button" class="custom-select-option" data-value="WITHDRAWN" data-i18n="withdrawn">Withdrawn</button>
+                            </div>
+                            <input type="hidden" id="newStatus" name="newStatus" value="" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelStatusUpdateBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveStatusBtn">
-                        <span id="saveStatusBtnText">Update Status</span>
+                    <button type="button" class="btn btn-secondary" id="cancelStatusUpdateBtn" data-i18n="cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveStatusBtn" form="statusUpdateForm">
+                        <span id="saveStatusBtnText" data-i18n="updateStatus">Update Status</span>
                         <span id="saveStatusBtnLoading" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i> Updating...
+                            <i class="fas fa-spinner fa-spin"></i> <span data-i18n="updating">Updating...</span>
                         </span>
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -349,23 +369,23 @@
     <div class="modal-overlay" id="addNoteModalOverlay" style="display: none;">
         <div class="modal-content add-note-modal">
             <div class="modal-header">
-                <h2 class="modal-title">Add Note</h2>
+                <h2 class="modal-title" data-i18n="addNote">Add Note</h2>
                 <button class="modal-close" id="addNoteCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="addNoteForm" class="add-note-form">
                 <div class="form-group">
-                    <label for="noteText" class="form-label">Note</label>
+                    <label for="noteText" class="form-label" data-i18n="note">Note</label>
                     <textarea id="noteText" class="form-textarea" rows="6" required
-                        placeholder="Add your notes about this candidate..."></textarea>
+                        data-i18n-placeholder="addYourNotes" placeholder="Add your notes about this candidate..."></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelNoteBtn">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="cancelNoteBtn" data-i18n="cancel">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveNoteBtn">
-                        <span id="saveNoteBtnText">Add Note</span>
+                        <span id="saveNoteBtnText" data-i18n="addNote">Add Note</span>
                         <span id="saveNoteBtnLoading" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i> Saving...
+                            <i class="fas fa-spinner fa-spin"></i> <span data-i18n="saving">Saving...</span>
                         </span>
                     </button>
                 </div>

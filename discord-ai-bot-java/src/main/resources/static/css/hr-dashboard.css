@@ -2593,13 +2593,92 @@ body.light-theme .btn-secondary i {
     background: rgba(15, 23, 42, 0.95);
 }
 
+/* Modal içindeki custom select dropdown için özel stiller */
+.modal-body .custom-select-wrapper,
+.modal-content .custom-select-wrapper {
+    position: relative;
+    z-index: 1001;
+}
+
+.modal-body .custom-select-dropdown,
+.modal-content .custom-select-dropdown {
+    position: absolute;
+    z-index: 10002;
+    max-height: 320px;
+    min-height: auto;
+    /* Dropdown'un modal içinde kalması için */
+    bottom: auto;
+    top: calc(100% + 0.5rem);
+    /* Dropdown'un modal sınırlarını aşmaması için */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Scrollbar stilleri */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Status Update Modal içindeki dropdown için özel ayarlar */
+.status-update-modal .custom-select-dropdown {
+    max-height: 336px; /* 7 seçenek * 48px = 336px (tüm seçenekler için) */
+    min-height: 200px;
+    /* Tüm seçeneklerin görünmesi için yeterli yükseklik */
+    width: 100%;
+    left: 0;
+    right: 0;
+}
+
+/* Status Update Modal body - dropdown için yeterli alan */
+.status-update-modal .modal-body {
+    padding-bottom: 2.5rem; /* Dropdown için ekstra alan */
+    overflow: visible; /* Dropdown'un görünmesi için */
+}
+
+.modal-body .custom-select-dropdown::-webkit-scrollbar,
+.modal-content .custom-select-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body .custom-select-dropdown::-webkit-scrollbar-track,
+.modal-content .custom-select-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body .custom-select-dropdown::-webkit-scrollbar-thumb,
+.modal-content .custom-select-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.modal-body .custom-select-dropdown::-webkit-scrollbar-thumb:hover,
+.modal-content .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Dropdown yukarı doğru açıldığında */
+.modal-body .custom-select-dropdown.dropdown-up,
+.modal-content .custom-select-dropdown.dropdown-up {
+    top: auto;
+    bottom: calc(100% + 0.5rem);
+}
+
+/* Light theme scrollbar */
+body.light-theme .modal-body .custom-select-dropdown::-webkit-scrollbar-thumb,
+body.light-theme .modal-content .custom-select-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+body.light-theme .modal-body .custom-select-dropdown::-webkit-scrollbar-thumb:hover,
+body.light-theme .modal-content .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
 .custom-select-dropdown.active {
     display: block;
 }
 
 .custom-select-option {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     background: transparent;
     border: none;
     color: var(--text-primary);
@@ -2609,6 +2688,10 @@ body.light-theme .btn-secondary i {
     cursor: pointer;
     transition: all 0.2s ease;
     display: block;
+    min-height: 48px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
 }
 
 .custom-select-option:hover {
@@ -2899,14 +2982,87 @@ body.light-theme .btn-secondary i {
 /* Job Modal */
 .job-modal {
     max-width: 800px;
-    max-height: 90vh;
+    width: 90%;
+}
+
+.modal-body {
+    flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2rem;
+    min-height: 0;
+    max-height: calc(90vh - 140px);
+}
+
+/* Status Update Modal Body - Özel ayarlar */
+.status-update-modal .modal-body {
+    padding: 2rem;
+    overflow: visible !important;
+    max-height: none !important;
+    min-height: 250px;
+    position: relative;
+    flex: 0 0 auto; /* Dropdown için yeterli alan */
+}
+
+/* Status Update Modal Content - Dropdown için yeterli alan */
+.status-update-modal {
+    overflow: visible !important;
+}
+
+.status-update-modal .modal-content {
+    overflow: visible !important;
+    max-height: 90vh;
+}
+
+/* Status Update Modal - Dropdown'un modal dışına taşmaması için */
+.status-update-modal .modal-overlay {
+    overflow: visible;
+}
+
+/* Status Update Modal için özel z-index ayarları */
+.status-update-modal .custom-select-wrapper {
+    z-index: 10003;
+}
+
+.status-update-modal .custom-select-dropdown {
+    z-index: 10004;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .job-form {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+.modal-footer {
+    padding: 0;
+    border-top: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.02);
+    flex-shrink: 0;
+}
+
+.modal-footer .form-actions {
+    padding: 1.5rem 2rem;
+    margin: 0;
+    border-top: none;
 }
 
 .form-row {
@@ -2921,17 +3077,85 @@ body.light-theme .btn-secondary i {
     }
 }
 
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+}
+
+/* Modal Content */
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    transform: rotate(90deg);
+}
+
 /* Job Detail Modal */
 .job-detail-modal {
-    max-width: 700px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-width: 900px;
+    width: 90%;
 }
 
 .job-detail-content {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .job-detail-section {
@@ -2996,6 +3220,160 @@ body.light-theme .btn-secondary i {
     padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
     margin-top: 1rem;
+}
+
+/* Applicants List */
+.applicants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.applicant-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.applicant-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary-color);
+}
+
+.applicant-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.applicant-name {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.applicant-date {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.no-applicants {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+}
+
+.btn-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.btn-warning:hover {
+    background: rgba(245, 158, 11, 0.3);
+    border-color: #f59e0b;
+}
+
+/* Light Theme - Applicants */
+body.light-theme .applicant-item {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+}
+
+body.light-theme .applicant-item:hover {
+    background: #ffffff;
+    border-color: var(--primary-color);
+}
+
+body.light-theme .applicant-name {
+    color: #0f172a;
+}
+
+body.light-theme .applicant-date {
+    color: #64748b;
+}
+
+body.light-theme .no-applicants {
+    color: #64748b;
+}
+
+body.light-theme .btn-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+body.light-theme .btn-warning:hover {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #d97706;
+}
+
+/* Light Theme - Modal */
+body.light-theme .modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+}
+
+body.light-theme .modal-content {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+body.light-theme .modal-header {
+    border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .modal-title {
+    color: #0f172a;
+}
+
+body.light-theme .modal-close {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+}
+
+body.light-theme .modal-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+    border-color: var(--primary-color);
+}
+
+body.light-theme .job-detail-content {
+    color: #0f172a;
+}
+
+body.light-theme .modal-body {
+    color: #0f172a;
+}
+
+body.light-theme .modal-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+body.light-theme .modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+}
+
+body.light-theme .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+body.light-theme .modal-footer {
+    border-top-color: #e2e8f0;
+    background: #f8fafc;
 }
 
 /* Light Theme - Job Openings */
@@ -3226,6 +3604,138 @@ body.light-theme .job-detail-actions {
     border-top-color: #e2e8f0;
 }
 
+/* Light Theme - Job Openings Buttons - More Specific and Visible */
+body.light-theme .view-btn,
+body.light-theme button.view-btn,
+body.light-theme .job-action-btn.view-btn {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-color: transparent !important;
+}
+
+body.light-theme .view-btn:hover,
+body.light-theme button.view-btn:hover,
+body.light-theme .job-action-btn.view-btn:hover {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+body.light-theme .view-btn i,
+body.light-theme button.view-btn i,
+body.light-theme .job-action-btn.view-btn i,
+body.light-theme .view-btn svg,
+body.light-theme button.view-btn svg,
+body.light-theme .job-action-btn.view-btn svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+/* Light Theme - Job Detail Modal Buttons - More Specific */
+body.light-theme .job-detail-actions .btn-primary,
+body.light-theme .job-detail-actions button.btn-primary,
+body.light-theme .job-detail-modal .btn-primary,
+body.light-theme .modal-footer .btn-primary {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-color: transparent !important;
+}
+
+body.light-theme .job-detail-actions .btn-primary:hover,
+body.light-theme .job-detail-actions button.btn-primary:hover,
+body.light-theme .job-detail-modal .btn-primary:hover,
+body.light-theme .modal-footer .btn-primary:hover {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+body.light-theme .job-detail-actions .btn-primary i,
+body.light-theme .job-detail-actions button.btn-primary i,
+body.light-theme .job-detail-modal .btn-primary i,
+body.light-theme .modal-footer .btn-primary i {
+    color: #ffffff !important;
+}
+
+body.light-theme .job-detail-actions .btn-warning,
+body.light-theme .job-detail-actions button.btn-warning,
+body.light-theme .job-detail-modal .btn-warning,
+body.light-theme .modal-footer .btn-warning {
+    background: #f59e0b !important;
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    border: 1px solid #d97706 !important;
+    border-color: #d97706 !important;
+}
+
+body.light-theme .job-detail-actions .btn-warning:hover,
+body.light-theme .job-detail-actions button.btn-warning:hover,
+body.light-theme .job-detail-modal .btn-warning:hover,
+body.light-theme .modal-footer .btn-warning:hover {
+    background: #d97706 !important;
+    background-color: #d97706 !important;
+    border-color: #b45309 !important;
+    color: #ffffff !important;
+}
+
+body.light-theme .job-detail-actions .btn-warning i,
+body.light-theme .job-detail-actions button.btn-warning i,
+body.light-theme .job-detail-modal .btn-warning i,
+body.light-theme .modal-footer .btn-warning i {
+    color: #ffffff !important;
+}
+
+body.light-theme .job-detail-actions .btn-secondary,
+body.light-theme .job-detail-actions button.btn-secondary,
+body.light-theme .job-detail-modal .btn-secondary,
+body.light-theme .modal-footer .btn-secondary {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 2px solid #e2e8f0 !important;
+    border-color: #e2e8f0 !important;
+}
+
+body.light-theme .job-detail-actions .btn-secondary:hover,
+body.light-theme .job-detail-actions button.btn-secondary:hover,
+body.light-theme .job-detail-modal .btn-secondary:hover,
+body.light-theme .modal-footer .btn-secondary:hover {
+    background: #f8fafc !important;
+    background-color: #f8fafc !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+body.light-theme .job-detail-actions .btn-secondary i,
+body.light-theme .job-detail-actions button.btn-secondary i,
+body.light-theme .job-detail-modal .btn-secondary i,
+body.light-theme .modal-footer .btn-secondary i {
+    color: inherit !important;
+}
+
+/* Light Theme - All Buttons in Job Detail Modal */
+body.light-theme .job-detail-modal button,
+body.light-theme .job-detail-modal .btn {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Light Theme - Job Detail Modal Icons */
+body.light-theme .job-detail-content i,
+body.light-theme .job-detail-content svg {
+    color: #64748b !important;
+}
+
+body.light-theme .job-detail-content .btn i {
+    color: inherit !important;
+}
+
 /* ========== HR Post Job Page Styles ========== */
 
 .post-job-section {
@@ -3363,6 +3873,42 @@ body.light-theme .job-detail-actions {
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--primary-color);
+}
+
+/* Light Theme - General Button Styles */
+body.light-theme .btn-primary {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.light-theme .btn-primary:hover {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+body.light-theme .btn-primary i {
+    color: #ffffff !important;
+}
+
+body.light-theme .btn-warning {
+    background: #f59e0b !important;
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    border: 1px solid #d97706 !important;
+}
+
+body.light-theme .btn-warning:hover {
+    background: #d97706 !important;
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+    border-color: #b45309 !important;
+}
+
+body.light-theme .btn-warning i {
+    color: #ffffff !important;
 }
 
 /* Light Theme - Post Job Page */
@@ -3570,9 +4116,26 @@ body.light-theme .btn-secondary:hover {
 
 /* Candidate Detail Modal */
 .candidate-detail-modal {
-    max-width: 800px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-width: 1100px;
+    width: 95%;
+}
+
+.candidate-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .candidate-detail-header {
@@ -3582,6 +4145,7 @@ body.light-theme .btn-secondary:hover {
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 1.5rem;
+    flex-shrink: 0;
 }
 
 .candidate-detail-avatar {
@@ -3619,6 +4183,8 @@ body.light-theme .btn-secondary:hover {
 
 .candidate-detail-section:last-child {
     border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .candidate-detail-section h4 {
@@ -3678,20 +4244,171 @@ body.light-theme .btn-secondary:hover {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
-    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.modal-footer .candidate-detail-actions {
+    padding: 1.5rem 2rem;
+    border-top: none;
+    margin-top: 0;
 }
 
 /* Status Update Modal */
 .status-update-modal {
-    max-width: 500px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .status-update-form {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    min-height: 150px;
+}
+
+.status-update-form .form-group {
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Status Update Modal içindeki custom select wrapper */
+.status-update-modal .custom-select-wrapper {
+    position: relative;
+    z-index: 1001;
+    margin-bottom: 0;
+}
+
+/* Status Update Form Select Styling */
+.status-update-form select.form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    width: 100%;
+    min-height: 48px;
+    font-size: 1rem;
+    color-scheme: dark;
+    /* Force dark dropdown background */
+    background: rgba(255, 255, 255, 0.05) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E") no-repeat right 1rem center / 12px !important;
+}
+
+.status-update-form select.form-input:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.status-update-form select.form-input:focus {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    outline: none;
+}
+
+.status-update-form select.form-input option {
+    background: var(--card-bg) !important;
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    padding: 0.75rem;
+}
+
+/* Force dark background for all options in dark theme */
+.status-update-form select.form-input option:not([value=""]) {
+    background: var(--card-bg) !important;
+    background-color: var(--card-bg) !important;
+}
+
+.status-update-form select.form-input option:hover,
+.status-update-form select.form-input option:focus,
+.status-update-form select.form-input option:checked {
+    background: rgba(239, 68, 68, 0.1) !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    color: var(--primary-color) !important;
+}
+
+.status-update-form select.form-input option:checked {
+    background: rgba(239, 68, 68, 0.2) !important;
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    font-weight: 600;
+}
+
+/* Additional rules for different browsers to ensure dark dropdown */
+.status-update-form select.form-input {
+    /* For WebKit browsers (Chrome, Safari, Edge) */
+    -webkit-appearance: none;
+    /* For Firefox */
+    -moz-appearance: none;
+    /* Standard */
+    appearance: none;
+}
+
+/* Try to style the dropdown list itself (limited browser support) */
+.status-update-form select.form-input::-ms-expand {
+    display: none;
+}
+
+/* For WebKit browsers - try to style the dropdown */
+@supports (-webkit-appearance: none) {
+    .status-update-form select.form-input {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    body.light-theme .status-update-form select.form-input {
+        background-color: #ffffff !important;
+    }
+}
+
+/* Light Theme - Status Update Form Select */
+body.light-theme .status-update-form select.form-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230f172a' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+    color-scheme: light;
+    /* Force light dropdown background */
+    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230f172a' d='M6 9L1 4h10z'/%3E%3C/svg%3E") no-repeat right 1rem center / 12px !important;
+}
+
+body.light-theme .status-update-form select.form-input:hover {
+    background-color: #ffffff !important;
+    border-color: var(--primary-color) !important;
+}
+
+body.light-theme .status-update-form select.form-input:focus {
+    background-color: #ffffff !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+body.light-theme .status-update-form select.form-input option {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .status-update-form select.form-input option:hover,
+body.light-theme .status-update-form select.form-input option:focus,
+body.light-theme .status-update-form select.form-input option:checked {
+    background: #f8fafc !important;
+    background-color: #f8fafc !important;
+    color: var(--primary-color) !important;
+}
+
+body.light-theme .status-update-form select.form-input option:checked {
+    background: rgba(239, 68, 68, 0.1) !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    font-weight: 600;
 }
 
 /* Add Note Modal */
@@ -3703,6 +4420,60 @@ body.light-theme .btn-secondary:hover {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+/* Light Theme - Add Note and Status Update Modal Buttons */
+body.light-theme .add-note-modal .btn-primary,
+body.light-theme .add-note-modal button.btn-primary,
+body.light-theme .status-update-modal .btn-primary,
+body.light-theme .status-update-modal button.btn-primary {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.light-theme .add-note-modal .btn-primary:hover,
+body.light-theme .add-note-modal button.btn-primary:hover,
+body.light-theme .status-update-modal .btn-primary:hover,
+body.light-theme .status-update-modal button.btn-primary:hover {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+body.light-theme .add-note-modal .btn-primary i,
+body.light-theme .add-note-modal button.btn-primary i,
+body.light-theme .status-update-modal .btn-primary i,
+body.light-theme .status-update-modal button.btn-primary i {
+    color: #ffffff !important;
+}
+
+body.light-theme .add-note-modal .btn-secondary,
+body.light-theme .add-note-modal button.btn-secondary,
+body.light-theme .status-update-modal .btn-secondary,
+body.light-theme .status-update-modal button.btn-secondary {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+body.light-theme .add-note-modal .btn-secondary:hover,
+body.light-theme .add-note-modal button.btn-secondary:hover,
+body.light-theme .status-update-modal .btn-secondary:hover,
+body.light-theme .status-update-modal button.btn-secondary:hover {
+    background: #f8fafc !important;
+    background-color: #f8fafc !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+body.light-theme .add-note-modal .btn-secondary i,
+body.light-theme .add-note-modal button.btn-secondary i,
+body.light-theme .status-update-modal .btn-secondary i,
+body.light-theme .status-update-modal button.btn-secondary i {
+    color: inherit !important;
 }
 
 /* Light Theme - Candidates */
@@ -3772,6 +4543,177 @@ body.light-theme .notes-text {
 
 body.light-theme .candidate-detail-actions {
     border-top-color: #e2e8f0;
+}
+
+/* Light Theme - Candidate Detail Modal Buttons and Icons - More Specific */
+body.light-theme .candidate-detail-actions .btn-primary,
+body.light-theme .candidate-detail-actions button.btn-primary,
+body.light-theme .candidate-detail-modal .btn-primary,
+body.light-theme .modal-footer .candidate-detail-actions .btn-primary {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-color: transparent !important;
+}
+
+body.light-theme .candidate-detail-actions .btn-primary:hover,
+body.light-theme .candidate-detail-actions button.btn-primary:hover,
+body.light-theme .candidate-detail-modal .btn-primary:hover,
+body.light-theme .modal-footer .candidate-detail-actions .btn-primary:hover {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+body.light-theme .candidate-detail-actions .btn-primary i,
+body.light-theme .candidate-detail-actions button.btn-primary i,
+body.light-theme .candidate-detail-modal .btn-primary i,
+body.light-theme .modal-footer .candidate-detail-actions .btn-primary i {
+    color: #ffffff !important;
+}
+
+body.light-theme .candidate-detail-actions .btn-secondary,
+body.light-theme .candidate-detail-actions button.btn-secondary,
+body.light-theme .candidate-detail-modal .btn-secondary,
+body.light-theme .modal-footer .candidate-detail-actions .btn-secondary {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 2px solid #e2e8f0 !important;
+    border-color: #e2e8f0 !important;
+}
+
+body.light-theme .candidate-detail-actions .btn-secondary:hover,
+body.light-theme .candidate-detail-actions button.btn-secondary:hover,
+body.light-theme .candidate-detail-modal .btn-secondary:hover,
+body.light-theme .modal-footer .candidate-detail-actions .btn-secondary:hover {
+    background: #f8fafc !important;
+    background-color: #f8fafc !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+body.light-theme .candidate-detail-actions .btn-secondary i,
+body.light-theme .candidate-detail-actions button.btn-secondary i,
+body.light-theme .candidate-detail-modal .btn-secondary i,
+body.light-theme .modal-footer .candidate-detail-actions .btn-secondary i {
+    color: inherit !important;
+}
+
+/* Light Theme - All Buttons in Candidate Detail Modal */
+body.light-theme .candidate-detail-modal button,
+body.light-theme .candidate-detail-modal .btn {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Light Theme - Detail Row */
+body.light-theme .detail-row {
+    color: #0f172a;
+}
+
+body.light-theme .detail-label {
+    color: #64748b !important;
+}
+
+body.light-theme .detail-value {
+    color: #0f172a !important;
+}
+
+body.light-theme .detail-value .status-badge {
+    /* Status badges already have their own colors, just ensure visibility */
+    opacity: 1;
+}
+
+/* Light Theme - Info Row Icons */
+body.light-theme .info-row i {
+    color: #64748b !important;
+}
+
+/* Light Theme - View Detail Button - More Specific */
+body.light-theme .view-detail-btn,
+body.light-theme button.view-detail-btn,
+body.light-theme .candidate-card .view-detail-btn,
+body.light-theme .candidate-footer .view-detail-btn {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-color: transparent !important;
+}
+
+body.light-theme .view-detail-btn:hover,
+body.light-theme button.view-detail-btn:hover,
+body.light-theme .candidate-card .view-detail-btn:hover,
+body.light-theme .candidate-footer .view-detail-btn:hover {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+body.light-theme .view-detail-btn i,
+body.light-theme button.view-detail-btn i,
+body.light-theme .candidate-card .view-detail-btn i,
+body.light-theme .candidate-footer .view-detail-btn i {
+    color: #ffffff !important;
+}
+
+/* Light Theme - Candidate Card Buttons */
+body.light-theme .candidate-footer .btn,
+body.light-theme .candidate-footer button {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body.light-theme .candidate-footer .btn-primary,
+body.light-theme .candidate-footer button.btn-primary {
+    background: #ef4444 !important;
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.light-theme .candidate-footer .btn-primary i,
+body.light-theme .candidate-footer button.btn-primary i {
+    color: #ffffff !important;
+}
+
+/* Light Theme - Modal Close Button Icon */
+body.light-theme .modal-close i {
+    color: #64748b !important;
+}
+
+body.light-theme .modal-close:hover i {
+    color: #0f172a !important;
+}
+
+/* Light Theme - Status Badge in Detail Modal */
+body.light-theme .candidate-detail-section .status-badge {
+    opacity: 1;
+}
+
+/* Light Theme - Candidate Avatar in Detail Modal */
+body.light-theme .candidate-detail-avatar {
+    background: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Light Theme - All buttons in modal footer */
+body.light-theme .modal-footer .btn i {
+    color: inherit !important;
+}
+
+/* Light Theme - Ensure all icons are visible */
+body.light-theme .candidate-detail-content i,
+body.light-theme .candidate-detail-content svg {
+    color: #64748b !important;
+}
+
+body.light-theme .candidate-detail-content .btn i {
+    color: inherit !important;
 }
 
 /* ========== HR Hires Page Styles ========== */

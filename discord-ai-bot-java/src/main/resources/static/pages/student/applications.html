@@ -115,21 +115,21 @@
                         <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Dashboard</span>
+                    <span data-i18n="dashboard">Dashboard</span>
                 </a>
                 <a href="#/student/job-matches" class="sidebar-item" data-route="#/student/job-matches">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Job Matches</span>
+                    <span data-i18n="jobMatches">Job Matches</span>
                 </a>
                 <a href="#/student/applications" class="sidebar-item active" data-route="#/student/applications">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>My Applications</span>
+                    <span data-i18n="myApplications">My Applications</span>
                 </a>
                 <a href="#/student/cv" class="sidebar-item" data-route="#/student/cv">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -139,14 +139,14 @@
                         <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>CV Management</span>
+                    <span data-i18n="cvManagement">CV Management</span>
                 </a>
                 <a href="#/student/code-practice" class="sidebar-item" data-route="#/student/code-practice">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16 18L22 12L16 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M8 6L2 12L8 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Code Practice</span>
+                    <span data-i18n="codePractice">Code Practice</span>
                 </a>
                 <a href="#/student/advisor" class="sidebar-item" data-route="#/student/advisor">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -154,7 +154,7 @@
                         <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Career Advisor</span>
+                    <span data-i18n="careerAdvisor">Career Advisor</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -184,7 +184,7 @@
             <div class="dashboard-content">
                 <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">My Applications</h1>
+                    <h1 class="welcome-title" data-i18n="myApplications">My Applications</h1>
                     <p class="welcome-subtitle">Başvurularınızı görüntüleyin ve yönetin</p>
                 </div>
 
@@ -193,19 +193,19 @@
                     <div class="filters-card">
                         <div class="filter-options">
                             <button class="filter-btn active" data-status="" id="allApplicationsBtn">
-                                <span>All</span>
+                                <span data-i18n="all">All</span>
                                 <span class="filter-count" id="allCount">0</span>
                             </button>
                             <button class="filter-btn" data-status="Applied" id="appliedBtn">
-                                <span>Applied</span>
+                                <span data-i18n="applied">Applied</span>
                                 <span class="filter-count" id="appliedCount">0</span>
                             </button>
                             <button class="filter-btn" data-status="Interview" id="interviewBtn">
-                                <span>Interview</span>
+                                <span data-i18n="interview">Interview</span>
                                 <span class="filter-count" id="interviewCount">0</span>
                             </button>
                             <button class="filter-btn" data-status="Rejected" id="rejectedBtn">
-                                <span>Rejected</span>
+                                <span data-i18n="rejected">Rejected</span>
                                 <span class="filter-count" id="rejectedCount">0</span>
                             </button>
                         </div>

@@ -242,67 +242,16 @@ async function createJobCard(job) {
             <div class="job-salary" id="applicantCount-${job.id}">Loading...</div>
             <div class="job-actions">
                 <button class="job-action-btn view-btn" data-action="view" data-job-id="${job.id}" title="View Details">
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-arrow-right"></i>
                 </button>
-                <button class="job-action-btn edit-btn" data-action="edit" data-job-id="${job.id}" title="Edit">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="job-action-btn applicants-btn" data-action="applicants" data-job-id="${job.id}" title="View Applicants">
-                    <i class="fas fa-users"></i>
-                </button>
-                <div class="job-status-dropdown">
-                    <button class="job-action-btn status-btn" data-action="status" data-job-id="${job.id}" title="Change Status">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <div class="status-dropdown-menu" id="statusMenu-${job.id}">
-                        ${status !== 'OPEN' ? '<button class="status-option" data-status="OPEN">Mark as Open</button>' : ''}
-                        ${status !== 'CLOSED' ? '<button class="status-option" data-status="CLOSED">Mark as Closed</button>' : ''}
-                        ${status !== 'ARCHIVED' ? '<button class="status-option" data-status="ARCHIVED">Archive</button>' : ''}
-                        <button class="status-option delete-option" data-action="delete" data-job-id="${job.id}">Delete</button>
-                    </div>
-                </div>
             </div>
         </div>
     `;
 
-    // Add event listeners
+    // Add event listener for view button
     const viewBtn = card.querySelector('[data-action="view"]');
-    const editBtn = card.querySelector('[data-action="edit"]');
-    const applicantsBtn = card.querySelector('[data-action="applicants"]');
-    const statusBtn = card.querySelector('[data-action="status"]');
-    const statusMenu = card.querySelector(`#statusMenu-${job.id}`);
-    const statusOptions = card.querySelectorAll('.status-option');
-
-    viewBtn?.addEventListener('click', () => viewJobDetails(job.id));
-    editBtn?.addEventListener('click', () => editJob(job.id));
-    applicantsBtn?.addEventListener('click', () => viewJobApplicants(job.id));
-    
-    statusBtn?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        statusMenu?.classList.toggle('active');
-    });
-
-    statusOptions.forEach(option => {
-        option.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const status = option.getAttribute('data-status');
-            const action = option.getAttribute('data-action');
-            const jobId = option.getAttribute('data-job-id');
-            
-            if (action === 'delete') {
-                handleDeleteJob(parseInt(jobId));
-            } else if (status) {
-                handleStatusChange(parseInt(jobId), status);
-            }
-            statusMenu?.classList.remove('active');
-        });
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!card.contains(e.target)) {
-            statusMenu?.classList.remove('active');
-        }
+    viewBtn?.addEventListener('click', () => {
+        viewJobDetails(job.id);
     });
 
     return card;
@@ -497,14 +446,11 @@ async function handleJobSubmit(e) {
     }
 }
 
-async function editJob(jobId) {
-    openJobModal(jobId);
-}
-
 async function viewJobDetails(jobId) {
     try {
         const job = await HrAPI.getJob(jobId);
-        showJobDetailModal(job);
+        const applicants = await HrAPI.getJobApplications(jobId);
+        showJobDetailModal(job, applicants);
     } catch (error) {
         console.error('Failed to load job details:', error);
         if (typeof UI !== 'undefined' && UI.toast) {
@@ -513,7 +459,7 @@ async function viewJobDetails(jobId) {
     }
 }
 
-function showJobDetailModal(job) {
+function showJobDetailModal(job, applicants = []) {
     const modal = document.getElementById('jobDetailModalOverlay');
     const content = document.getElementById('jobDetailContent');
     const title = document.getElementById('jobDetailTitle');
@@ -524,6 +470,8 @@ function showJobDetailModal(job) {
 
     if (content) {
         const status = getJobStatus(job);
+        const applicantsCount = Array.isArray(applicants) ? applicants.length : 0;
+        
         content.innerHTML = `
             <div class="job-detail-section">
                 <h3>Basic Information</h3>
@@ -595,9 +543,32 @@ function showJobDetailModal(job) {
                 </div>
             </div>
             ` : ''}
+            <div class="job-detail-section">
+                <h3>Applicants (${applicantsCount})</h3>
+                ${applicantsCount > 0 ? `
+                <div class="applicants-list">
+                    ${applicants.map((app, index) => `
+                        <div class="applicant-item">
+                            <div class="applicant-info">
+                                <span class="applicant-name">${escapeHtml(app.studentName || `Applicant ${index + 1}`)}</span>
+                                <span class="applicant-status status-badge ${(app.status || 'APPLIED').toLowerCase()}">${escapeHtml(app.status || 'APPLIED')}</span>
+                            </div>
+                            ${app.appliedAt ? `<span class="applicant-date">Applied: ${formatDate(app.appliedAt)}</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                ` : '<p class="no-applicants">No applicants yet.</p>'}
+            </div>
             <div class="job-detail-actions">
                 <button class="btn btn-secondary" onclick="closeJobDetailModal()">Close</button>
-                <button class="btn btn-primary" onclick="editJob(${job.id}); closeJobDetailModal();">Edit Job</button>
+                ${status === 'OPEN' ? `
+                <button class="btn btn-warning" onclick="handleCloseApplication(${job.id})" id="closeApplicationBtn">
+                    <i class="fas fa-times-circle"></i> Close Application
+                </button>
+                ` : ''}
+                <button class="btn btn-primary" onclick="editJob(${job.id}); closeJobDetailModal();">
+                    <i class="fas fa-edit"></i> Edit Job
+                </button>
             </div>
         `;
     }
@@ -614,13 +585,28 @@ function closeJobDetailModal() {
     }
 }
 
-async function viewJobApplicants(jobId) {
-    // Navigate to candidates page with job filter
-    if (typeof router !== 'undefined' && router.navigate) {
-        router.navigate(`/hr/candidates?jobId=${jobId}`);
-    } else {
-        window.location.href = `/pages/hr/hr-candidates.html?jobId=${jobId}`;
+async function handleCloseApplication(jobId) {
+    if (!confirm('Are you sure you want to close this application? This means your company no longer needs employees for this position. The job will be marked as CLOSED.')) {
+        return;
     }
+
+    try {
+        await HrAPI.updateJobStatus(jobId, 'CLOSED');
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Application closed successfully', 'success');
+        }
+        closeJobDetailModal();
+        await loadJobs();
+    } catch (error) {
+        console.error('Failed to close application:', error);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to close application.', 'error');
+        }
+    }
+}
+
+async function editJob(jobId) {
+    openJobModal(jobId);
 }
 
 async function handleStatusChange(jobId, status) {
