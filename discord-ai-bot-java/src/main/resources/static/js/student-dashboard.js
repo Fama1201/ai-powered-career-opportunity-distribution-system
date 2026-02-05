@@ -183,28 +183,69 @@ function renderJobMatches(matches) {
         return;
     }
 
+    // Helper function to escape HTML
+    const escapeHtml = (text) => {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
     // Show first 2-3 matches
     const displayMatches = matches.slice(0, 3);
-    grid.innerHTML = displayMatches.map(job => `
-        <div class="job-card" data-job-id="${job.id}">
-            <div class="job-icon purple">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+    grid.innerHTML = displayMatches.map(job => {
+        const matchScore = job.matchScore || job.match_score || 0;
+        const matchScoreColor = matchScore >= 70 ? '#22c55e' : matchScore >= 50 ? '#f59e0b' : '#64748b';
+        
+        return `
+        <div class="job-card dashboard-job-card" data-job-id="${job.id}">
+            <div class="job-card-header-dashboard">
+                <div class="job-icon-dashboard purple">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                ${matchScore > 0 ? `
+                <div class="match-score-badge-dashboard" style="background: ${matchScoreColor}20; color: ${matchScoreColor}; border: 1px solid ${matchScoreColor}40;">
+                    ${matchScore}%
+                </div>
+                ` : ''}
             </div>
-            <div class="job-content">
-                <h3 class="job-title">${job.title || 'N/A'}</h3>
-                <p class="job-company">${job.company || 'N/A'}</p>
-                <p class="job-location">${job.homeOffice || 'N/A'}</p>
+            <div class="job-content-dashboard">
+                <h3 class="job-title-dashboard">${escapeHtml(job.title || 'N/A')}</h3>
+                <p class="job-company-dashboard">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 21V7L13 2L21 7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 9V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 9V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    ${escapeHtml(job.company || 'N/A')}
+                </p>
+                <div class="job-meta-dashboard">
+                    <span class="job-location-dashboard">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        ${escapeHtml(job.homeOffice || job.location || 'Remote')}
+                    </span>
+                    <span class="job-type-dashboard">${escapeHtml(job.jobType || I18n.t('fullTime'))}</span>
+                </div>
             </div>
-            <div class="job-footer">
-                <span class="job-type">${job.jobType || I18n.t('fullTime')}</span>
-                <div class="job-salary">${job.wage || 'N/A'}</div>
-                <button class="job-arrow" data-job-id="${job.id}" aria-label="View job details">></button>
+            <div class="job-footer-dashboard">
+                ${job.wage ? `<div class="job-salary-dashboard">💰 ${escapeHtml(job.wage)}</div>` : ''}
+                <button class="job-arrow-dashboard" data-job-id="${job.id}" aria-label="View job details">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 
     // Re-attach event listeners
     setupJobCards();
