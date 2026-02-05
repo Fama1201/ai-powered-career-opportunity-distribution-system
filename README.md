@@ -1,203 +1,72 @@
-# 🤖 AI-Powered Career Opportunity Distribution System
+Claro Cisco. Aquí tienes el README.md actualizado con los nuevos roles que me pediste.He integrado los cambios de forma profesional en la sección de "Authors", manteniendo el resto de la documentación técnica intacta.Markdown# 🤖 AI-Powered Career Opportunity Distribution System (Jobify CVUT)
 
-**Jobify CVUT** is an intelligent Discord bot that connects students of FIT ČVUT with relevant internship and job opportunities. It uses the EXPERTS.AI platform for opportunity sourcing, OpenAI's GPT for CV analysis and recommendations, and PostgreSQL for persistent profile and opportunity tracking.
+**Jobify CVUT** is a comprehensive ecosystem connecting **FIT ČVUT** students with career opportunities. The system integrates an intelligent **Discord Bot** for real-time interaction and a robust **Web Platform** for in-depth management. 
 
----
-
-## 📌 Features
-
-- 🎯 **Personalized Job Matching** – Based on skills and career interests stored in student profiles.
-- 📄 **CV Upload & Parsing** – Automatically extracts name, email, skills, and positions from uploaded PDF resumes.
-- 🧠 **GPT-Powered Career Advisor** – Analyzes saved opportunities and CVs to suggest improvements or ideal positions.
-- 👤 **Interactive Profile Setup** – Discord-driven onboarding via buttons and dropdowns.
-- 🔄 **Opportunity Synchronization** – Periodic and real-time fetching from the EXPERTS.AI API.
-- 💾 **Persistent Data Layer** – PostgreSQL-backed storage of students and their assigned opportunities.
-- 📝 **Feedback Logging** – Stores GPT-based resume suggestions and ratings using `FeedbackDAO`.
+Powered by **Spring Boot**, **OpenAI (GPT)**, and **PostgreSQL**, it serves two main user groups: **Students** (seeking jobs/internships) and **HR/Recruiters** (posting opportunities).
 
 ---
 
-## 📁 Project Structure
+## 📌 Unified Features
 
-```
-src/
-├── main/
-│   └── java/
-│       └── bot/
-│           ├── BotMain.java               # Entry point
-│           ├── CommandHandler.java        # Handles messages and commands
-│           ├── InteractionHandler.java    # Handles buttons and dropdowns
-│           ├── GPTClient.java             # GPT API handler
-│           ├── api/
-│           │   └── OpportunityClient.java # EXPERTS.AI integration
-│           ├── storage/
-│           │   ├── StudentDAO.java        # DB access for students
-│           │   ├── OpportunityDAO.java    # DB access for opportunities
-│           │   └── FeedbackDAO.java       # Stores GPT feedback and ratings
-│           └── util/
-│               └── PdfUtils.java          # Resume text extraction
+### 🌐 Web Platform (New!)
+- **Student Dashboard:** Visual progress tracking, job application history, and profile completeness stats.
+- **HR Portal:** Companies can post new jobs, manage candidate pipelines, and view analytics.
+- **Smart CV Builder:** Web interface to edit skills, experience, and education details.
+- **Job Matching Engine:** View matched opportunities filtered by the AI algorithm.
+- **Analytics:** Charts and insights on application trends (via `Chart.js`).
 
-```
+### 🤖 Discord Bot
+- **Interactive Onboarding:** Seamless sign-up flow directly within Discord.
+- **Instant Notifications:** Receive alerts for new job matches via DM.
+- **PDF Resume Parsing:** Upload a CV file in Discord, and the system extracts data automatically.
+- **GPT Career Advisor:** Ask questions like *"How can I improve my CV?"* directly in chat.
+
+### 🧠 Core Technology
+- **AI Matching:** Uses EXPERTS.AI data and OpenAI to match profiles with job descriptions.
+- **Persistent Data:** PostgreSQL database shared between the Bot and the Web App.
+- **Feedback Loop:** System learns from user ratings and interactions.
 
 ---
 
-## ⚙️ Installation & Setup
+## 📁 Extended Project Structure
 
-### 1. Requirements
-
-- Java 17+
-- PostgreSQL
-- Discord Bot Token
-- OpenAI API Key (optional)
-
-### 2. Environment Variables
-
-Set the following variables:
-
-```env
-DISCORD_TOKEN=your_discord_bot_token
-OPENAI_API_KEY=your_openai_key
-```
-
-### 3. Database Schema
-
-```sql
-CREATE TABLE student (
-  id SERIAL PRIMARY KEY,
-  name TEXT,
-  email TEXT,
-  skills TEXT,
-  career_interest TEXT,
-  discord_id TEXT UNIQUE,
-  cv_text TEXT
-);
-
-CREATE TABLE opportunities (
-  opportunity_id TEXT,
-  discord_id TEXT,
-  title TEXT,
-  description TEXT,
-  job_type TEXT,
-  application_deadline DATE,
-  url TEXT,
-  wage TEXT,
-  home_office TEXT,
-  benefits TEXT,
-  formal_requirements TEXT,
-  technical_requirements TEXT,
-  contact_person TEXT,
-  company TEXT,
-  PRIMARY KEY (opportunity_id, discord_id)
-);
-
-CREATE TABLE feedback (
-  id SERIAL PRIMARY KEY,
-  feedback_text TEXT,
-  stars INTEGER,
-  discord_id TEXT
-);
-```
-
-### 4. Run the Bot
-
-```bash
-./gradlew run
-# or with plain Java
-java -cp your-jar-name.jar bot.BotMain
-```
-
----
-
-## 🚀 Usage
-
-### Commands
-
-| Command       | Description                              |
-|---------------|------------------------------------------|
-| `!start`      | Begins onboarding with buttons           |
-| `!ask <text>` | Asks GPT for personalized guidance       |
-| `!fetch`      | Manually fetches job matches             |
-| `!status`     | Bot status check                         |
-
-### Interaction Flow
-
-1. User types `!start`
-2. Bot responds in DM with options to:
-   - Upload CV
-   - Create profile manually
-   - Ask GPT questions
-   - Match jobs
-3. User receives GPT-based analysis or matched jobs
-
----
-
-## 💡 Example GPT Prompts
+The project follows a standard Spring Boot Monolith structure (Backend + Static Frontend).
 
 ```text
-!ask Based on my profile and the jobs below, which one should I apply to?
-!ask How can I improve my CV for DevOps positions?
-!ask Which technical skills should I focus on for backend roles?
-```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/jobifycvut/
+│   │       ├── backend/
+│   │       │   ├── controller/      # Web API & Page Controllers (Dashboard, HR, Auth)
+│   │       │   ├── service/         # Business Logic (MatchService, AiService)
+│   │       │   ├── model/           # JPA Entities (Student, Opportunity, HrUser)
+│   │       │   ├── repository/      # Spring Data JPA Repositories
+│   │       │   └── config/          # Security & App Config
+│   │       └── bot/                 # Discord Bot Logic (Listeners, Commands)
+│   │
+│   └── resources/
+│       ├── application.properties   # Main configuration
+│       └── static/                  # Web Frontend
+│           ├── css/                 # Stylesheets
+│           ├── js/                  # JavaScript logic (Charts, API calls)
+│           ├── pages/               # HTML Views
+│           │   ├── student/         # Student Dashboard Views
+│           │   ├── hr/              # HR/Company Views
+│           │   └── auth/            # Login/Register Pages
+│           └── index.html           # Landing Page
+⚙️ Installation & Setup1. RequirementsJava JDK 17+PostgreSQL 14+Discord Bot TokenOpenAI API Key2. Environment ConfigurationConfigure src/main/resources/application.properties or set environment variables:Properties# Database
+DB_URL=jdbc:postgresql://localhost:5432/jobify_db
+DB_USER=postgres
+DB_PASSWORD=your_password
 
----
+# External APIs
+DISCORD_TOKEN=your_discord_bot_token
+OPENAI_API_KEY=sk-proj-...
+3. Database InitializationCreate the database and run the schema script:Bashpsql -U postgres -d jobify_db -f database-schema.sql
+4. Running the ApplicationThe command below starts both the Web Server (Port 8080) and the Discord Bot.Bash# Using Gradle Wrapper
+./gradlew bootRun
 
-## 📌 Roadmap
-
-- 🔔 Notification system for new job opportunities
-- 🌍 Location-based filtering
-- 🗃️ Admin panel for company management
-- 🌐 Multilingual support (EN/CZ)
-
----
-
-## 🙋‍♂️ Support
-
-For help or questions, please contact:
-
-- Email: francisco.molina.antonio@gmail.com
-
-- Email: ErdemYusufEmre@gmail.com
-
-- Email: emreyuce228@gmail.com
-
-- GitLab Issues: [Open a ticket](https://gitlab.fit.cvut.cz/molinfr1/ai-powered-career-opportunity-distribution-system/-/issues)
-
----
-
-## 👨‍💻 Authors and Acknowledgment
-
-This project was developed by a collaborative team of students from FIT ČVUT. Below are the contributors and their specific roles:
-
-- **Francisco Antonio Molina Alava** – 🧠 Team Leader & Main Developer    
-  Led the team, directed the architecture and main code development, improved the database schema, and coordinated the documentation process.
-
-- **Yunus Emre Yuce** – 🗂️ Documentation & Initial Database  
-  Contributed significantly to the documentation and built the first version of the database.
-
-- **Yusuf Emre Erdem** – 💻 Developer & Documentation  
-  Participated in writing documentation, contributed to backend logic, and assisted in development tasks.
-
-- **Emir Orhan** – 🗂️ Documentation & Initial Database  
-  Helped with the documentation and collaborated on the initial database setup and validation.
-
-- **Abdul Rahman Asaad Mourad** – 📄 Documentation & Code Quality  
-  Contributed to the documentation and performed static code analysis to ensure code quality and maintainability.
-
-- **Karim Gamal Aziz Georgy Habib** – 📄 Documentation  
-  Assisted with creating and formatting the official project documentation.
-
-- **Maya Hussein Abdulhalem Elkadi** – 📄 Documentation  
-  Supported the documentation effort across various project components.
-
-We thank all contributors for their collaboration and effort in building this AI-powered opportunity matching system.
-
-
-## 📄 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-## 📊 Project Status
-
-🚧 Actively maintained. New features are being developed regularly.  
-Looking for collaborators and testers!
+# Or using the built JAR
+java -jar build/libs/discord-ai-bot-java-0.0.1-SNAPSHOT.jar
+🚀 Usage Guide🌐 Accessing the Web PortalOnce the application is running, open your browser:Landing Page: http://localhost:8080/Student Login: http://localhost:8080/pages/auth/login.htmlHR Login: http://localhost:8080/pages/auth/hr-signup.htmlTip: You can log in using the same credentials created via the Discord Bot or sign up directly on the web.🤖 Discord CommandsCommandDescription!startBegins the onboarding process (creates profile).!ask <text>Ask GPT for career advice (e.g., "What skills do I lack?").!fetchForce the system to look for new job matches immediately.!statusCheck if the Bot and Backend are online.📌 Roadmap & Future Plans🔔 Real-time Web Sockets: Push notifications on the web dashboard.🌍 Localization: Toggle between English (EN) and Czech (CZ).📱 Mobile Responsiveness: Improved UI for mobile browsers.🔐 OAuth2: Login with Google or GitHub.🙋‍♂️ Support & ContactFor help, bug reports, or feature requests, please contact the development team:Email: francisco.molina.antonio@gmail.comEmail: ErdemYusufEmre@gmail.comEmail: emreyuce228@gmail.comGitLab Issues: Open a ticket👨‍💻 Authors and AcknowledgmentThis project was developed by a collaborative team of students from FIT ČVUT.Francisco Antonio Molina Alava – 🧠 Team Leader & Main DeveloperLed architecture, backend/frontend integration, database design, and CI/CD pipeline.Yunus Emre Yuce – 💻 Main Backend Developer & DatabaseSpearheaded core backend development, designed the initial database schema, and managed project documentation.Yusuf Emre Erdem – 🎨 Main Frontend Developer & Backend LogicLed the frontend architecture and implementation, contributed to backend logic, unit testing, and documentation support.Emir Orhan – 🖥️ Frontend Programmer & ResearchDeveloped frontend components, assisted in data validation, and conducted initial requirements gathering.Abdul Rahman Asaad Mourad – ⚙️ Backend Developer & Quality AssuranceImplemented backend features, performed static code analysis, and ensured code quality.Karim Gamal Aziz Georgy Habib – 📄 DocumentationOfficial project documentation formatting and structuring.Maya Hussein Abdulhalem Elkadi – 📄 DocumentationSupported the documentation effort across various project components.We thank all contributors for their collaboration in building this AI-powered ecosystem.📄 LicenseThis project is licensed under the MIT License. See the LICENSE file for details.
