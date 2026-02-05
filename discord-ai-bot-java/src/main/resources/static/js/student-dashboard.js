@@ -61,6 +61,7 @@ async function loadDashboardData() {
         // Update UI
         updateWelcomeMessage(overview);
         updateStatusCards(stats);
+        updateSavedJobsCount();
         renderJobMatches(jobMatches);
         
     } catch (error) {
@@ -117,12 +118,10 @@ function updateStatusCards(stats) {
         interviewNumber.textContent = stats.interviews || 0;
     }
 
-    // Update detailed Applied card (the large one with "Applied • Interview")
-    // This should show only "Applied" status count, not including Interview or Rejected
-    const detailedApplied = document.querySelector('.status-card.detailed:first-of-type .status-number-large');
-    if (detailedApplied) {
-        // Calculate correct Applied count from applications (async, will update when ready)
-        calculateAppliedCountForDetailedCard();
+    // Update Saved Jobs card
+    const savedJobsCount = document.querySelector('#savedJobsCount');
+    if (savedJobsCount && dashboardData) {
+        savedJobsCount.textContent = dashboardData.savedJobsCount || 0;
     }
 
     // Update Rejected card
@@ -133,24 +132,12 @@ function updateStatusCards(stats) {
 }
 
 /**
- * Calculate and update the detailed Applied card count
- * This ensures only "Applied" status applications are counted (excluding Interview/Rejected)
+ * Update Saved Jobs count from dashboard overview
  */
-async function calculateAppliedCountForDetailedCard() {
-    try {
-        const applications = await StudentAPI.getApplications();
-        // Filter only "Applied" status (case-insensitive, excluding Interview and Rejected)
-        const appliedCount = applications.filter(app => {
-            const status = (app.status || '').toLowerCase();
-            return status.includes('applied') && !status.includes('interview') && !status.includes('reject');
-        }).length;
-        
-        const detailedApplied = document.querySelector('.status-card.detailed:first-of-type .status-number-large');
-        if (detailedApplied) {
-            detailedApplied.textContent = appliedCount;
-        }
-    } catch (error) {
-        console.error('Error calculating applied count for detailed card:', error);
+function updateSavedJobsCount() {
+    const savedJobsCount = document.querySelector('#savedJobsCount');
+    if (savedJobsCount && dashboardData) {
+        savedJobsCount.textContent = dashboardData.savedJobsCount || 0;
     }
 }
 
@@ -260,14 +247,35 @@ function setupStatusCards() {
         card.style.cursor = 'pointer';
         card.addEventListener('click', function() {
             const label = this.querySelector('.status-label, .status-title')?.textContent;
-            if (label) {
+            const isSavedJobsCard = this.classList.contains('saved-jobs-card');
+            
+            if (isSavedJobsCard) {
+                // Navigate to Job Matches page (where saved jobs can be viewed)
+                if (typeof router !== 'undefined' && router.navigate) {
+                    router.navigate('/student/job-matches');
+                } else {
+                    window.location.href = '/pages/student/job-matches.html';
+                }
+            } else if (label) {
                 const status = label.toLowerCase();
                 if (status.includes('applied')) {
-                    router.navigate('/student/applications', { status: 'Applied' });
+                    if (typeof router !== 'undefined' && router.navigate) {
+                        router.navigate('/student/applications', { status: 'Applied' });
+                    } else {
+                        window.location.href = '/pages/student/applications.html?status=Applied';
+                    }
                 } else if (status.includes('interview')) {
-                    router.navigate('/student/applications', { status: 'Interview' });
+                    if (typeof router !== 'undefined' && router.navigate) {
+                        router.navigate('/student/applications', { status: 'Interview' });
+                    } else {
+                        window.location.href = '/pages/student/applications.html?status=Interview';
+                    }
                 } else if (status.includes('rejected')) {
-                    router.navigate('/student/applications', { status: 'Rejected' });
+                    if (typeof router !== 'undefined' && router.navigate) {
+                        router.navigate('/student/applications', { status: 'Rejected' });
+                    } else {
+                        window.location.href = '/pages/student/applications.html?status=Rejected';
+                    }
                 }
             }
         });

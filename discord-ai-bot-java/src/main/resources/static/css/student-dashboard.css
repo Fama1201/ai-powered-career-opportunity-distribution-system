@@ -687,6 +687,19 @@ body.light-theme .theme-icon.moon-icon {
     background: #ef4444;
 }
 
+.status-dot.blue {
+    background: var(--primary-blue);
+}
+
+.saved-jobs-card {
+    border-left: 4px solid var(--primary-blue);
+}
+
+.saved-jobs-card:hover {
+    border-left-color: var(--secondary-purple);
+    transform: translateX(4px);
+}
+
 /* Job Matches Section */
 .job-matches-section {
     margin-bottom: 2.5rem;
@@ -1339,6 +1352,19 @@ body.light-theme .status-card:hover {
     border-color: #cbd5e1;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
+}
+
+body.light-theme .saved-jobs-card {
+    border-left-color: var(--primary-blue);
+}
+
+body.light-theme .saved-jobs-card:hover {
+    border-left-color: var(--secondary-purple);
+    transform: translateX(4px);
+}
+
+body.light-theme .status-dot.blue {
+    background: var(--primary-blue);
 }
 
 /* Light Theme - Dashboard Job Cards */
