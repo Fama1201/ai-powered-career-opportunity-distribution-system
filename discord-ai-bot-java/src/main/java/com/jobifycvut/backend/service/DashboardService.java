@@ -65,7 +65,7 @@ public class DashboardService {
         if (student == null) return List.of();
 
         // Use MatchService for intelligent matching
-        return matchService.findMatches(student, 10);
+        return matchService.findMatches(student, 0);
     }
 
     // 3) NEW JOBS
