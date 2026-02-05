@@ -99,11 +99,17 @@ function updateWelcomeMessage(overview) {
  * Update status cards with real data
  */
 function updateStatusCards(stats) {
-    if (!stats) {
-        // Calculate from applications if stats not available
-        calculateStatsFromApplications();
-        return;
-    }
+    // Always calculate from applications to ensure accuracy
+    // API stats might be incorrect, so we recalculate from the actual applications list
+    // This ensures the count is always correct based on actual application statuses
+    calculateStatsFromApplications();
+}
+
+/**
+ * Update status cards directly with calculated stats (internal use)
+ */
+function updateStatusCardsWithStats(stats) {
+    if (!stats) return;
 
     // Update Applied card
     const appliedNumber = document.querySelector('.status-card:first-child .status-number');
@@ -117,7 +123,7 @@ function updateStatusCards(stats) {
         interviewNumber.textContent = stats.interviews || 0;
     }
 
-    // Update detailed Applied card
+    // Update detailed Applied card (the large one)
     const detailedApplied = document.querySelector('.status-card.detailed:first-of-type .status-number-large');
     if (detailedApplied) {
         detailedApplied.textContent = stats.totalApplied || 0;
@@ -153,7 +159,7 @@ async function calculateStatsFromApplications() {
                 return status.includes('reject');
             }).length
         };
-        updateStatusCards(stats);
+        updateStatusCardsWithStats(stats);
     } catch (error) {
         console.error('Error calculating stats:', error);
     }
