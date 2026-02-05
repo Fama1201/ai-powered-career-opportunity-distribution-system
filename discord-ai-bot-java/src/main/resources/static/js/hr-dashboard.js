@@ -1,64 +1,334 @@
-// HR Dashboard JavaScript
+// hr-dashboard.js
+// HR Dashboard page functionality
 
-document.addEventListener('DOMContentLoaded', function () {
-    initializeDashboard();
-    loadSavedTheme();
-    loadSavedLanguage();
-    loadUserProfile();
+let allJobs = [];
+let allApplications = [];
+let dashboardStats = {
+    totalJobs: 0,
+    newCandidates: 0,
+    totalHires: 0,
+    hiresThisMonth: 0,
+    totalInterviews: 0
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
 });
 
-function initializeDashboard() {
-    setupSidebarNavigation();
-    setupUserProfile();
-    setupThemeToggle();
-    setupLanguageDropdown();
-    setupDashboardsButton();
-    setupJobCards();
-    setupAssistantCard();
-    setupClickOutside();
+async function initDashboard() {
+    loadSavedTheme();
+    loadSavedLanguage();
+    await loadUserProfile();
+    setupEventListeners();
+    await loadDashboardData();
+    updateDashboardDisplay();
 }
 
-// Load user profile information from backend or localStorage
-function loadUserProfile() {
-    // Try to get from localStorage first (from login)
-    const fullName = localStorage.getItem('hrFullName');
-    const email = localStorage.getItem('email');
-    const role = localStorage.getItem('role');
-    
-    // Ensure role is HR for HR dashboard
-    const hrRole = (role === 'HR' || role === 'hr') ? 'HR' : 'HR';
-    
-    console.log('Loading HR profile - fullName:', fullName, 'email:', email, 'role:', role);
-    
-    if (fullName) {
-        updateUserProfileDisplay(fullName, hrRole);
-    } else if (email) {
-        // If fullName not in localStorage, try to get from backend
-        // For now, use email as fallback
-        updateUserProfileDisplay(email, hrRole);
-    } else {
-        // Fallback if nothing is available
-        updateUserProfileDisplay('HR User', hrRole);
+function setupEventListeners() {
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const route = item.getAttribute('data-route');
+            if (route) {
+                navigateTo(route);
+            }
+        });
+    });
+
+    // Profile and Notifications dropdown items
+    document.getElementById('profileItem')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.getAttribute('data-route');
+        if (route) {
+            navigateTo(route);
+        }
+    });
+    document.getElementById('notificationsItem')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.getAttribute('data-route');
+        if (route) {
+            navigateTo(route);
+        }
+    });
+
+    // Logout
+    document.getElementById('logoutItem')?.addEventListener('click', handleLogout);
+
+    // Theme toggle
+    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+
+    // Language dropdown
+    document.getElementById('languageBtn')?.addEventListener('click', toggleLanguageMenu);
+    document.querySelectorAll('.language-option').forEach(btn => {
+        btn.addEventListener('click', (e) => handleLanguageChange(e.currentTarget));
+    });
+
+    // User profile dropdown
+    document.getElementById('userProfileBtn')?.addEventListener('click', toggleUserProfileMenu);
+
+    // See all link
+    document.querySelector('.see-all-link')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.getAttribute('data-route');
+        if (route) {
+            navigateTo(route);
+        }
+    });
+
+    // Assistant buttons
+    document.getElementById('askAssistantBtn')?.addEventListener('click', () => {
+        navigateTo('#/hr/analytics'); // Navigate to Analytics or Career Advisor
+    });
+    document.getElementById('assistantAskBtn')?.addEventListener('click', () => {
+        navigateTo('#/hr/analytics');
+    });
+
+    // Click outside to close dropdowns
+    document.addEventListener('click', (e) => {
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const languageMenu = document.getElementById('languageMenu');
+
+        if (userDropdownMenu && !e.target.closest('.user-profile-dropdown')) {
+            userDropdownMenu.classList.remove('active');
+        }
+        if (languageMenu && !e.target.closest('.language-dropdown')) {
+            languageMenu.classList.remove('active');
+        }
+    });
+}
+
+async function loadDashboardData() {
+    try {
+        // Load all jobs
+        allJobs = await HrAPI.getJobs();
+        allJobs = Array.isArray(allJobs) ? allJobs : [];
+
+        // Load applications for all jobs
+        allApplications = [];
+        for (const job of allJobs) {
+            try {
+                const applications = await HrAPI.getJobApplications(job.id);
+                const appsWithJob = applications.map(app => ({
+                    ...app,
+                    jobId: job.id,
+                    jobTitle: job.title || `Job #${job.id}`
+                }));
+                allApplications.push(...appsWithJob);
+            } catch (error) {
+                console.error(`Failed to load applications for job ${job.id}:`, error);
+                // Continue with other jobs
+            }
+        }
+
+        // Calculate statistics
+        calculateStatistics();
+    } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to load dashboard data.', 'error');
+        }
     }
 }
 
-// Update user profile display in header
+function calculateStatistics() {
+    // Total jobs
+    dashboardStats.totalJobs = allJobs.length;
+
+    // New candidates (APPLIED status)
+    dashboardStats.newCandidates = allApplications.filter(app => {
+        const status = (app.status || '').toUpperCase();
+        return status === 'APPLIED';
+    }).length;
+
+    // Total hires
+    dashboardStats.totalHires = allApplications.filter(app => {
+        const status = (app.status || '').toUpperCase();
+        return status === 'HIRED';
+    }).length;
+
+    // Hires this month
+    const now = new Date();
+    dashboardStats.hiresThisMonth = allApplications.filter(app => {
+        const status = (app.status || '').toUpperCase();
+        if (status !== 'HIRED') return false;
+        if (!app.appliedAt) return false;
+        const hireDate = new Date(app.appliedAt);
+        return hireDate.getMonth() === now.getMonth() && 
+               hireDate.getFullYear() === now.getFullYear();
+    }).length;
+
+    // Total interviews
+    dashboardStats.totalInterviews = allApplications.filter(app => {
+        const status = (app.status || '').toUpperCase();
+        return status === 'INTERVIEW';
+    }).length;
+}
+
+function updateDashboardDisplay() {
+    // Update statistics cards
+    document.getElementById('totalJobOpenings').textContent = dashboardStats.totalJobs;
+    document.getElementById('newCandidates').textContent = dashboardStats.newCandidates;
+    document.getElementById('totalHires').textContent = dashboardStats.totalHires;
+    document.getElementById('hiresThisMonth').textContent = `${dashboardStats.hiresThisMonth} Hired this month`;
+    document.getElementById('totalInterviews').textContent = dashboardStats.totalInterviews;
+
+    // Update recent jobs
+    renderRecentJobs();
+
+    // Update assistant message
+    updateAssistantMessage();
+}
+
+function renderRecentJobs() {
+    const grid = document.getElementById('recentJobsGrid');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+
+    if (!allJobs || allJobs.length === 0) {
+        if (grid) {
+            grid.innerHTML = '';
+        }
+        if (emptyState) {
+            emptyState.style.display = 'block';
+        }
+        return;
+    }
+
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    if (grid) {
+        grid.innerHTML = '';
+    }
+
+    // Sort by ID (most recent first) and take first 2
+    const recentJobs = [...allJobs]
+        .sort((a, b) => (b.id || 0) - (a.id || 0))
+        .slice(0, 2);
+
+    recentJobs.forEach(job => {
+        const card = createJobCard(job);
+        if (grid && card) {
+            grid.appendChild(card);
+        }
+    });
+}
+
+function createJobCard(job) {
+    const card = document.createElement('div');
+    card.className = 'job-card';
+    card.setAttribute('data-job-id', job.id);
+
+    // Get job icon color based on status or random
+    const iconColors = ['purple', 'green', 'blue', 'orange', 'red'];
+    const iconColor = iconColors[job.id % iconColors.length] || 'purple';
+
+    // Format wage
+    const wage = job.wage || job.salary || 'N/A';
+    const wageDisplay = typeof wage === 'number' ? `€ ${wage.toFixed(2)}` : wage;
+
+    // Get job type
+    const jobType = job.type || 'Full-Time';
+
+    card.innerHTML = `
+        <div class="job-icon ${iconColor}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </div>
+        <div class="job-content">
+            <h3 class="job-title">${escapeHtml(job.title || 'Untitled Job')}</h3>
+            <p class="job-company">${escapeHtml(job.company || 'Company')}</p>
+            <p class="job-location">${escapeHtml(job.location || 'Location')}</p>
+        </div>
+        <div class="job-footer">
+            <span class="job-type">${escapeHtml(jobType)}</span>
+            <div class="job-salary">${escapeHtml(wageDisplay)}</div>
+            <button class="job-arrow" data-job-id="${job.id}">></button>
+        </div>
+    `;
+
+    // Add event listeners
+    card.addEventListener('click', () => {
+        navigateTo(`#/hr/job-openings?jobId=${job.id}`);
+    });
+
+    const arrowBtn = card.querySelector('.job-arrow');
+    arrowBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigateTo(`#/hr/job-openings?jobId=${job.id}`);
+    });
+
+    return card;
+}
+
+function updateAssistantMessage() {
+    const messageEl = document.getElementById('assistantMessage');
+    if (!messageEl) return;
+
+    if (dashboardStats.newCandidates > 0) {
+        messageEl.textContent = `Reviewing candidate pools... ${dashboardStats.newCandidates} new candidates found across ${dashboardStats.totalJobs} job postings.`;
+    } else if (dashboardStats.totalJobs > 0) {
+        messageEl.textContent = `You have ${dashboardStats.totalJobs} active job postings. Start receiving applications soon!`;
+    } else {
+        messageEl.textContent = `Welcome! Create your first job posting to start receiving applications.`;
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// User profile functions
+async function loadUserProfile() {
+    const firstName = localStorage.getItem(CONFIG.STORAGE_KEYS.FIRST_NAME);
+    const lastName = localStorage.getItem(CONFIG.STORAGE_KEYS.LAST_NAME);
+    const email = localStorage.getItem(CONFIG.STORAGE_KEYS.USER_EMAIL);
+    const role = localStorage.getItem(CONFIG.STORAGE_KEYS.ROLE) || 'HR';
+
+    let fullName = '';
+    if (firstName && lastName) {
+        fullName = `${firstName} ${lastName}`;
+    } else if (firstName) {
+        fullName = firstName;
+    } else if (email) {
+        fullName = email.split('@')[0];
+    } else {
+        fullName = 'HR Professional';
+    }
+
+    updateUserProfileDisplay(fullName, role);
+}
+
 function updateUserProfileDisplay(fullName, role) {
     const profileNameElement = document.querySelector('.profile-name');
     const profileRoleElement = document.querySelector('.profile-role');
     const profileInitialsElement = document.querySelector('.profile-initials');
-    
+    const welcomeUserNameElement = document.querySelector('.user-name');
+
     if (profileNameElement) {
-        profileNameElement.textContent = fullName || 'HR User';
+        profileNameElement.textContent = fullName;
     }
-    
+
     if (profileRoleElement) {
-        // Always show HR Professional for HR dashboard
-        profileRoleElement.textContent = 'HR Professional';
+        profileRoleElement.textContent = role === 'HR' ? 'HR Professional' : role;
     }
-    
+
     if (profileInitialsElement && fullName) {
-        // Extract initials from full name
         const names = fullName.trim().split(' ');
         let initials = '';
         if (names.length >= 2) {
@@ -68,130 +338,46 @@ function updateUserProfileDisplay(fullName, role) {
         }
         profileInitialsElement.textContent = initials || 'HR';
     }
-    
-    // Update welcome message with user's first name
-    const welcomeUserNameElement = document.querySelector('.user-name');
+
     if (welcomeUserNameElement && fullName) {
-        // Extract first name from full name
         const firstName = fullName.trim().split(' ')[0];
         welcomeUserNameElement.textContent = firstName || 'HR Manager';
     }
 }
 
-// Sidebar Navigation
-function setupSidebarNavigation() {
-    const sidebarItems = document.querySelectorAll('.sidebar-item');
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+    } else {
+        document.body.classList.remove('light-theme');
+    }
+}
 
-    sidebarItems.forEach(item => {
-        item.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            // Get route from data-route attribute or href
-            const route = this.getAttribute('data-route') || this.getAttribute('href');
-            
-            if (route && route.startsWith('#/')) {
-                // Use router if available
-                if (typeof router !== 'undefined' && router.navigate) {
-                    router.navigate(route.substring(1)); // Remove # prefix
-                } else {
-                    // Fallback: use hash navigation
-                    window.location.hash = route;
-                }
-            } else if (route && !route.startsWith('#')) {
-                // Direct href navigation
-                window.location.href = route;
+function loadSavedLanguage() {
+    const savedLang = localStorage.getItem('language') || 'en';
+    if (typeof I18n !== 'undefined' && I18n.setLanguage) {
+        I18n.setLanguage(savedLang);
+    }
+    const langButtons = document.querySelectorAll('.language-option');
+    langButtons.forEach(btn => {
+        const lang = btn.getAttribute('data-lang');
+        const langName = btn.getAttribute('data-lang-name');
+        if (lang === savedLang) {
+            btn.classList.add('active');
+            const currentLangEl = document.getElementById('currentLanguage');
+            if (currentLangEl) {
+                currentLangEl.textContent = langName || 'English';
             }
-            
-            // Remove active class from all items
-            sidebarItems.forEach(i => i.classList.remove('active'));
-            // Add active class to clicked item
-            this.classList.add('active');
-        });
+        } else {
+            btn.classList.remove('active');
+        }
     });
-}
-
-// User Profile Dropdown
-function setupUserProfile() {
-    const userProfileBtn = document.getElementById('userProfileBtn');
-    const userDropdownMenu = document.getElementById('userDropdownMenu');
-
-    if (userProfileBtn && userDropdownMenu) {
-        userProfileBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            userDropdownMenu.classList.toggle('active');
-        });
-    }
-
-    // Profile menu items
-    const profileItem = document.getElementById('profileItem');
-    const notificationsItem = document.getElementById('notificationsItem');
-    const logoutItem = document.getElementById('logoutItem');
-
-    if (profileItem) {
-        profileItem.addEventListener('click', function (e) {
-            e.preventDefault();
-            userDropdownMenu.classList.remove('active');
-            // Navigate to profile page using router
-            if (typeof router !== 'undefined' && router.navigate) {
-                router.navigate('/hr/profile');
-            } else {
-                // Fallback: use hash navigation
-                window.location.hash = '#/hr/profile';
-            }
-        });
-    }
-
-    if (notificationsItem) {
-        notificationsItem.addEventListener('click', function (e) {
-            e.preventDefault();
-            userDropdownMenu.classList.remove('active');
-            // Navigate to notifications page using router
-            if (typeof router !== 'undefined' && router.navigate) {
-                router.navigate('/hr/notifications');
-            } else {
-                // Fallback: use hash navigation
-                window.location.hash = '#/hr/notifications';
-            }
-        });
-    }
-
-    if (logoutItem) {
-        logoutItem.addEventListener('click', function (e) {
-            e.preventDefault();
-            // Clear all authentication data
-            if (typeof clearAuthData === 'function') {
-                clearAuthData();
-            } else {
-                // Fallback: clear all possible auth keys
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('email');
-                localStorage.removeItem('role');
-                localStorage.removeItem('userToken');
-                localStorage.removeItem('userData');
-            }
-            // Redirect to login page (absolute path)
-            window.location.href = '/pages/auth/login.html';
-        });
-    }
-}
-
-// Theme Toggle
-function setupThemeToggle() {
-    const themeToggle = document.getElementById('themeToggle');
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function () {
-            toggleTheme();
-        });
-    }
 }
 
 function toggleTheme() {
     const body = document.body;
     const isLightTheme = body.classList.contains('light-theme');
-
     if (isLightTheme) {
         body.classList.remove('light-theme');
         localStorage.setItem('theme', 'dark');
@@ -201,300 +387,45 @@ function toggleTheme() {
     }
 }
 
-function loadSavedTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-theme');
-    }
+function toggleLanguageMenu() {
+    document.getElementById('languageMenu')?.classList.toggle('active');
 }
 
-// Language Dropdown
-function setupLanguageDropdown() {
-    const languageBtn = document.getElementById('languageBtn');
-    const languageMenu = document.getElementById('languageMenu');
-    const languageOptions = document.querySelectorAll('.language-option');
-
-    if (languageBtn && languageMenu) {
-        languageBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            languageMenu.classList.toggle('active');
-        });
+function handleLanguageChange(button) {
+    const lang = button.getAttribute('data-lang');
+    const langName = button.getAttribute('data-lang-name');
+    document.getElementById('currentLanguage').textContent = langName;
+    document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('active'));
+    button.classList.add('active');
+    localStorage.setItem('language', lang);
+    if (typeof I18n !== 'undefined' && I18n.setLanguage) {
+        I18n.setLanguage(lang);
     }
-
-    // Language options
-    languageOptions.forEach(option => {
-        option.addEventListener('click', function () {
-            const lang = this.getAttribute('data-lang');
-            const langName = this.getAttribute('data-lang-name');
-
-            // Update current language display
-            document.getElementById('currentLanguage').textContent = langName;
-
-            // Remove active class from all options
-            languageOptions.forEach(opt => opt.classList.remove('active'));
-            // Add active class to selected option
-            this.classList.add('active');
-
-            // Save language preference
-            localStorage.setItem('language', lang);
-
-            // Close menu
-            languageMenu.classList.remove('active');
-
-            // Apply language translation
-            applyLanguage(lang);
-        });
-    });
+    document.getElementById('languageMenu')?.classList.remove('active');
 }
 
-function loadSavedLanguage() {
-    const savedLang = localStorage.getItem('language') || 'en';
-    const langOption = document.querySelector(`.language-option[data-lang="${savedLang}"]`);
-
-    if (langOption) {
-        const langName = langOption.getAttribute('data-lang-name');
-        document.getElementById('currentLanguage').textContent = langName;
-        langOption.classList.add('active');
-        applyLanguage(savedLang);
-    }
+function toggleUserProfileMenu() {
+    document.getElementById('userDropdownMenu')?.classList.toggle('active');
 }
 
-// Language translations
-const translations = {
-    en: {
-        profile: 'Profile',
-        notifications: 'Notifications',
-        logout: 'Logout',
-        welcome: 'Welcome HR Manager',
-        dashboard: 'Dashboard',
-        jobMatches: 'Job Openings',
-        myApplications: 'Candidates',
-        cvManagement: 'Hires',
-        careerAdvisor: 'Analytics',
-        applied: 'Job Openings',
-        interview: 'New Candidates',
-        rejected: 'Interviews',
-        newJobMatches: 'Recent Job Postings',
-        seeAll: 'See all',
-        yourCareerAssistant: 'HR Assistant',
-        ask: 'Ask...',
-        fullTime: 'Full-Time'
-    },
-    cs: {
-        profile: 'Profil',
-        notifications: 'Notifikace',
-        logout: 'Odhlásit se',
-        welcome: 'Vítejte v Jobify',
-        dashboard: 'Nástěnka',
-        jobMatches: 'Shody práce',
-        myApplications: 'Moje přihlášky',
-        cvManagement: 'Správa CV',
-        careerAdvisor: 'Kariérní poradce',
-        applied: 'Přihlášeno',
-        interview: 'Pohovor',
-        rejected: 'Odmítnuto',
-        newJobMatches: 'Nové shody práce',
-        seeAll: 'Zobrazit vše',
-        yourCareerAssistant: 'Váš kariérní asistent',
-        ask: 'Zeptat se...',
-        fullTime: 'Plný úvazek'
-    },
-    tr: {
-        profile: 'Profil',
-        notifications: 'Bildirimler',
-        logout: 'Çıkış Yap',
-        welcome: 'Hoş Geldiniz İK Yöneticisi',
-        dashboard: 'Kontrol Paneli',
-        jobMatches: 'Açık Pozisyonlar',
-        myApplications: 'Adaylar',
-        cvManagement: 'İşe Alımlar',
-        careerAdvisor: 'Analizler',
-        applied: 'Açık Pozisyonlar',
-        interview: 'Yeni Adaylar',
-        rejected: 'Mülakatlar',
-        newJobMatches: 'Son İş İlanları',
-        seeAll: 'Tümünü Gör',
-        yourCareerAssistant: 'İK Asistanı',
-        ask: 'Sor...',
-        fullTime: 'Tam Zamanlı'
-    },
-    es: {
-        profile: 'Perfil',
-        notifications: 'Notificaciones',
-        logout: 'Cerrar sesión',
-        welcome: 'Bienvenido a Jobify',
-        dashboard: 'Panel',
-        jobMatches: 'Coincidencias de trabajo',
-        myApplications: 'Mis solicitudes',
-        cvManagement: 'Gestión de CV',
-        careerAdvisor: 'Asesor de carrera',
-        applied: 'Aplicado',
-        interview: 'Entrevista',
-        rejected: 'Rechazado',
-        newJobMatches: 'Nuevas coincidencias',
-        seeAll: 'Ver todo',
-        yourCareerAssistant: 'Tu asistente de carrera',
-        ask: 'Preguntar...',
-        fullTime: 'Tiempo completo'
-    }
-};
-
-function applyLanguage(lang) {
-    const t = translations[lang] || translations.en;
-
-    // Update all elements with data-i18n attribute
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (t[key]) {
-            element.textContent = t[key];
+async function handleLogout(e) {
+    e.preventDefault();
+    if (confirm('Are you sure you want to logout?')) {
+        try {
+            await apiRequest('/auth/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            clearAuthData();
+            window.location.href = '/pages/auth/login.html';
         }
-    });
-
-    // Update sidebar items
-    const sidebarItems = document.querySelectorAll('.sidebar-item span');
-    if (sidebarItems.length >= 5) {
-        sidebarItems[0].textContent = t.dashboard;
-        sidebarItems[1].textContent = t.jobMatches;
-        sidebarItems[2].textContent = t.myApplications;
-        sidebarItems[3].textContent = t.cvManagement;
-        sidebarItems[4].textContent = t.careerAdvisor;
-    }
-
-    // Update section titles
-    const welcomeTitle = document.querySelector('.welcome-title');
-    if (welcomeTitle) {
-        const userName = document.querySelector('.user-name').textContent;
-        welcomeTitle.innerHTML = `${t.welcome} <span class="user-name">${userName}</span>!`;
-    }
-
-    // Update other text elements
-    const seeAllLinks = document.querySelectorAll('.see-all-link');
-    seeAllLinks.forEach(link => {
-        link.textContent = t.seeAll + ' >';
-    });
-
-    const sectionTitles = document.querySelectorAll('.section-title');
-    sectionTitles.forEach((title, index) => {
-        if (index === 0) title.textContent = t.newJobMatches;
-        if (index === 1) title.textContent = t.yourCareerAssistant;
-    });
-
-    const askButtons = document.querySelectorAll('.ask-button, .assistant-ask-btn');
-    askButtons.forEach(btn => {
-        if (btn.classList.contains('ask-button')) {
-            btn.textContent = t.ask;
-        } else {
-            btn.textContent = t.ask + ' >';
-        }
-    });
-}
-
-// Dashboards Button
-function setupDashboardsButton() {
-    const dashboardsBtn = document.getElementById('dashboardsBtn');
-
-    if (dashboardsBtn) {
-        dashboardsBtn.addEventListener('click', function () {
-            // TODO: Open dashboards menu or navigate
-            console.log('Dashboards clicked');
-            // Could open a dropdown menu with different dashboard views
-        });
     }
 }
 
-
-// Job Cards Interaction
-function setupJobCards() {
-    const jobCards = document.querySelectorAll('.job-card');
-
-    jobCards.forEach(card => {
-        card.addEventListener('click', function () {
-            // TODO: Navigate to job details page
-            const jobTitle = this.querySelector('.job-title').textContent;
-            console.log('Job card clicked:', jobTitle);
-            // window.location.href = `job-details.html?id=${jobId}`;
-        });
-
-        // Arrow button click
-        const arrowBtn = card.querySelector('.job-arrow');
-        if (arrowBtn) {
-            arrowBtn.addEventListener('click', function (e) {
-                e.stopPropagation(); // Prevent card click
-                // TODO: Navigate to job details
-                const jobTitle = card.querySelector('.job-title').textContent;
-                console.log('Job arrow clicked:', jobTitle);
-            });
-        }
-    });
-}
-
-// Career Assistant Card
-function setupAssistantCard() {
-    const askButton = document.querySelector('.ask-button');
-    const assistantAskBtn = document.querySelector('.assistant-ask-btn');
-
-    if (askButton) {
-        askButton.addEventListener('click', function () {
-            // TODO: Open AI chat interface
-            console.log('Ask button clicked');
-            openAssistantChat();
-        });
-    }
-
-    if (assistantAskBtn) {
-        assistantAskBtn.addEventListener('click', function () {
-            // TODO: Open AI chat interface
-            console.log('Assistant ask button clicked');
-            openAssistantChat();
-        });
+function navigateTo(route) {
+    if (typeof router !== 'undefined' && router.navigate) {
+        router.navigate(route);
+    } else {
+        window.location.hash = route;
     }
 }
-
-// Open Assistant Chat
-function openAssistantChat() {
-    // TODO: Implement AI chat modal or redirect to chat page
-    alert('AI Career Assistant chat will open here. This feature will be implemented soon!');
-    // You can create a modal or redirect to a chat page
-}
-
-// Click outside to close dropdowns
-function setupClickOutside() {
-    document.addEventListener('click', function (e) {
-        const userDropdown = document.getElementById('userDropdownMenu');
-        const languageMenu = document.getElementById('languageMenu');
-
-        if (userDropdown && !e.target.closest('.user-profile-dropdown')) {
-            userDropdown.classList.remove('active');
-        }
-
-        if (languageMenu && !e.target.closest('.language-dropdown')) {
-            languageMenu.classList.remove('active');
-        }
-    });
-}
-
-// Utility: Get user data from localStorage or API
-function getUserData() {
-    // TODO: Fetch user data from API or localStorage
-    const userData = {
-        name: 'Emre Erdem',
-        email: 'emre@example.com',
-        role: 'Student'
-    };
-
-    return userData;
-}
-
-// Update welcome message with user name
-function updateWelcomeMessage() {
-    const userData = getUserData();
-    const userNameElement = document.querySelector('.user-name');
-
-    if (userNameElement && userData.name) {
-        const firstName = userData.name.split(' ')[0];
-        userNameElement.textContent = firstName;
-    }
-}
-
-// Initialize welcome message
-updateWelcomeMessage();

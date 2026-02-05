@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hires - Jobify CVUT</title>
+    <title>Post New Job - Jobify CVUT</title>
 
     <!-- Styles -->
     <link rel="stylesheet" href="../../css/style.css">
@@ -158,7 +158,7 @@
                     </svg>
                     <span>Candidates</span>
                 </a>
-                <a href="#/hr/hires" class="sidebar-item active" data-route="#/hr/hires">
+                <a href="#/hr/hires" class="sidebar-item" data-route="#/hr/hires">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
@@ -215,110 +215,130 @@
             <div class="dashboard-content">
                 <!-- Page Header -->
                 <div class="welcome-section">
-                    <h1 class="welcome-title">Hires</h1>
-                    <p class="welcome-subtitle">View and manage your successful hires</p>
+                    <h1 class="welcome-title">Post New Job</h1>
+                    <p class="welcome-subtitle">Create a new job posting to attract talented candidates</p>
                 </div>
 
-                <!-- Statistics Cards -->
-                <section class="hires-stats">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon hired">
-                                <i class="fas fa-user-check"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-value" id="totalHires">0</h3>
-                                <p class="stat-label">Total Hires</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon job">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-value" id="totalJobs">0</h3>
-                                <p class="stat-label">Jobs with Hires</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon month">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-value" id="thisMonthHires">0</h3>
-                                <p class="stat-label">This Month</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Filters Section -->
-                <section class="hires-filters">
-                    <div class="filters-card">
-                        <div class="filter-group">
-                            <label for="jobFilter" class="filter-label">Filter by Job</label>
-                            <div class="custom-select-wrapper">
-                                <button type="button" class="custom-select-btn" id="jobFilterBtn">
-                                    <span class="custom-select-text" id="jobFilterText">All Jobs</span>
-                                    <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                                <div class="custom-select-dropdown" id="jobFilterDropdown">
-                                    <button type="button" class="custom-select-option" data-value="">All Jobs</button>
-                                    <!-- Job options will be loaded dynamically -->
+                <!-- Job Post Form -->
+                <section class="post-job-section">
+                    <div class="post-job-card">
+                        <form id="postJobForm" class="post-job-form">
+                            <!-- Basic Information -->
+                            <div class="form-section">
+                                <h2 class="form-section-title">Basic Information</h2>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="jobTitle" class="form-label">Job Title *</label>
+                                        <input type="text" id="jobTitle" name="title" class="form-input" required
+                                            placeholder="e.g., Frontend Developer">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jobCompany" class="form-label">Company *</label>
+                                        <input type="text" id="jobCompany" name="company" class="form-input" required
+                                            placeholder="e.g., Tech Corp">
+                                    </div>
                                 </div>
-                                <input type="hidden" id="jobFilter" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="jobType" class="form-label">Job Type *</label>
+                                        <select id="jobType" name="jobType" class="form-input" required>
+                                            <option value="">Select job type</option>
+                                            <option value="Full-Time">Full-Time</option>
+                                            <option value="Part-Time">Part-Time</option>
+                                            <option value="Contract">Contract</option>
+                                            <option value="Internship">Internship</option>
+                                            <option value="Freelance">Freelance</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jobWage" class="form-label">Wage/Salary</label>
+                                        <input type="text" id="jobWage" name="wage" class="form-input"
+                                            placeholder="e.g., €50,000 - €70,000">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="jobHomeOffice" class="form-label">Work Location</label>
+                                        <select id="jobHomeOffice" name="homeOffice" class="form-input">
+                                            <option value="">Select location</option>
+                                            <option value="Remote">Remote</option>
+                                            <option value="On-site">On-site</option>
+                                            <option value="Hybrid">Hybrid</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jobDeadline" class="form-label">Application Deadline</label>
+                                        <input type="datetime-local" id="jobDeadline" name="applicationDeadline" class="form-input">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="filter-group">
-                            <label for="searchInput" class="filter-label">Search</label>
-                            <div class="search-box">
-                                <input type="text" id="searchInput" class="search-input" placeholder="Search by name or email...">
-                                <button class="search-btn" id="searchBtn">
-                                    <i class="fas fa-search"></i>
+
+                            <!-- Job Description -->
+                            <div class="form-section">
+                                <h2 class="form-section-title">Job Description</h2>
+                                <div class="form-group">
+                                    <label for="jobDescription" class="form-label">Description *</label>
+                                    <textarea id="jobDescription" name="description" class="form-textarea" rows="6" required
+                                        placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Requirements -->
+                            <div class="form-section">
+                                <h2 class="form-section-title">Requirements</h2>
+                                <div class="form-group">
+                                    <label for="jobTechnicalRequirements" class="form-label">Technical Requirements</label>
+                                    <textarea id="jobTechnicalRequirements" name="technicalRequirements" class="form-textarea" rows="4"
+                                        placeholder="e.g., JavaScript, React, Node.js, etc."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="jobFormalRequirements" class="form-label">Formal Requirements</label>
+                                    <textarea id="jobFormalRequirements" name="formalRequirements" class="form-textarea" rows="4"
+                                        placeholder="e.g., Bachelor's degree, 3+ years experience, etc."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Benefits & Contact -->
+                            <div class="form-section">
+                                <h2 class="form-section-title">Benefits & Contact Information</h2>
+                                <div class="form-group">
+                                    <label for="jobBenefits" class="form-label">Benefits</label>
+                                    <textarea id="jobBenefits" name="benefits" class="form-textarea" rows="4"
+                                        placeholder="e.g., Health insurance, flexible hours, etc."></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="jobContactPerson" class="form-label">Contact Person</label>
+                                        <input type="text" id="jobContactPerson" name="contactPerson" class="form-input"
+                                            placeholder="e.g., John Doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jobUrl" class="form-label">Application URL</label>
+                                        <input type="url" id="jobUrl" name="url" class="form-input"
+                                            placeholder="https://example.com/apply">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelBtn">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <span id="submitBtnText">
+                                        <i class="fas fa-paper-plane"></i> Post Job
+                                    </span>
+                                    <span id="submitBtnLoading" style="display: none;">
+                                        <i class="fas fa-spinner fa-spin"></i> Posting...
+                                    </span>
                                 </button>
                             </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Hires List -->
-                <section class="hires-section">
-                    <div class="hires-grid" id="hiresGrid">
-                        <!-- Loading State -->
-                        <div class="loading-state" id="loadingState">
-                            <div class="loading-spinner"></div>
-                            <p>Loading hires...</p>
-                        </div>
-                    </div>
-                    <!-- Empty State -->
-                    <div class="empty-state" id="emptyState" style="display: none;">
-                        <svg width="128" height="128" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <h3>No Hires Found</h3>
-                        <p id="emptyStateMessage">You haven't hired any candidates yet. Hired candidates will appear here.</p>
+                        </form>
                     </div>
                 </section>
             </div>
         </main>
-    </div>
-
-    <!-- Hire Detail Modal -->
-    <div class="modal-overlay" id="hireDetailModalOverlay" style="display: none;">
-        <div class="modal-content hire-detail-modal">
-            <div class="modal-header">
-                <h2 class="modal-title" id="hireDetailTitle">Hire Details</h2>
-                <button class="modal-close" id="hireDetailCloseBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="hire-detail-content" id="hireDetailContent">
-                <!-- Hire details will be loaded here -->
-            </div>
-        </div>
     </div>
 
     <script src="../../js/config.js"></script>
@@ -327,7 +347,8 @@
     <script src="../../js/api.js"></script>
     <script src="../../js/ui.js"></script>
     <script src="../../js/i18n.js"></script>
-    <script src="../../js/hr-hires.js"></script>
+    <script src="../../js/hr-post-job.js"></script>
 </body>
 
 </html>
+

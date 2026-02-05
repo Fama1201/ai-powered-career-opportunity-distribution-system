@@ -3225,3 +3225,866 @@ body.light-theme .detail-value {
 body.light-theme .job-detail-actions {
     border-top-color: #e2e8f0;
 }
+
+/* ========== HR Post Job Page Styles ========== */
+
+.post-job-section {
+    margin-top: 2rem;
+}
+
+.post-job-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-job-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-section {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section-title {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.form-input,
+.form-textarea {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    outline: none;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-color-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* Light Theme - Post Job Page */
+body.light-theme .post-job-card {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .form-section {
+    border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .form-section-title {
+    color: #0f172a;
+    border-bottom-color: var(--primary-color);
+}
+
+body.light-theme .form-label {
+    color: #0f172a;
+}
+
+body.light-theme .form-input,
+body.light-theme .form-textarea {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+body.light-theme .form-input:focus,
+body.light-theme .form-textarea:focus {
+    background: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+body.light-theme .form-input::placeholder,
+body.light-theme .form-textarea::placeholder {
+    color: #94a3b8;
+}
+
+body.light-theme .form-actions {
+    border-top-color: #e2e8f0;
+}
+
+body.light-theme .btn-secondary {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-theme .btn-secondary:hover {
+    background: #ffffff;
+    border-color: var(--primary-color);
+}
+
+/* ========== HR Candidates Page Styles ========== */
+
+.candidates-filters {
+    margin-bottom: 2rem;
+}
+
+.candidates-section {
+    margin-top: 2rem;
+}
+
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.candidate-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.candidate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
+}
+
+.candidate-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.candidate-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.candidate-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.candidate-name {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.candidate-email {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.candidate-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.info-row i {
+    color: var(--text-secondary);
+    width: 16px;
+}
+
+.candidate-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.applied {
+    background: rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+}
+
+.status-badge.shortlisted {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-badge.interview {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status-badge.rejected {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.status-badge.hired {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.status-badge.withdrawn {
+    background: rgba(100, 116, 139, 0.2);
+    color: #64748b;
+}
+
+/* Candidate Detail Modal */
+.candidate-detail-modal {
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.candidate-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.candidate-detail-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.candidate-detail-info h3 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.candidate-detail-email {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.candidate-detail-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.candidate-detail-section:last-child {
+    border-bottom: none;
+}
+
+.candidate-detail-section h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+}
+
+.candidate-skills,
+.candidate-career-interest {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.cv-preview {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.cv-text {
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+}
+
+.notes-preview {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notes-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+}
+
+.candidate-detail-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+}
+
+/* Status Update Modal */
+.status-update-modal {
+    max-width: 500px;
+}
+
+.status-update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Add Note Modal */
+.add-note-modal {
+    max-width: 600px;
+}
+
+.add-note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Light Theme - Candidates */
+body.light-theme .candidate-card {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .candidate-card:hover {
+    background: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+body.light-theme .candidate-name {
+    color: #0f172a;
+}
+
+body.light-theme .candidate-email,
+body.light-theme .info-row {
+    color: #64748b;
+}
+
+body.light-theme .candidate-footer {
+    border-top-color: #e2e8f0;
+}
+
+body.light-theme .candidate-detail-header {
+    border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .candidate-detail-info h3 {
+    color: #0f172a;
+}
+
+body.light-theme .candidate-detail-email {
+    color: #64748b;
+}
+
+body.light-theme .candidate-detail-section {
+    border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .candidate-detail-section h4 {
+    color: #0f172a;
+}
+
+body.light-theme .candidate-skills,
+body.light-theme .candidate-career-interest {
+    color: #475569;
+}
+
+body.light-theme .cv-preview,
+body.light-theme .notes-preview {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+body.light-theme .cv-text {
+    color: #0f172a;
+}
+
+body.light-theme .notes-text {
+    color: #475569;
+}
+
+body.light-theme .candidate-detail-actions {
+    border-top-color: #e2e8f0;
+}
+
+/* ========== HR Hires Page Styles ========== */
+
+.hires-stats {
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-icon.hired {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.stat-icon.job {
+    background: rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+}
+
+.stat-icon.month {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    color: var(--text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.hires-filters {
+    margin-bottom: 2rem;
+}
+
+.hires-section {
+    margin-top: 2rem;
+}
+
+.hire-card {
+    border-left: 4px solid #22c55e;
+}
+
+.hired-avatar {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* Light Theme - Hires */
+body.light-theme .stat-card {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .stat-card:hover {
+    background: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+body.light-theme .stat-value {
+    color: #0f172a;
+}
+
+body.light-theme .stat-label {
+    color: #64748b;
+}
+
+body.light-theme .hire-card {
+    border-left-color: #22c55e;
+}
+
+/* ========== HR Analytics Page Styles ========== */
+
+.analytics-stats {
+    margin-bottom: 2rem;
+}
+
+.analytics-charts {
+    margin-bottom: 2rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.analytics-table-section {
+    margin-top: 2rem;
+}
+
+.table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+    margin-bottom: 1.5rem;
+}
+
+.table-title {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.analytics-table thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.analytics-table th {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.analytics-table td {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.analytics-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.analytics-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.stat-icon.application {
+    background: rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+}
+
+.stat-icon.conversion {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+/* Light Theme - Analytics */
+body.light-theme .chart-card,
+body.light-theme .table-card {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .chart-title,
+body.light-theme .table-title {
+    color: #0f172a;
+}
+
+body.light-theme .analytics-table thead {
+    background: #f8fafc;
+}
+
+body.light-theme .analytics-table th {
+    color: #0f172a;
+    border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .analytics-table td {
+    color: #475569;
+    border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .analytics-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ========== HR Dashboard Status Cards ========== */
+
+.status-icon.red {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.status-icon.yellow {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status-icon.green {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-icon.blue {
+    background: rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+}
+
+.status-icon.purple {
+    background: rgba(139, 92, 246, 0.2);
+    color: #8b5cf6;
+}
+
+.status-icon.orange {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316;
+}
+
+/* Light Theme - Status Icons */
+body.light-theme .status-icon.red {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+body.light-theme .status-icon.yellow {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+body.light-theme .status-icon.green {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+body.light-theme .status-icon.blue {
+    background: rgba(37, 99, 235, 0.15);
+}
+
+body.light-theme .status-icon.purple {
+    background: rgba(139, 92, 246, 0.15);
+}
+
+body.light-theme .status-icon.orange {
+    background: rgba(249, 115, 22, 0.15);
+}

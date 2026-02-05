@@ -259,16 +259,50 @@ router.register('/hr/job-openings', () => {
     }
 });
 
+router.register('/hr/post-job', () => {
+    window.location.href = '/pages/hr/hr-post-job.html';
+});
+
 router.register('/hr/candidates', () => {
-    window.location.href = '/pages/hr/hr-candidates.html';
+    // If we're already on hr-candidates.html, just update active state
+    if (window.location.pathname.includes('hr-candidates.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('candidates') || item.getAttribute('data-route')?.includes('candidates') || item.textContent.includes('Candidates')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        window.location.href = '/pages/hr/hr-candidates.html';
+    }
 });
 
 router.register('/hr/hires', () => {
-    window.location.href = '/pages/hr/hr-hires.html';
+    // If we're already on hr-hires.html, just update active state
+    if (window.location.pathname.includes('hr-hires.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('hires') || item.getAttribute('data-route')?.includes('hires') || item.textContent.includes('Hires')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        window.location.href = '/pages/hr/hr-hires.html';
+    }
 });
 
 router.register('/hr/analytics', () => {
-    window.location.href = '/pages/hr/hr-analytics.html';
+    // If we're already on hr-analytics.html, just update active state
+    if (window.location.pathname.includes('hr-analytics.html')) {
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href')?.includes('analytics') || item.getAttribute('data-route')?.includes('analytics') || item.textContent.includes('Analytics')) {
+                item.classList.add('active');
+            }
+        });
+    } else {
+        window.location.href = '/pages/hr/hr-analytics.html';
+    }
 });
 
 router.register('/hr/profile', () => {

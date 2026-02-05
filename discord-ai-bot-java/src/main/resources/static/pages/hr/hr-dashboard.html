@@ -221,7 +221,7 @@
                 <!-- Application Status Section -->
                 <section class="status-section">
                     <div class="status-grid">
-                        <!-- Applied Card -->
+                        <!-- Job Openings Card -->
                         <div class="status-card">
                             <div class="status-icon yellow">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -235,14 +235,14 @@
                                 </svg>
                             </div>
                             <div class="status-content">
-                                <div class="status-number">25</div>
+                                <div class="status-number" id="totalJobOpenings">0</div>
                                 <div class="status-label">Job Openings</div>
                             </div>
                         </div>
 
-                        <!-- Interview Card -->
+                        <!-- New Candidates Card -->
                         <div class="status-card">
-                            <div class="status-icon green">
+                            <div class="status-icon red">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -254,104 +254,72 @@
                                 </svg>
                             </div>
                             <div class="status-content">
-                                <div class="status-number">134</div>
+                                <div class="status-number" id="newCandidates">0</div>
                                 <div class="status-label">New Candidates</div>
                             </div>
                         </div>
 
-                        <!-- Applied with Details Card -->
+                        <!-- Hires Card -->
                         <div class="status-card detailed">
                             <div class="status-header">
                                 <div class="status-title">Hires</div>
-                                <div class="status-number-large">57</div>
+                                <div class="status-number-large" id="totalHires">0</div>
                             </div>
                             <div class="status-details">
                                 <div class="status-detail-item">
                                     <span class="status-dot green"></span>
-                                    <span>Hired this month</span>
+                                    <span id="hiresThisMonth">Hired this month</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Rejected Card -->
-                        <div class="status-header">
-                            <div class="status-title">Interviews</div>
-                            <div class="status-number-large">12</div>
-                        </div>
-                        <div class="status-details">
-                            <div class="status-detail-item">
-                                <span class="status-dot orange"></span>
-                                <span>Scheduled</span>
+                        <!-- Interviews Card -->
+                        <div class="status-card detailed">
+                            <div class="status-header">
+                                <div class="status-title">Interviews</div>
+                                <div class="status-number-large" id="totalInterviews">0</div>
+                            </div>
+                            <div class="status-details">
+                                <div class="status-detail-item">
+                                    <span class="status-dot orange"></span>
+                                    <span>Scheduled</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-            </div>
-            </section>
+                </section>
 
-            <!-- New Job Matches Section -->
+            <!-- Recent Job Postings Section -->
             <section class="job-matches-section">
                 <div class="section-header">
                     <h2 class="section-title">Recent Job Postings</h2>
-                    <a href="#" class="see-all-link">See all ></a>
+                    <a href="#/hr/job-openings" class="see-all-link" data-route="#/hr/job-openings">See all ></a>
                 </div>
-                <div class="job-cards-grid">
-                    <!-- Frontend Developer Job -->
-                    <div class="job-card">
-                        <div class="job-icon purple">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                        <div class="job-content">
-                            <h3 class="job-title">Frontend Developer</h3>
-                            <p class="job-company">Tech-Solutions</p>
-                            <p class="job-location">Prague</p>
-                        </div>
-                        <div class="job-footer">
-                            <span class="job-type">Full-Time</span>
-                            <div class="job-salary">€ 4.50 €</div>
-                            <button class="job-arrow">></button>
-                        </div>
+                <div class="job-cards-grid" id="recentJobsGrid">
+                    <!-- Loading State -->
+                    <div class="loading-state" id="loadingState" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Loading jobs...</p>
                     </div>
-
-                    <!-- Data Analyst Job -->
-                    <div class="job-card">
-                        <div class="job-icon green">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                        <div class="job-content">
-                            <h3 class="job-title">Data Analyst</h3>
-                            <p class="job-company">InnoBeta</p>
-                            <p class="job-location">Prague</p>
-                        </div>
-                        <div class="job-footer">
-                            <span class="job-type">Full-Time</span>
-                            <div class="job-salary">€ 5.50 €</div>
-                            <button class="job-arrow">></button>
-                        </div>
-                    </div>
+                    <!-- Jobs will be loaded dynamically -->
+                </div>
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <svg width="128" height="128" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <h3>No Job Postings</h3>
+                    <p>You haven't posted any jobs yet. Create your first job posting!</p>
                 </div>
             </section>
 
-            <!-- Career Assistant Section -->
+            <!-- HR Assistant Section -->
             <section class="career-assistant-section">
                 <div class="section-header">
                     <h2 class="section-title">HR Assistant</h2>
-                    <button class="ask-button">Ask...</button>
+                    <button class="ask-button" id="askAssistantBtn">Ask...</button>
                 </div>
                 <div class="assistant-card">
                     <div class="assistant-avatar">
@@ -367,10 +335,9 @@
                         <div class="ai-badge">AI</div>
                     </div>
                     <div class="assistant-content">
-                        <p class="assistant-message">Reviewing candidate pools... 3 new strong matches found for
-                            Frontend Developer.</p>
+                        <p class="assistant-message" id="assistantMessage">Reviewing candidate pools and job postings...</p>
                     </div>
-                    <button class="assistant-ask-btn">Ask ></button>
+                    <button class="assistant-ask-btn" id="assistantAskBtn">Ask ></button>
                 </div>
             </section>
     </div>

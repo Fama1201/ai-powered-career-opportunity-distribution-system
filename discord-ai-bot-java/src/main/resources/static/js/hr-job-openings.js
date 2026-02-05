@@ -19,9 +19,9 @@ async function initJobOpenings() {
 }
 
 function setupEventListeners() {
-    // Post new job button
+    // Post new job button - navigate to post job page
     document.getElementById('postNewJobBtn')?.addEventListener('click', () => {
-        openJobModal();
+        navigateTo('#/hr/post-job');
     });
 
     // Status filter (custom dropdown)

@@ -32,6 +32,9 @@ function setupEventListeners() {
     document.getElementById('jobTypeFilter')?.addEventListener('change', handleFilter);
     document.getElementById('locationFilter')?.addEventListener('change', handleFilter);
 
+    // Refresh matches button
+    document.getElementById('refreshMatchesBtn')?.addEventListener('click', handleRefreshMatches);
+
     // Theme toggle
     document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
@@ -77,12 +80,19 @@ async function loadJobMatches() {
     const loadingState = document.getElementById('loadingState');
     const emptyState = document.getElementById('emptyState');
 
-    showLoading(grid);
-    loadingState.style.display = 'block';
-    emptyState.style.display = 'none';
+    if (grid) {
+        showLoading(grid);
+    }
+    if (loadingState) {
+        loadingState.style.display = 'block';
+    }
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
 
     try {
-        const matches = await apiRequest(CONFIG.ENDPOINTS.DASHBOARD_MATCHES);
+        // Use StudentAPI to get job matches from backend
+        const matches = await StudentAPI.getJobMatches();
         allJobMatches = Array.isArray(matches) ? matches : [];
         filteredMatches = [...allJobMatches];
         
@@ -90,11 +100,21 @@ async function loadJobMatches() {
         renderJobMatches(filteredMatches);
     } catch (error) {
         console.error('Failed to load job matches:', error);
-        showToast(error.message || 'Failed to load job matches. Please try again.', 'error');
-        emptyState.style.display = 'block';
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to load job matches. Please try again.', 'error');
+        } else {
+            alert(error.message || 'Failed to load job matches. Please try again.');
+        }
+        if (emptyState) {
+            emptyState.style.display = 'block';
+        }
     } finally {
-        hideLoading(grid);
-        loadingState.style.display = 'none';
+        if (grid) {
+            hideLoading(grid);
+        }
+        if (loadingState) {
+            loadingState.style.display = 'none';
+        }
     }
 }
 
@@ -125,8 +145,19 @@ function createJobCard(job) {
     card.className = 'job-card';
     card.setAttribute('data-job-id', job.id);
 
+    // Get match score from backend response (matchScore field)
     const matchScore = job.matchScore || job.match_score || 0;
-    const matchScoreColor = matchScore >= 70 ? 'var(--success-green)' : matchScore >= 50 ? 'var(--warning-yellow)' : 'var(--text-secondary)';
+    const matchScoreColor = matchScore >= 70 ? '#22c55e' : matchScore >= 50 ? '#f59e0b' : '#64748b';
+
+    // Format wage - could be string or number
+    let wageDisplay = '';
+    if (job.wage) {
+        if (typeof job.wage === 'number') {
+            wageDisplay = `€ ${job.wage.toFixed(2)}`;
+        } else {
+            wageDisplay = job.wage;
+        }
+    }
 
     card.innerHTML = `
         <div class="job-card-header">
@@ -136,9 +167,11 @@ function createJobCard(job) {
                     <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <div class="match-score-badge" style="background: ${matchScoreColor}20; color: ${matchScoreColor};">
+            ${matchScore > 0 ? `
+            <div class="match-score-badge" style="background: ${matchScoreColor}20; color: ${matchScoreColor}; border: 1px solid ${matchScoreColor};">
                 ${matchScore}% Match
             </div>
+            ` : ''}
         </div>
         <div class="job-content">
             <h3 class="job-title">${escapeHtml(job.title || 'N/A')}</h3>
@@ -153,7 +186,7 @@ function createJobCard(job) {
                 </span>
                 <span class="job-type">${escapeHtml(job.jobType || 'N/A')}</span>
             </div>
-            ${job.wage ? `<p class="job-salary">💰 ${escapeHtml(job.wage)}</p>` : ''}
+            ${wageDisplay ? `<p class="job-salary">💰 ${escapeHtml(wageDisplay)}</p>` : ''}
             ${job.applicationDeadline ? `<p class="job-deadline">📅 Deadline: ${formatDate(job.applicationDeadline)}</p>` : ''}
         </div>
         <div class="job-card-footer">
@@ -185,10 +218,12 @@ function createJobCard(job) {
     return card;
 }
 
+let currentModal = null;
+
 async function viewJobDetail(jobId) {
-    showLoading(document.body);
     try {
-        const job = await apiRequest(`${CONFIG.ENDPOINTS.GET_JOB}/${jobId}`);
+        // Use StudentAPI to get job details from backend
+        const job = await StudentAPI.getJobById(jobId);
         
         const modalContent = `
             <div class="job-detail-content">
@@ -221,10 +256,10 @@ async function viewJobDetail(jobId) {
                     <h4>Description</h4>
                     <p>${escapeHtml(job.description)}</p>
                 </div>` : ''}
-                ${job.requirements ? `
+                ${job.formalRequirements ? `
                 <div class="job-detail-section">
-                    <h4>Requirements</h4>
-                    <p>${escapeHtml(job.requirements)}</p>
+                    <h4>Formal Requirements</h4>
+                    <p>${escapeHtml(job.formalRequirements)}</p>
                 </div>` : ''}
                 ${job.technicalRequirements ? `
                 <div class="job-detail-section">
@@ -235,6 +270,16 @@ async function viewJobDetail(jobId) {
                 <div class="job-detail-section">
                     <h4>Benefits</h4>
                     <p>${escapeHtml(job.benefits)}</p>
+                </div>` : ''}
+                ${job.contactPerson ? `
+                <div class="job-detail-section">
+                    <h4>Contact Person</h4>
+                    <p>${escapeHtml(job.contactPerson)}</p>
+                </div>` : ''}
+                ${job.url ? `
+                <div class="job-detail-section">
+                    <h4>Application URL</h4>
+                    <p><a href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(job.url)}</a></p>
                 </div>` : ''}
             </div>
         `;
@@ -248,25 +293,44 @@ async function viewJobDetail(jobId) {
             </button>
         `;
 
-        showModal(modalContent, 'Job Details', modalFooter);
+        if (typeof UI !== 'undefined' && UI.modal) {
+            currentModal = UI.modal({
+                title: 'Job Details',
+                content: modalContent,
+                footer: modalFooter,
+                size: 'large',
+                onClose: () => {
+                    currentModal = null;
+                }
+            });
 
-        // Add event listeners to modal buttons
-        document.querySelector('[data-action="save-job"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            handleSaveJob(jobId);
-        });
+            // Add event listeners to modal buttons after modal is created
+            setTimeout(() => {
+                document.querySelector('[data-action="save-job"]')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleSaveJob(jobId);
+                });
 
-        document.querySelector('[data-action="apply-job-modal"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            handleApplyJob(jobId);
-            hideModal();
-        });
+                document.querySelector('[data-action="apply-job-modal"]')?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await handleApplyJob(jobId);
+                    if (currentModal && currentModal.close) {
+                        currentModal.close();
+                    }
+                });
+            }, 100);
+        } else {
+            // Fallback: use alert
+            alert(`Job: ${job.title}\nCompany: ${job.company}\nLocation: ${job.homeOffice || job.location || 'Remote'}`);
+        }
 
     } catch (error) {
         console.error('Failed to load job details:', error);
-        showToast(error.message || 'Failed to load job details. Please try again.', 'error');
-    } finally {
-        hideLoading(document.body);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to load job details. Please try again.', 'error');
+        } else {
+            alert(error.message || 'Failed to load job details. Please try again.');
+        }
     }
 }
 
@@ -278,18 +342,27 @@ async function handleApplyJob(jobId, cardElement = null) {
     if (!button || button.disabled) return;
 
     const originalText = button.innerHTML;
-    showLoading(button);
     button.disabled = true;
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
 
     try {
-        await apiRequest(`${CONFIG.ENDPOINTS.APPLY_JOB}/${jobId}/apply`, { method: 'POST' });
-        showToast('Application submitted successfully!', 'success');
+        // Use StudentAPI to apply for job
+        await StudentAPI.applyToJob(jobId);
+        
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Application submitted successfully!', 'success');
+        } else {
+            alert('Application submitted successfully!');
+        }
         
         // Update button state
         button.textContent = 'Applied';
         button.disabled = true;
         button.classList.remove('btn-primary');
         button.classList.add('btn-secondary');
+        button.style.opacity = '1';
 
         // Update job in arrays
         const jobIndex = allJobMatches.findIndex(j => j.id === jobId);
@@ -303,11 +376,15 @@ async function handleApplyJob(jobId, cardElement = null) {
 
     } catch (error) {
         console.error('Failed to apply for job:', error);
-        showToast(error.message || 'Failed to apply for job. Please try again.', 'error');
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to apply for job. Please try again.', 'error');
+        } else {
+            alert(error.message || 'Failed to apply for job. Please try again.');
+        }
         button.disabled = false;
         button.innerHTML = originalText;
-    } finally {
-        hideLoading(button);
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
     }
 }
 
@@ -316,21 +393,34 @@ async function handleSaveJob(jobId) {
     if (!button || button.disabled) return;
 
     const originalText = button.innerHTML;
-    showLoading(button);
     button.disabled = true;
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
-        await apiRequest(`${CONFIG.ENDPOINTS.SAVE_JOB}/${jobId}/save`, { method: 'POST' });
-        showToast('Job saved successfully!', 'success');
+        // Use StudentAPI to save job
+        await StudentAPI.saveJob(jobId);
+        
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Job saved successfully!', 'success');
+        } else {
+            alert('Job saved successfully!');
+        }
         button.textContent = 'Saved';
         button.disabled = true;
+        button.style.opacity = '1';
     } catch (error) {
         console.error('Failed to save job:', error);
-        showToast(error.message || 'Failed to save job. Please try again.', 'error');
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to save job. Please try again.', 'error');
+        } else {
+            alert(error.message || 'Failed to save job. Please try again.');
+        }
         button.disabled = false;
         button.innerHTML = originalText;
-    } finally {
-        hideLoading(button);
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
     }
 }
 
@@ -388,6 +478,41 @@ function updateMatchesCount() {
     if (countElement) {
         const count = filteredMatches.length;
         countElement.textContent = `${count} ${count === 1 ? 'match' : 'matches'} found`;
+    }
+}
+
+async function handleRefreshMatches() {
+    const refreshBtn = document.getElementById('refreshMatchesBtn');
+    if (!refreshBtn) return;
+
+    // Disable button and show loading state
+    refreshBtn.disabled = true;
+    const originalHTML = refreshBtn.innerHTML;
+    refreshBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinning">
+            <path d="M1 4V10H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Refreshing...</span>
+    `;
+
+    try {
+        // Reload matches from backend
+        await loadJobMatches();
+        
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Matches refreshed successfully!', 'success');
+        }
+    } catch (error) {
+        console.error('Failed to refresh matches:', error);
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast(error.message || 'Failed to refresh matches. Please try again.', 'error');
+        }
+    } finally {
+        // Re-enable button
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = originalHTML;
     }
 }
 
@@ -521,11 +646,18 @@ async function handleLogout(e) {
     e.preventDefault();
     if (confirm('Are you sure you want to logout?')) {
         try {
-            await apiRequest('/auth/logout', { method: 'POST' });
+            // Use StudentAPI or direct API call
+            if (typeof StudentAPI !== 'undefined' && StudentAPI.request) {
+                await StudentAPI.request('/auth/logout', { method: 'POST' });
+            } else if (typeof apiRequest !== 'undefined') {
+                await apiRequest('/auth/logout', { method: 'POST' });
+            }
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            clearAuthData();
+            if (typeof clearAuthData === 'function') {
+                clearAuthData();
+            }
             window.location.href = '/pages/auth/login.html';
         }
     }

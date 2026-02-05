@@ -474,6 +474,71 @@ const HrAPI = {
      */
     async getJobApplications(jobId) {
         return this.request(`/hr/jobs/${jobId}/applications`);
+    },
+
+    // ========== HR CANDIDATES ==========
+
+    /**
+     * GET /api/hr/applications/{applicationId}
+     * Returns: HrApplicationDetailResponse
+     */
+    async getApplicationDetail(applicationId) {
+        return this.request(`/hr/applications/${applicationId}`);
+    },
+
+    /**
+     * PATCH /api/hr/applications/{applicationId}/status
+     * Body: { status: "APPLIED"|"SHORTLISTED"|"INTERVIEW"|"REJECTED"|"HIRED"|"WITHDRAWN" }
+     * Returns: 204 No Content
+     */
+    async updateApplicationStatus(applicationId, status) {
+        return this.request(`/hr/applications/${applicationId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+    },
+
+    /**
+     * POST /api/hr/applications/{applicationId}/notes
+     * Body: { note: "..." }
+     * Returns: 204 No Content
+     */
+    async addApplicationNote(applicationId, note) {
+        return this.request(`/hr/applications/${applicationId}/notes`, {
+            method: 'POST',
+            body: JSON.stringify({ note })
+        });
+    },
+
+    // ========== HR STUDENTS ==========
+
+    /**
+     * GET /api/hr/students/{studentId}/profile
+     * Returns: StudentProfileResponse
+     */
+    async getStudentProfile(studentId) {
+        return this.request(`/hr/students/${studentId}/profile`);
+    },
+
+    /**
+     * GET /api/hr/students/{studentId}/cv
+     * Returns: CvResponse
+     */
+    async getStudentCv(studentId) {
+        return this.request(`/hr/students/${studentId}/cv`);
+    },
+
+    /**
+     * GET /api/hr/students/search?skills=&major=&keywords=
+     * Returns: StudentProfileResponse[]
+     */
+    async searchStudents(skills = null, major = null, keywords = null) {
+        const params = new URLSearchParams();
+        if (skills) params.append('skills', skills);
+        if (major) params.append('major', major);
+        if (keywords) params.append('keywords', keywords);
+        const query = params.toString();
+        return this.request(`/hr/students/search${query ? '?' + query : ''}`);
     }
 };
 
